@@ -1,0 +1,128 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Information System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f8;
+    }
+    header {
+      background: #1e5fc7;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      background: #144a9e;
+      padding: 10px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 12px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover { text-decoration: underline; }.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+input, button, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background: #1e5fc7;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover { background: #144a9e; }
+
+footer {
+  background: #1e5fc7;
+  color: white;
+  text-align: center;
+  padding: 15px;
+}
+
+.hidden { display: none; }
+
+  </style>
+</head>
+<body><header>
+  <h1>College Management System</h1>
+  <p>Students • Staff • Materials • Results</p>
+</header><nav>
+  <a href="#login">Login</a>
+  <a href="#students">Students</a>
+  <a href="#staff">Staff</a>
+  <a href="#materials">Materials</a>
+  <a href="#assignments">Assignments</a>
+  <a href="#results">Results</a>
+  <a href="#history">History</a>
+  <a href="#logout">Logout</a>
+</nav><div class="container"><!-- LOGIN --><section id="login" class="card">
+  <h2>Login</h2>
+  <input type="text" placeholder="Username">
+  <input type="password" placeholder="Password">
+  <button>Login</button>
+</section><!-- STUDENT INFO --><section id="students" class="card">
+  <h2>Student Information System</h2>
+  <input type="text" placeholder="Full Name">
+  <input type="text" placeholder="Registration Number">
+  <input type="text" placeholder="Course">
+  <input type="text" placeholder="Year">
+  <button>Save Student</button>
+</section><!-- STAFF INFO --><section id="staff" class="card">
+  <h2>Staff Information</h2>
+  <input type="text" placeholder="Staff Name">
+  <input type="text" placeholder="Position">
+  <input type="text" placeholder="Department">
+  <button>Save Staff</button>
+</section><!-- MATERIALS --><section id="materials" class="card">
+  <h2>Study Materials Room</h2>
+  <input type="text" placeholder="Material Title">
+  <textarea placeholder="Material Description"></textarea>
+  <input type="file">
+  <button>Upload Material</button>
+</section><!-- ASSIGNMENTS --><section id="assignments" class="card">
+  <h2>Assignment Submission Room</h2>
+  <input type="text" placeholder="Subject">
+  <textarea placeholder="Assignment Details"></textarea>
+  <input type="file">
+  <button>Submit Assignment</button>
+</section><!-- RESULTS --><section id="results" class="card">
+  <h2>Results Report Room</h2>
+  <input type="text" placeholder="Registration Number">
+  <button>View Results</button>
+  <p>Results will appear here...</p>
+</section><!-- HISTORY --><section id="history" class="card">
+  <h2>College History</h2>
+  <p>This college was established to provide quality education and professional training.</p>
+  <p>We aim to empower students with skills and knowledge.</p>
+</section><!-- LOGOUT --><section id="logout" class="card">
+  <h2>Logout</h2>
+  <button>Logout</button>
+</section></div><footer>
+  <p>&copy; 2026 College System | Developed by Carina</p>
+</footer></body>
+</html>
