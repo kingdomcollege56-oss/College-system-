@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+</head>
+
+<body>
+
+<h2>📢 Post Announcement</h2>
+
+<input id="title" placeholder="Title"><br><br>
+
+<textarea id="content" placeholder="Message"></textarea><br><br>
+
+<button onclick="post()">Post</button>
+<button onclick="logout()">Logout</button>
+
+<hr>
+
+<h3>Posted News</h3>
+<div id="list"></div>
+
+<script>
+
+// Check login
+if(localStorage.getItem("adminLogin")!="yes"){
+window.location="admin.html";
+}
+
+let news=JSON.parse(localStorage.getItem("collegeNews"))||[];
+
+function post(){
+
+let t=document.getElementById("title").value;
+let c=document.getElementById("content").value;
+
+if(t==""||c=="") return alert("Fill all fields");
+
+let n={
+title:t,
+content:c,
+date:new Date().toLocaleDateString()
+};
+
+news.unshift(n);
+
+localStorage.setItem("collegeNews",JSON.stringify(news));
+
+show();
+
+alert("Posted!");
+}
+
+function show(){
+
+let html="";
+
+news.forEach(n=>{
+html+=`
+<div style="border:1px solid #ccc;padding:10px;margin:10px;">
+<b>${n.title}</b><br>
+<small>${n.date}</small>
+<p>${n.content}</p>
+</div>
+`;
+});
+
+document.getElementById("list").innerHTML=html;
+}
+
+function logout(){
+localStorage.removeItem("adminLogin");
+window.location="admin.html";
+}
+
+show();
+
+</script>
+
+</body>
+</html>
