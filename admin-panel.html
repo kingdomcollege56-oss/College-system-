@@ -1,81 +1,262 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Admin Panel</title>
+<meta charset="UTF-8">
+<title>Kingdom College | Admin Panel</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  margin:0;
+  background:#f2f2f2;
+}
+
+/* Header */
+header{
+  background:#0b3c5d;
+  color:white;
+  padding:20px;
+  text-align:center;
+}
+
+/* Layout */
+.container{
+  display:flex;
+  min-height:100vh;
+}
+
+/* Sidebar */
+.sidebar{
+  width:230px;
+  background:#1c4e80;
+  color:white;
+  padding-top:20px;
+}
+
+.sidebar a{
+  display:block;
+  padding:12px;
+  color:white;
+  text-decoration:none;
+  border-bottom:1px solid #2e6fa3;
+}
+
+.sidebar a:hover{
+  background:#0b3c5d;
+}
+
+/* Main */
+.main{
+  flex:1;
+  padding:20px;
+}
+
+/* Sections */
+.section{
+  display:none;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+.section h2{
+  color:#0b3c5d;
+}
+
+/* Forms */
+input,textarea,select,button{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:5px;
+  border:1px solid #ccc;
+}
+
+button{
+  background:#1c4e80;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#0b3c5d;
+}
+
+/* Footer */
+footer{
+  text-align:center;
+  padding:15px;
+  background:#0b3c5d;
+  color:white;
+}
+</style>
 </head>
 
 <body>
 
-<h2>📢 Post Announcement</h2>
+<header>
+<h1>Kingdom College Admin System</h1>
+<p>Administrator Dashboard</p>
+</header>
 
-<input id="title" placeholder="Title"><br><br>
+<div class="container">
 
-<textarea id="content" placeholder="Message"></textarea><br><br>
+<!-- SIDEBAR -->
+<div class="sidebar">
 
-<button onclick="post()">Post</button>
-<button onclick="logout()">Logout</button>
+<a href="#" onclick="openTab('dashboard')">🏠 Dashboard</a>
+<a href="#" onclick="openTab('students')">👨‍🎓 Students</a>
+<a href="#" onclick="openTab('teachers')">👩‍🏫 Teachers</a>
+<a href="#" onclick="openTab('news')">📢 News</a>
+<a href="#" onclick="openTab('results')">📊 Results</a>
+<a href="#" onclick="openTab('assignments')">📚 Assignments</a>
+<a href="#" onclick="openTab('ethics')">🔐 Ethics Reports</a>
+<a href="#" onclick="openTab('transfer')">🔄 Transfers</a>
+<a href="#" onclick="openTab('sports')">⚽ Sports</a>
+<a href="#" onclick="openTab('messages')">💬 Messages</a>
+<a href="index.html">🚪 Logout</a>
 
-<hr>
+</div>
 
-<h3>Posted News</h3>
-<div id="list"></div>
+<!-- MAIN -->
+<div class="main">
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section">
+<h2>Dashboard</h2>
+<p>Welcome Admin 👋</p>
+<ul>
+<li>Total Students</li>
+<li>Total Teachers</li>
+<li>Pending Transfers</li>
+<li>New Messages</li>
+</ul>
+</div>
+
+<!-- STUDENTS -->
+<div id="students" class="section">
+<h2>Manage Students</h2>
+
+<input placeholder="Full Name">
+<input placeholder="Registration No">
+<input placeholder="Course">
+<input placeholder="Year">
+
+<button>Save Student</button>
+</div>
+
+<!-- TEACHERS -->
+<div id="teachers" class="section">
+<h2>Manage Teachers</h2>
+
+<input placeholder="Teacher Name">
+<input placeholder="Subject">
+<input placeholder="Phone">
+<input placeholder="Email">
+
+<button>Save Teacher</button>
+</div>
+
+<!-- NEWS -->
+<div id="news" class="section">
+<h2>News & Announcements</h2>
+
+<textarea placeholder="Write Announcement"></textarea>
+
+<button>Post News</button>
+
+<div id="newsList">
+<p>No news yet</p>
+</div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="section">
+<h2>Upload Results</h2>
+
+<input placeholder="Student Reg No">
+<input placeholder="Subject">
+<input placeholder="Marks">
+
+<button>Upload Result</button>
+</div>
+
+<!-- ASSIGNMENTS -->
+<div id="assignments" class="section">
+<h2>Assignments</h2>
+
+<input placeholder="Subject">
+<textarea placeholder="Assignment Details"></textarea>
+<input type="file">
+
+<button>Upload Assignment</button>
+</div>
+
+<!-- ETHICS -->
+<div id="ethics" class="section">
+<h2>Ethics / Private Reports</h2>
+
+<textarea placeholder="Student Complaints / Reports"></textarea>
+
+<button>Submit</button>
+</div>
+
+<!-- TRANSFER -->
+<div id="transfer" class="section">
+<h2>Transfer Requests</h2>
+
+<input placeholder="Student Reg No">
+<input placeholder="Current College">
+<input placeholder="New College">
+
+<button>Approve Transfer</button>
+</div>
+
+<!-- SPORTS -->
+<div id="sports" class="section">
+<h2>Sports & Games</h2>
+
+<textarea placeholder="Match Schedule / Events"></textarea>
+
+<button>Save</button>
+</div>
+
+<!-- MESSAGES -->
+<div id="messages" class="section">
+<h2>Messages</h2>
+
+<textarea placeholder="Write message to users"></textarea>
+
+<button>Send</button>
+</div>
+
+</div>
+</div>
+
+<footer>
+© 2026 Kingdom College | By Carina 💙
+</footer>
 
 <script>
 
-// Check login
-if(localStorage.getItem("adminLogin")!="yes"){
-window.location="admin.html";
+function openTab(tab){
+
+let sections = document.getElementsByClassName("section");
+
+for(let i=0;i<sections.length;i++){
+  sections[i].style.display="none";
 }
 
-let news=JSON.parse(localStorage.getItem("collegeNews"))||[];
+document.getElementById(tab).style.display="block";
 
-function post(){
-
-let t=document.getElementById("title").value;
-let c=document.getElementById("content").value;
-
-if(t==""||c=="") return alert("Fill all fields");
-
-let n={
-title:t,
-content:c,
-date:new Date().toLocaleDateString()
-};
-
-news.unshift(n);
-
-localStorage.setItem("collegeNews",JSON.stringify(news));
-
-show();
-
-alert("Posted!");
 }
 
-function show(){
-
-let html="";
-
-news.forEach(n=>{
-html+=`
-<div style="border:1px solid #ccc;padding:10px;margin:10px;">
-<b>${n.title}</b><br>
-<small>${n.date}</small>
-<p>${n.content}</p>
-</div>
-`;
-});
-
-document.getElementById("list").innerHTML=html;
-}
-
-function logout(){
-localStorage.removeItem("adminLogin");
-window.location="admin.html";
-}
-
-show();
+// Open dashboard first
+openTab("dashboard");
 
 </script>
 
 </body>
-</html>
+  </html>
