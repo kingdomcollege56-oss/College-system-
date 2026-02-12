@@ -1,192 +1,442 @@
-ko<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="sw">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>College Information System</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f4f6f8;
-    }
-    header {
-      background: #1e5fc7;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    nav {
-      background: #144a9e;
-      padding: 10px;
-      text-align: center;
-    }
-    nav a {
-      color: white;
-      margin: 0 12px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    nav a:hover { text-decoration: underline; }.container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 20px;
+<meta charset="UTF-8">
+<title>Kingdom College Management System</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f2f2f2;
 }
 
-.card {
-  background: white;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+header{
+background:#0a3d62;
+color:white;
+padding:20px;
+text-align:center;
 }
 
-input, button, textarea {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+.container{
+max-width:1000px;
+margin:auto;
+padding:20px;
 }
 
-button {
-  background: #1e5fc7;
-  color: white;
-  border: none;
-  cursor: pointer;
+#loginBox{
+background:white;
+padding:25px;
+max-width:400px;
+margin:40px auto;
+border-radius:10px;
+box-shadow:0 0 10px gray;
 }
 
-button:hover { background: #144a9e; }
-
-footer {
-  background: #1e5fc7;
-  color: white;
-  text-align: center;
-  padding: 15px;
+input,textarea,select,button{
+width:100%;
+padding:10px;
+margin:8px 0;
 }
 
-.hidden { display: none; }
+button{
+background:#1e3799;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
 
-  </style>
+button:hover{
+background:#4a69bd;
+}
+
+#dashboard{
+display:none;
+}
+
+.menu button{
+margin:4px 0;
+}
+
+.section{
+display:none;
+background:white;
+padding:20px;
+margin-top:15px;
+border-radius:10px;
+}
+
+footer{
+background:#0a3d62;
+color:white;
+padding:15px;
+text-align:center;
+margin-top:40px;
+}
+
+.card{
+border:1px solid #ccc;
+padding:10px;
+margin:10px 0;
+border-radius:6px;
+}
+
+</style>
 </head>
-<body><header>
-  <h1>College Management System</h1>
-  <p>Students • Staff • Materials • Results</p>
-</header><nav>
-  <a href="#login">Login</a>
-  <a href="admin.html">Admin</a>
-  <a href="#students">Students</a>
-  <a href="#staff">Staff</a>
-  <a href="#materials">Materials</a>
-  <a href="#assignments">Assignments</a>
-  <a href="#results">Results</a>
-  <a href="#history">History</a>
-  <a href="#logout">Logout</a>
-</nav><div class="container"><!-- LOGIN --><section id="login" class="card">
-  <h2>Login</h2>
-  <input type="text" placeholder="Username">
-  <input type="password" placeholder="Password">
-  <button>Login</button>
-</section><!-- STUDENT INFO --><section id="students" class="card">
-  <h2>Student Information System</h2>
-  <input type="text" placeholder="Full Name">
-  <input type="text" placeholder="Registration Number">
-  <input type="text" placeholder="Course">
-  <input type="text" placeholder="Year">
-  <button>Save Student</button>
-</section><!-- STAFF INFO --><section id="staff" class="card">
-  <h2>Staff Information</h2>
-  <input type="text" placeholder="Staff Name">
-  <input type="text" placeholder="Position">
-  <input type="text" placeholder="Department">
-  <button>Save Staff</button>
-</section><!-- MATERIALS --><section id="materials" class="card">
-  <h2>Study Materials Room</h2>
-  <input type="text" placeholder="Material Title">
-  <textarea placeholder="Material Description"></textarea>
-  <input type="file">
-  <button>Upload Material</button>
-</section><!-- ASSIGNMENTS --><section id="assignments" class="card">
-  <h2>Assignment Submission Room</h2>
-  <input type="text" placeholder="Subject">
-  <textarea placeholder="Assignment Details"></textarea>
-  <input type="file">
-  <button>Submit Assignment</button>
-</section><!-- RESULTS --><section id="results" class="card">
-  <h2>Results Report Room</h2>
-  <input type="text" placeholder="Registration Number">
-  <button>View Results</button>
-  <p>Results will appear here...</p>
-</section><!-- HISTORY --><section id="history" class="card">
-  <h2>College History</h2>
-  <p>This college was established to provide quality education and professional training.</p>
-  <p>We aim to empower students with skills and knowledge.</p>
-</section><!-- LOGOUT --><section id="logout" class="card">
-  <h2>Logout</h2>
-  <button>Logout</button>
-</section></div><footer>
-  <p>&copy; 2026 College System | Developed by Carina</p>
-</footer> 
-  <!-- ANNOUNCEMENTS -->
-<h2>📢 Latest Announcements</h2>
-<div id="publicNews"></div>
 
-<script>
-function loadPublicNews(){
+<body>
 
-  let news = JSON.parse(localStorage.getItem("collegeNews")) || [];
+<header>
+<h2>Kingdom College Management System</h2>
+<p>Admin Panel</p>
+</header>
 
-  let html="";
+<div class="container">
 
-  if(news.length==0){
-    html="No announcements yet";
-  }else{
-    news.slice(0,5).forEach(n=>{
-      html+=`
-      <div style="border:1px solid #ccc;padding:10px;margin:10px 0;">
-        <h4>${n.title}</h4>
-        <small>${n.date}</small>
-        <p>${n.content}</p>
-      </div>
-      `;
-    });
-  }
+<!-- LOGIN -->
+<div id="loginBox">
 
-  document.getElementById("publicNews").innerHTML=html;
-}
+<h3>Admin Login</h3>
 
-loadPublicNews();
-  </script>
-</body>
+<input id="user" placeholder="Username">
+<input id="pass" type="password" placeholder="Password">
 
-</html>
-<section style="background:#f5f5f5; padding:25px; margin-top:40px; border-radius:10px;">
-  
-  <h2>📍 Mawasiliano ya Chuo</h2>
+<button onclick="login()">Login</button>
 
-  <p><strong>Jina:</strong><br>
-  Kingdom College of Health and Allied Sciences</p>
+<p id="msg" style="color:red;"></p>
 
-  <p><strong>Mahali:</strong><br>
-  Mbeya - Kyela, Njia Panda Ipinda, Nyuma ya Lake Oil</p>
+</div>
 
-  <p><strong>Simu:</strong><br>
-  📞 +255 785 705 151<br>
-  📞 +255 735 705 151</p>
+<!-- DASHBOARD -->
+<div id="dashboard">
 
-  <p><strong>Email:</strong><br>
-  info@kingdomcollege.ac.tz</p>
+<h3>Dashboard</h3>
 
-  <h3>📌 Ramani ya Eneo</h3>
+<div class="menu">
 
-  <iframe 
-    src="https://www.google.com/maps?q=Kyela+Ipinda+Lake+Oil+Mbeya+Tanzania&output=embed"
-    width="100%" 
-    height="300" 
-    style="border:0; border-radius:10px;"
-    allowfullscreen=""
-    loading="lazy">
-  </iframe>
+<button onclick="show('news')">📢 News</button>
+<button onclick="show('students')">🎓 Students</button>
+<button onclick="show('materials')">📚 Materials</button>
+<button onclick="show('results')">📄 Results</button>
+<button onclick="show('transfer')">📤 Transfer</button>
+<button onclick="show('ethics')">🔒 Ethics Room</button>
+<button onclick="show('sports')">⚽ Sports</button>
+<button onclick="logout()">🚪 Logout</button>
+
+</div>
+
+<!-- NEWS -->
+<div id="news" class="section">
+
+<h3>Post Announcement</h3>
+
+<input id="newsTitle" placeholder="Title">
+
+<textarea id="newsText" placeholder="Write here..."></textarea>
+
+<button onclick="postNews()">Post</button>
+
+<div id="newsList"></div>
+
+</div>
+
+<!-- STUDENTS -->
+<div id="students" class="section">
+
+<h3>Student Info</h3>
+
+<input placeholder="Full Name">
+<input placeholder="Reg Number">
+<input placeholder="Course">
+
+<button>Save</button>
+
+</div>
+
+<!-- MATERIALS -->
+<div id="materials" class="section">
+
+<h3>Study Materials</h3>
+
+<input placeholder="Title">
+
+<textarea placeholder="Description"></textarea>
+
+<input type="file">
+
+<button>Upload</button>
+
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="section">
+
+<h3>Results</h3>
+
+<input placeholder="Reg Number">
+
+<button>Check</button>
+
+</div>
+
+<!-- TRANSFER -->
+<div id="transfer" class="section">
+
+<h3>College Transfer</h3>
+
+<input placeholder="Full Name">
+<input placeholder="Registration Number">
+<input placeholder="Current College">
+<input placeholder="New College">
+
+<textarea placeholder="Reason for Transfer"></textarea>
+
+<button onclick="submitTransfer()">Submit</button>
+
+<p id="transferMsg"></p>
+
+<a href="https://www.nactvet.go.tz" target="_blank">
+<button style="background:green;">Open NACTVET</button>
+</a>
+
+</div>
+
+<!-- ETHICS ROOM -->
+<div id="ethics" class="section">
+
+<h3>Private Ethics Room (Anonymous)</h3>
+
+<textarea id="ethicsMsg" placeholder="Write confidential message..."></textarea>
+
+<button onclick="sendEthics()">Send</button>
+
+<div id="ethicsList"></div>
+
+</div>
+
+<!-- SPORTS -->
+<div id="sports" class="section">
+
+<h3>Sports & Games</h3>
+
+<input id="sportTitle" placeholder="Event Title">
+
+<input type="date" id="sportDate">
+
+<textarea id="sportDesc" placeholder="Description"></textarea>
+
+<button onclick="addSport()">Add</button>
+
+<div id="sportList"></div>
+
+</div>
+
+</div>
+</div>
+
+<!-- CONTACT -->
+<section style="background:white;padding:20px;">
+
+<h3>📍 Mawasiliano</h3>
+
+<p>Kingdom College of Health and Allied Sciences</p>
+<p>Mbeya - Kyela, Ipinda nyuma ya Lake Oil</p>
+<p>📞 +255785705151 / +255735705151</p>
+
+<iframe
+src="https://www.google.com/maps?q=Kyela+Ipinda+Lake+Oil+Mbeya+Tanzania&output=embed"
+width="100%" height="300">
+</iframe>
 
 </section>
 
+<footer>
+<p>© 2026 Kingdom College | Developed by Carina</p>
+</footer>
 
+<script>
+
+/* LOGIN */
+function login(){
+
+let u=user.value;
+let p=pass.value;
+
+if(u=="admin" && p=="1234"){
+
+loginBox.style.display="none";
+dashboard.style.display="block";
+
+}else{
+msg.innerHTML="Wrong Login";
+}
+
+}
+
+/* LOGOUT */
+function logout(){
+location.reload();
+}
+
+/* SHOW */
+function show(id){
+
+document.querySelectorAll(".section")
+.forEach(s=>s.style.display="none");
+
+document.getElementById(id).style.display="block";
+
+}
+
+/* NEWS */
+function postNews(){
+
+let t=newsTitle.value;
+let c=newsText.value;
+
+let data=JSON.parse(localStorage.news||"[]");
+
+data.unshift({
+title:t,
+text:c,
+date:new Date().toLocaleString()
+});
+
+localStorage.news=JSON.stringify(data);
+
+newsTitle.value="";
+newsText.value="";
+
+loadNews();
+
+}
+
+function loadNews(){
+
+let data=JSON.parse(localStorage.news||"[]");
+
+let html="";
+
+data.forEach(n=>{
+
+html+=`
+<div class="card">
+<h4>${n.title}</h4>
+<small>${n.date}</small>
+<p>${n.text}</p>
+</div>`;
+
+});
+
+newsList.innerHTML=html;
+
+}
+
+loadNews();
+
+/* TRANSFER */
+function submitTransfer(){
+
+transferMsg.innerHTML=
+"Request submitted. Contact NACTVET for approval.";
+
+}
+
+/* ETHICS */
+function sendEthics(){
+
+let m=ethicsMsg.value;
+
+let data=JSON.parse(localStorage.ethics||"[]");
+
+data.unshift({
+msg:m,
+date:new Date().toLocaleString()
+});
+
+localStorage.ethics=JSON.stringify(data);
+
+ethicsMsg.value="";
+
+loadEthics();
+
+}
+
+function loadEthics(){
+
+let data=JSON.parse(localStorage.ethics||"[]");
+
+let html="";
+
+data.forEach(e=>{
+
+html+=`
+<div class="card">
+<small>${e.date}</small>
+<p>${e.msg}</p>
+</div>`;
+
+});
+
+ethicsList.innerHTML=html;
+
+}
+
+loadEthics();
+
+/* SPORTS */
+function addSport(){
+
+let t=sportTitle.value;
+let d=sportDate.value;
+let c=sportDesc.value;
+
+let data=JSON.parse(localStorage.sports||"[]");
+
+data.unshift({
+title:t,
+date:d,
+desc:c
+});
+
+localStorage.sports=JSON.stringify(data);
+
+sportTitle.value="";
+sportDate.value="";
+sportDesc.value="";
+
+loadSports();
+
+}
+
+function loadSports(){
+
+let data=JSON.parse(localStorage.sports||"[]");
+
+let html="";
+
+data.forEach(s=>{
+
+html+=`
+<div class="card">
+<h4>${s.title}</h4>
+<small>${s.date}</small>
+<p>${s.desc}</p>
+</div>`;
+
+});
+
+sportList.innerHTML=html;
+
+}
+
+loadSports();
+
+</script>
+
+</body>
+  </html>
