@@ -84,14 +84,12 @@ border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
 
 <button onclick="studentRegister()">Register</button>
 
-<p id="smsg"></p>
-
 </div>
 
 <!-- TEACHER -->
 <div id="teacherBox" class="box" style="display:none;">
 
-<h3>Teacher Login</h3>
+<h3>Teacher</h3>
 
 <input id="tr" placeholder="Username">
 <input id="tp" type="password" placeholder="Password">
@@ -112,7 +110,7 @@ border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
 <!-- ADMIN -->
 <div id="adminBox" class="box" style="display:none;">
 
-<h3>Admin Login</h3>
+<h3>Admin</h3>
 
 <input id="au" placeholder="Username">
 <input id="ap" type="password">
@@ -121,91 +119,11 @@ border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
 
 </div>
 
-<!-- STUDENT DASH -->
-<div id="studentDash">
+<!-- DASHBOARDS -->
 
-<h3>Student: <span id="sname"></span></h3>
-
-<div class="menu">
-
-<button onclick="show('sassign')">📄 Assignments</button>
-<button onclick="show('ssubmit')">📤 Submit</button>
-<button onclick="show('smarks')">📊 Results</button>
-<button onclick="logout()">🚪 Logout</button>
-
-</div>
-
-<div id="sassign" class="section"></div>
-
-<div id="ssubmit" class="section">
-
-<h4>Submit Assignment</h4>
-
-<select id="aslist"></select>
-
-<textarea id="sanswer" placeholder="Your Answer"></textarea>
-
-<button onclick="submitAssign()">Send</button>
-
-</div>
-
-<div id="smarks" class="section"></div>
-
-</div>
-
-<!-- TEACHER DASH -->
-<div id="teacherDash">
-
-<h3>Teacher: <span id="tname"></span></h3>
-
-<div class="menu">
-
-<button onclick="show('tassign')">📝 Create Assignment</button>
-<button onclick="show('tsub')">📥 Submissions</button>
-<button onclick="show('tmark')">📊 Mark</button>
-<button onclick="logout()">🚪 Logout</button>
-
-</div>
-
-<div id="tassign" class="section">
-
-<input id="atitle" placeholder="Title">
-<textarea id="adesc" placeholder="Description"></textarea>
-
-<button onclick="createAssign()">Post</button>
-
-</div>
-
-<div id="tsub" class="section"></div>
-
-<div id="tmark" class="section">
-
-<select id="marklist"></select>
-<input id="mark" placeholder="Marks">
-
-<button onclick="saveMark()">Save</button>
-
-</div>
-
-</div>
-
-<!-- ADMIN DASH -->
-<div id="adminDash">
-
-<h3>Admin Panel</h3>
-
-<div class="menu">
-
-<button onclick="show('ausers')">👥 Users</button>
-<button onclick="show('aresults')">📊 All Results</button>
-<button onclick="logout()">🚪 Logout</button>
-
-</div>
-
-<div id="ausers" class="section"></div>
-<div id="aresults" class="section"></div>
-
-</div>
+<div id="studentDash"></div>
+<div id="teacherDash"></div>
+<div id="adminDash"></div>
 
 </div>
 
@@ -213,12 +131,31 @@ border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
 <p>© 2026 Kingdom College | By Carina</p>
 </footer>
 
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <script>
+
+/* FIREBASE CONFIG */
+const firebaseConfig = {
+ apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+ authDomain: "collegeportal-app.firebaseapp.com",
+ databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+ projectId: "collegeportal-app",
+ storageBucket: "collegeportal-app.firebasestorage.app",
+ messagingSenderId: "266762331631",
+ appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
 /* OPEN */
 function openStudent(){hide();studentBox.style.display="block";}
 function openTeacher(){hide();teacherBox.style.display="block";}
 function openAdmin(){hide();adminBox.style.display="block";}
+
 function hide(){
 selectBox.style.display="none";
 studentBox.style.display="none";
@@ -229,69 +166,38 @@ adminBox.style.display="none";
 /* STUDENT */
 function studentRegister(){
 
-let data=JSON.parse(localStorage.students||"[]");
-
-data.push({
-name:sn.value,
-reg:sr2.value,
-pass:sp2.value
-});
-
-localStorage.students=JSON.stringify(data);
-
-alert("Registered");
+auth.createUserWithEmailAndPassword(sr2.value+"@kcs.com",sp2.value)
+.then(()=>{
+alert("Registered ✅");
+})
+.catch(e=>alert(e.message));
 
 }
 
 function studentLogin(){
 
-let data=JSON.parse(localStorage.students||"[]");
-
-let u=data.find(x=>x.reg==sr.value && x.pass==sp.value);
-
-if(!u){alert("Wrong");return;}
-
-localStorage.user=JSON.stringify({type:"student",...u});
-
-hideAll();studentDash.style.display="block";
-sname.innerHTML=u.name;
-
-loadAll();
+auth.signInWithEmailAndPassword(sr.value+"@kcs.com",sp.value)
+.then(()=>{
+alert("Login OK ✅");
+})
+.catch(e=>alert("Wrong Login"));
 
 }
 
 /* TEACHER */
 function teacherRegister(){
 
-let data=JSON.parse(localStorage.teachers||"[]");
-
-data.push({
-name:tn.value,
-subject:ts.value,
-user:tr2.value,
-pass:tp2.value
-});
-
-localStorage.teachers=JSON.stringify(data);
-
-alert("Teacher Registered");
+auth.createUserWithEmailAndPassword(tr2.value+"@kcs.com",tp2.value)
+.then(()=>alert("Teacher Registered"))
+.catch(e=>alert(e.message));
 
 }
 
 function teacherLogin(){
 
-let data=JSON.parse(localStorage.teachers||"[]");
-
-let u=data.find(x=>x.user==tr.value && x.pass==tp.value);
-
-if(!u){alert("Wrong");return;}
-
-localStorage.user=JSON.stringify({type:"teacher",...u});
-
-hideAll();teacherDash.style.display="block";
-tname.innerHTML=u.name+" ("+u.subject+")";
-
-loadAll();
+auth.signInWithEmailAndPassword(tr.value+"@kcs.com",tp.value)
+.then(()=>alert("Teacher Login OK"))
+.catch(()=>alert("Wrong"));
 
 }
 
@@ -299,272 +205,14 @@ loadAll();
 function adminLogin(){
 
 if(au.value=="admin" && ap.value=="1234"){
-
-localStorage.user=JSON.stringify({type:"admin"});
-
-hideAll();adminDash.style.display="block";
-
-loadAll();
-
-}else alert("Wrong");
+alert("Admin OK");
+}else{
+alert("Wrong");
+}
 
 }
 
-/* LOGOUT */
-function logout(){
-localStorage.removeItem("user");
-location.reload();
-}
-
-/* HIDE ALL */
-function hideAll(){
-
-studentDash.style.display="none";
-teacherDash.style.display="none";
-adminDash.style.display="none";
-selectBox.style.display="none";
-studentBox.style.display="none";
-teacherBox.style.display="none";
-adminBox.style.display="none";
-
-}
-
-/* SHOW */
-function show(id){
-
-document.querySelectorAll(".section")
-.forEach(x=>x.style.display="none");
-
-document.getElementById(id).style.display="block";
-
-}
-
-/* ASSIGNMENTS */
-function createAssign(){
-
-let u=JSON.parse(localStorage.user);
-
-let data=JSON.parse(localStorage.assign||"[]");
-
-data.push({
-id:Date.now(),
-title:atitle.value,
-desc:adesc.value,
-teacher:u.name,
-subject:u.subject
-});
-
-localStorage.assign=JSON.stringify(data);
-
-alert("Posted");
-
-loadAll();
-
-}
-
-function loadAssign(){
-
-let data=JSON.parse(localStorage.assign||"[]");
-
-let html="";
-
-data.forEach(a=>{
-
-html+=`
-<div class="card">
-<b>${a.title}</b> (${a.subject})<br>
-${a.desc}<br>
-By: ${a.teacher}
-</div>`;
-
-});
-
-sassign.innerHTML=html;
-
-let opt="";
-
-data.forEach(a=>{
-opt+=`<option value="${a.id}">${a.title}</option>`;
-});
-
-aslist.innerHTML=opt;
-
-}
-
-/* SUBMIT */
-function submitAssign(){
-
-let u=JSON.parse(localStorage.user);
-
-let data=JSON.parse(localStorage.subs||"[]");
-
-data.push({
-aid:aslist.value,
-reg:u.reg,
-name:u.name,
-answer:sanswer.value
-});
-
-localStorage.subs=JSON.stringify(data);
-
-alert("Submitted");
-
-}
-
-/* SUBMISSIONS */
-function loadSubs(){
-
-let data=JSON.parse(localStorage.subs||"[]");
-
-let html="";
-
-data.forEach(s=>{
-
-html+=`
-<div class="card">
-${s.name} (${s.reg})<br>
-${s.answer}
-</div>`;
-
-});
-
-tsub.innerHTML=html;
-
-}
-
-/* MARK */
-function loadMark(){
-
-let data=JSON.parse(localStorage.subs||"[]");
-
-let opt="";
-
-data.forEach(s=>{
-
-opt+=`<option value="${s.reg}|${s.aid}">
-${s.name} (${s.reg})
-</option>`;
-});
-
-marklist.innerHTML=opt;
-
-}
-
-function saveMark(){
-
-let [reg,aid]=marklist.value.split("|");
-
-let data=JSON.parse(localStorage.marks||"[]");
-
-data.push({
-reg,aid,mark:mark.value
-});
-
-localStorage.marks=JSON.stringify(data);
-
-alert("Saved");
-
-}
-
-/* RESULTS */
-function loadResults(){
-
-let u=JSON.parse(localStorage.user);
-
-let data=JSON.parse(localStorage.marks||"[]");
-
-let html="";
-
-data.filter(x=>x.reg==u.reg)
-.forEach(r=>{
-
-html+=`
-<div class="card">
-Assignment: ${r.aid}<br>
-Marks: ${r.mark}
-</div>`;
-
-});
-
-smarks.innerHTML=html;
-
-}
-
-/* ADMIN */
-function loadUsers(){
-
-let s=JSON.parse(localStorage.students||"[]");
-let t=JSON.parse(localStorage.teachers||"[]");
-
-let html="<h4>Students</h4>";
-
-s.forEach(x=>html+=x.name+"<br>");
-
-html+="<h4>Teachers</h4>";
-
-t.forEach(x=>html+=x.name+" ("+x.subject+")<br>");
-
-ausers.innerHTML=html;
-
-}
-
-function loadAllResults(){
-
-let d=JSON.parse(localStorage.marks||"[]");
-
-let html="";
-
-d.forEach(r=>{
-
-html+=`
-<div class="card">
-${r.reg} - ${r.aid} : ${r.mark}
-</div>`;
-
-});
-
-aresults.innerHTML=html;
-
-}
-
-/* LOAD */
-function loadAll(){
-
-loadAssign();
-loadSubs();
-loadMark();
-loadResults();
-loadUsers();
-loadAllResults();
-
-}
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
-    authDomain: "collegeportal-app.firebaseapp.com",
-    databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
-    projectId: "collegeportal-app",
-    storageBucket: "collegeportal-app.firebasestorage.app",
-    messagingSenderId: "266762331631",
-    appId: "1:266762331631:web:66ddfbde53d33086ac421a",
-    measurementId: "G-WK2RH31TC2"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
 </script>
 
 </body>
-  </html>
-
-
+</html>
