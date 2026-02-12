@@ -1,57 +1,254 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html lang="en">
 <head>
-<title>Admin Login</title>
-<style>
+<meta charset="UTF-8">
+<title>Admin Panel - Kingdom College</title><style>
 body{
-font-family:Arial;
-background:#f4f4f4;
+font-family:Arial, sans-serif;
+margin:0;
+background:#f2f2f2;
+}
+
+header{
+background:#004aad;
+color:white;
+padding:15px;
 text-align:center;
-padding:50px;
 }
-input,button{
+
+nav{
+background:#222;
 padding:10px;
-margin:10px;
-width:80%;
-max-width:300px;
 }
-button{
-background:#007bff;
+
+nav button{
+background:#004aad;
 color:white;
 border:none;
+padding:10px 15px;
+margin:5px;
+cursor:pointer;
+border-radius:5px;
+}
+
+section{
+display:none;
+background:white;
+margin:20px;
+padding:20px;
+border-radius:10px;
+}
+
+section.active{
+display:block;
+}
+
+input, textarea, select{
+width:100%;
+padding:8px;
+margin:5px 0;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+button.submit{
+background:green;
+color:white;
+border:none;
+padding:10px;
+border-radius:5px;
 cursor:pointer;
 }
-</style>
-</head>
 
-<body>
-
-<h2>🔐 Admin Login</h2>
-
-<input type="text" id="user" placeholder="Username"><br>
-<input type="password" id="pass" placeholder="Password"><br>
-
-<button onclick="login()">Login</button>
-
-<p id="msg"></p>
-
-<script>
-function login(){
-
-let u=document.getElementById("user").value;
-let p=document.getElementById("pass").value;
-
-// Badilisha hizi kama unataka
-if(u=="admin" && p=="12345"){
-
-localStorage.setItem("adminLogin","yes");
-window.location="admin-panel.html";
-
-}else{
-document.getElementById("msg").innerHTML="❌ Wrong login!";
+.box{
+border:1px solid #ccc;
+padding:10px;
+margin:10px 0;
+border-radius:5px;
 }
-}
-</script>
+</style></head><body><header>
+<h2>Kingdom College Admin Panel</h2>
+<p>Full Management System</p>
+</header><nav>
+<button onclick="show('news')">News</button>
+<button onclick="show('students')">Students</button>
+<button onclick="show('teachers')">Teachers</button>
+<button onclick="show('results')">Results</button>
+<button onclick="show('assignments')">Assignments</button>
+<button onclick="show('transfer')">Transfers</button>
+<button onclick="show('ethics')">Ethics</button>
+<button onclick="show('logout')">Logout</button>
+</nav><!-- NEWS --><section id="news" class="active">
+<h3>Post News</h3>
+<input id="newsTitle" placeholder="Title">
+<textarea id="newsContent" placeholder="Content"></textarea>
+<button class="submit" onclick="addNews()">Post</button>
+<div id="newsList"></div>
+</section><!-- STUDENTS --><section id="students">
+<h3>Register Student</h3>
+<input id="sname" placeholder="Name">
+<input id="sreg" placeholder="Registration No">
+<button class="submit" onclick="addStudent()">Add</button>
+<div id="studentList"></div>
+</section><!-- TEACHERS --><section id="teachers">
+<h3>Register Teacher</h3>
+<input id="tname" placeholder="Name">
+<input id="tsubject" placeholder="Subject">
+<button class="submit" onclick="addTeacher()">Add</button>
+<div id="teacherList"></div>
+</section><!-- RESULTS --><section id="results">
+<h3>Upload Results</h3>
+<input id="rreg" placeholder="Student Reg No">
+<input id="rsubject" placeholder="Subject">
+<input id="rmarks" placeholder="Marks">
+<button class="submit" onclick="addResult()">Save</button>
+<div id="resultList"></div>
+</section><!-- ASSIGNMENTS --><section id="assignments">
+<h3>Assignments</h3>
+<input id="asub" placeholder="Subject">
+<textarea id="adesc" placeholder="Description"></textarea>
+<button class="submit" onclick="addAssignment()">Post</button>
+<div id="assignList"></div>
+</section><!-- TRANSFER --><section id="transfer">
+<h3>Transfer Requests</h3>
+<div id="transferList"></div>
+</section><!-- ETHICS --><section id="ethics">
+<h3>Ethics Reports</h3>
+<div id="ethicsList"></div>
+</section><!-- LOGOUT --><section id="logout">
+<h3>Logout</h3>
+<button class="submit" onclick="doLogout()">Logout</button>
+</section><script>
 
-</body>
+function show(id){
+document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+}
+
+// NEWS
+let news = JSON.parse(localStorage.getItem("collegeNews"))||[];
+
+function addNews(){
+let t=newsTitle.value;
+let c=newsContent.value;
+let d=new Date().toLocaleDateString();
+
+news.push({title:t,content:c,date:d});
+localStorage.setItem("collegeNews",JSON.stringify(news));
+newsTitle.value="";
+newsContent.value="";
+loadNews();
+}
+
+function loadNews(){
+newsList.innerHTML="";
+news.forEach(n=>{
+newsList.innerHTML+=`<div class='box'><b>${n.title}</b><br>${n.date}<p>${n.content}</p></div>`;
+});
+}
+
+// STUDENTS
+let students=JSON.parse(localStorage.getItem("students"))||[];
+
+function addStudent(){
+students.push({name:sname.value,reg:sreg.value});
+localStorage.setItem("students",JSON.stringify(students));
+sname.value="";
+sreg.value="";
+loadStudents();
+}
+
+function loadStudents(){
+studentList.innerHTML="";
+students.forEach(s=>{
+studentList.innerHTML+=`<div class='box'>${s.name} (${s.reg})</div>`;
+});
+}
+
+// TEACHERS
+let teachers=JSON.parse(localStorage.getItem("teachers"))||[];
+
+function addTeacher(){
+teachers.push({name:tname.value,subject:tsubject.value});
+localStorage.setItem("teachers",JSON.stringify(teachers));
+tname.value="";
+tsubject.value="";
+loadTeachers();
+}
+
+function loadTeachers(){
+teacherList.innerHTML="";
+teachers.forEach(t=>{
+teacherList.innerHTML+=`<div class='box'>${t.name} - ${t.subject}</div>`;
+});
+}
+
+// RESULTS
+let results=JSON.parse(localStorage.getItem("results"))||[];
+
+function addResult(){
+results.push({reg:rreg.value,subject:rsubject.value,marks:rmarks.value});
+localStorage.setItem("results",JSON.stringify(results));
+rreg.value="";
+rsubject.value="";
+rmarks.value="";
+loadResults();
+}
+
+function loadResults(){
+resultList.innerHTML="";
+results.forEach(r=>{
+resultList.innerHTML+=`<div class='box'>${r.reg} | ${r.subject} : ${r.marks}</div>`;
+});
+}
+
+// ASSIGNMENTS
+let assigns=JSON.parse(localStorage.getItem("assignments"))||[];
+
+function addAssignment(){
+assigns.push({subject:asub.value,desc:adesc.value});
+localStorage.setItem("assignments",JSON.stringify(assigns));
+asub.value="";
+adesc.value="";
+loadAssign();
+}
+
+function loadAssign(){
+assignList.innerHTML="";
+assigns.forEach(a=>{
+assignList.innerHTML+=`<div class='box'>${a.subject}<p>${a.desc}</p></div>`;
+});
+}
+
+// TRANSFER
+function loadTransfer(){
+let t=JSON.parse(localStorage.getItem("transfers"))||[];
+transferList.innerHTML="";
+t.forEach(x=>{
+transferList.innerHTML+=`<div class='box'>${x.name} - ${x.reason}</div>`;
+});
+}
+
+// ETHICS
+function loadEthics(){
+let e=JSON.parse(localStorage.getItem("ethics"))||[];
+ethicsList.innerHTML="";
+e.forEach(x=>{
+ethicsList.innerHTML+=`<div class='box'>${x.msg}</div>`;
+});
+}
+
+function doLogout(){
+alert("Logged Out");
+window.location="index.html";
+}
+
+loadNews();
+loadStudents();
+loadTeachers();
+loadResults();
+loadAssign();
+loadTransfer();
+loadEthics();
+
+</script></body>
 </html>
