@@ -2,81 +2,55 @@
 <html lang="sw">
 <head>
 <meta charset="UTF-8">
-<title>Kingdom College Portal</title>
+<title>Kingdom College System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-
 body{
-font-family:Arial;
-background:#f2f2f2;
-margin:0;
+  font-family:Arial;
+  background:#f2f2f2;
+  margin:0;
 }
 
 header{
-background:#0a3d62;
-color:white;
-padding:15px;
-text-align:center;
+  background:#0a3d62;
+  color:white;
+  padding:20px;
+  text-align:center;
 }
 
 .container{
-max-width:1200px;
-margin:auto;
-padding:20px;
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
 }
 
 .box{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 0 8px gray;
-max-width:400px;
-margin:20px auto;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 0 8px gray;
+  max-width:400px;
+  margin:20px auto;
 }
 
-input,textarea,button{
-width:100%;
-padding:10px;
-margin:6px 0;
+input,button{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
 }
 
 button{
-background:#1e3799;
-color:white;
-border:none;
-border-radius:5px;
-cursor:pointer;
+  background:#1e3799;
+  color:white;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
 }
 
 button:hover{
-background:#4a69bd;
+  background:#4a69bd;
 }
-
-.menu button{
-margin:3px;
-width:auto;
-}
-
-.section{
-display:none;
-background:white;
-padding:15px;
-margin-top:10px;
-border-radius:8px;
-}
-
-.card{
-border:1px solid #ccc;
-padding:10px;
-margin:8px 0;
-border-radius:6px;
-}
-
-#studentDash,#adminDash,#teacherDash{
-display:none;
-}
-
 </style>
 </head>
 
@@ -88,126 +62,42 @@ display:none;
 
 <div class="container">
 
-<!-- SELECT ROLE -->
-<div id="selectBox" class="box">
-
-<h3>Login As</h3>
-
-<button onclick="openStudent()">Student</button>
-<button onclick="openAdmin()">Admin</button>
-
-</div>
-
-
-<!-- STUDENT -->
-<div id="studentBox" class="box" style="display:none;">
+<!-- LOGIN -->
+<div class="box">
 
 <h3>Student Login</h3>
 
-<input id="sr" placeholder="Reg Number">
-<input id="sp" type="password" placeholder="Password">
+<input id="loginReg" placeholder="Reg Number (Example: Ns4882_0014_2022)">
+<input id="loginPass" type="password" placeholder="Password">
 
-<button onclick="studentLogin()">Login</button>
-
-<hr>
-
-<h4>Register</h4>
-
-<input id="sr2" placeholder="Reg Number">
-<input id="sp2" type="password" placeholder="Password">
-
-<button onclick="studentRegister()">Register</button>
-
-</div>
-
-
-<!-- ADMIN -->
-<div id="adminBox" class="box" style="display:none;">
-
-<h3>Admin Login</h3>
-
-<input id="au" placeholder="Username">
-<input id="ap" type="password">
-
-<button onclick="adminLogin()">Login</button>
-
-</div>
-
-
-<!-- STUDENT DASH -->
-<div id="studentDash">
-
-<h3>👩‍🎓 Student Dashboard</h3>
-
-<div class="menu">
-
-<button onclick="show('snews')">📰 News</button>
-<button onclick="logout()">🚪 Logout</button>
-
-</div>
-
-<div id="snews" class="section">
-
-<h4>📢 Announcements</h4>
-
-<div id="studentNews"></div>
-
-</div>
-
-</div>
-
-
-<!-- ADMIN DASH -->
-<div id="adminDash">
-
-<h3>👨‍💼 Admin Dashboard</h3>
-
-<div class="menu">
-
-<button onclick="show('anews')">📰 Post News</button>
-<button onclick="logout()">🚪 Logout</button>
-
-</div>
-
-
-<div id="anews" class="section">
-
-<h4>Post Announcement</h4>
-
-<input id="newsTitle" placeholder="Title">
-
-<textarea id="newsMsg" placeholder="Message"></textarea>
-
-<button onclick="postNews()">Post</button>
+<button onclick="login()">Login</button>
 
 <hr>
 
-<div id="adminNews"></div>
+<h3>Register</h3>
+
+<input id="regReg" placeholder="Reg Number (Example: Ns4882_0014_2022)">
+<input id="regPass" type="password" placeholder="Password (min 6 chars)">
+
+<button onclick="register()">Register</button>
 
 </div>
 
 </div>
 
-</div>
-
-
-<footer>
-<p>© 2026 Kingdom College | By Carina</p>
+<footer style="text-align:center;padding:15px;">
+© 2026 Kingdom College | By Carina
 </footer>
-
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
 
 <script>
 
 const firebaseConfig = {
  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
  authDomain: "collegeportal-app.firebaseapp.com",
- databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
  projectId: "collegeportal-app",
  storageBucket: "collegeportal-app.appspot.com",
  messagingSenderId: "266762331631",
@@ -217,158 +107,57 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
-const db = firebase.database();
 
 
-/* OPEN */
+// REGISTER
+function register(){
 
-function openStudent(){
-hideAll();
-studentBox.style.display="block";
-}
+  let reg = document.getElementById("regReg").value.trim();
+  let pass = document.getElementById("regPass").value;
 
-function openAdmin(){
-hideAll();
-adminBox.style.display="block";
-}
+  if(reg=="" || pass==""){
+    alert("Jaza taarifa zote");
+    return;
+  }
 
-function hideAll(){
+  if(pass.length < 6){
+    alert("Password iwe angalau herufi 6");
+    return;
+  }
 
-selectBox.style.display="none";
-studentBox.style.display="none";
-adminBox.style.display="none";
+  let email = reg + "@kcs.com";
 
-studentDash.style.display="none";
-adminDash.style.display="none";
-
-}
-
-
-/* STUDENT */
-
-function studentRegister(){
-
-auth.createUserWithEmailAndPassword(
-sr2.value+"@kcs.com",
-sp2.value
-)
-.then(()=>alert("Registered ✅"))
-.catch(e=>alert(e.message));
-
-}
-
-function studentLogin(){
-
-auth.signInWithEmailAndPassword(
-sr.value+"@kcs.com",
-sp.value
-)
-.then(()=>{
-hideAll();
-studentDash.style.display="block";
-loadNews();
-})
-.catch(()=>alert("Wrong Login"));
+  auth.createUserWithEmailAndPassword(email, pass)
+  .then(()=>{
+    alert("Registered Successfully ✅");
+  })
+  .catch(err=>{
+    alert(err.message);
+  });
 
 }
 
 
-/* ADMIN */
+// LOGIN
+function login(){
 
-function adminLogin(){
+  let reg = document.getElementById("loginReg").value.trim();
+  let pass = document.getElementById("loginPass").value;
 
-if(au.value=="admin" && ap.value=="1234"){
+  if(reg=="" || pass==""){
+    alert("Jaza taarifa zote");
+    return;
+  }
 
-hideAll();
-adminDash.style.display="block";
-loadNews();
+  let email = reg + "@kcs.com";
 
-}else{
-
-alert("Wrong Admin");
-
-}
-
-}
-
-
-/* LOGOUT */
-
-function logout(){
-
-auth.signOut();
-location.reload();
-
-}
-
-
-/* SECTIONS */
-
-function show(id){
-
-document.querySelectorAll(".section")
-.forEach(x=>x.style.display="none");
-
-document.getElementById(id).style.display="block";
-
-}
-
-
-/* NEWS SYSTEM */
-
-function postNews(){
-
-let id = Date.now();
-
-db.ref("news/"+id).set({
-
-title:newsTitle.value,
-msg:newsMsg.value,
-date:new Date().toLocaleString()
-
-});
-
-newsTitle.value="";
-newsMsg.value="";
-
-alert("Posted ✅");
-
-loadNews();
-
-}
-
-
-function loadNews(){
-
-db.ref("news").on("value", snap=>{
-
-let data = snap.val();
-
-let html="";
-
-if(!data){
-
-html="No news yet";
-}else{
-
-Object.values(data).reverse().forEach(n=>{
-
-html+=`
-<div class="card">
-<b>${n.title}</b><br>
-${n.msg}<br>
-<small>${n.date}</small>
-</div>
-`;
-
-});
-
-}
-
-studentNews.innerHTML=html;
-adminNews.innerHTML=html;
-
-});
+  auth.signInWithEmailAndPassword(email, pass)
+  .then(()=>{
+    alert("Login Successful ✅");
+  })
+  .catch(err=>{
+    alert(err.message);
+  });
 
 }
 
