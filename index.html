@@ -153,7 +153,10 @@ function login(){
 
   auth.signInWithEmailAndPassword(email, pass)
   .then(()=>{
-    alert("Login Successful ✅");
+
+    // HAPA NDIO REDIRECT
+    window.location.href = "student.html";
+
   })
   .catch(err=>{
     alert(err.message);
@@ -165,3 +168,4 @@ function login(){
 
 </body>
 </html>
+
