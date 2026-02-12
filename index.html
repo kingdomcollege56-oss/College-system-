@@ -125,7 +125,38 @@ footer {
   <button>Logout</button>
 </section></div><footer>
   <p>&copy; 2026 College System | Developed by Carina</p>
-</footer></body>
+</footer> 
+  <!-- ANNOUNCEMENTS -->
+<h2>📢 Latest Announcements</h2>
+<div id="publicNews"></div>
+
+<script>
+function loadPublicNews(){
+
+  let news = JSON.parse(localStorage.getItem("collegeNews")) || [];
+
+  let html="";
+
+  if(news.length==0){
+    html="No announcements yet";
+  }else{
+    news.slice(0,5).forEach(n=>{
+      html+=`
+      <div style="border:1px solid #ccc;padding:10px;margin:10px 0;">
+        <h4>${n.title}</h4>
+        <small>${n.date}</small>
+        <p>${n.content}</p>
+      </div>
+      `;
+    });
+  }
+
+  document.getElementById("publicNews").innerHTML=html;
+}
+
+loadPublicNews();
+  </script>
+</body>
 
 </html>
 <section style="background:#f5f5f5; padding:25px; margin-top:40px; border-radius:10px;">
@@ -157,4 +188,5 @@ footer {
   </iframe>
 
 </section>
+
 
