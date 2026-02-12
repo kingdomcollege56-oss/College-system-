@@ -2,7 +2,7 @@
 <html lang="sw">
 <head>
 <meta charset="UTF-8">
-<title>Kingdom College Management System</title>
+<title>Kingdom College System</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -27,19 +27,20 @@ margin:auto;
 padding:20px;
 }
 
-#loginBox{
+/* BOX */
+.box{
 background:white;
-padding:25px;
-max-width:400px;
-margin:40px auto;
+padding:20px;
 border-radius:10px;
-box-shadow:0 0 10px gray;
+box-shadow:0 0 8px gray;
+margin:20px auto;
+max-width:400px;
 }
 
-input,textarea,select,button{
+input,button{
 width:100%;
 padding:10px;
-margin:8px 0;
+margin:6px 0;
 }
 
 button{
@@ -54,10 +55,12 @@ button:hover{
 background:#4a69bd;
 }
 
-#dashboard{
+/* DASHBOARD */
+#studentDash,#adminDash{
 display:none;
 }
 
+/* MENU */
 .menu button{
 margin:4px 0;
 }
@@ -65,24 +68,16 @@ margin:4px 0;
 .section{
 display:none;
 background:white;
-padding:20px;
-margin-top:15px;
-border-radius:10px;
-}
-
-footer{
-background:#0a3d62;
-color:white;
 padding:15px;
-text-align:center;
-margin-top:40px;
+margin-top:10px;
+border-radius:8px;
 }
 
 .card{
 border:1px solid #ccc;
 padding:10px;
-margin:10px 0;
-border-radius:6px;
+margin:8px 0;
+border-radius:5px;
 }
 
 </style>
@@ -92,129 +87,94 @@ border-radius:6px;
 
 <header>
 <h2>Kingdom College Management System</h2>
-<p>Admin Panel</p>
 </header>
 
 <div class="container">
 
-<!-- LOGIN -->
-<div id="loginBox">
+<!-- STUDENT REGISTER -->
+<div id="registerBox" class="box">
 
-<h3>Admin Login</h3>
+<h3>Student Registration</h3>
 
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
+<input id="rname" placeholder="Full Name">
+<input id="rreg" placeholder="Reg Number">
+<input id="rpass" type="password" placeholder="Password">
 
-<button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
 
-<p id="msg" style="color:red;"></p>
+<p id="rmsg"></p>
+
+<hr>
+
+<p>Already have account?</p>
+<button onclick="showLogin()">Login</button>
 
 </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard">
+<!-- STUDENT LOGIN -->
+<div id="loginBox" class="box" style="display:none;">
 
-<h3>Dashboard</h3>
+<h3>Student Login</h3>
+
+<input id="lreg" placeholder="Reg Number">
+<input id="lpass" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p id="lmsg"></p>
+
+<hr>
+
+<button onclick="showRegister()">Register</button>
+
+</div>
+
+<!-- STUDENT DASHBOARD -->
+<div id="studentDash">
+
+<h3>Welcome, <span id="sname"></span></h3>
 
 <div class="menu">
 
-<button onclick="show('news')">📢 News</button>
-<button onclick="show('students')">🎓 Students</button>
-<button onclick="show('materials')">📚 Materials</button>
-<button onclick="show('results')">📄 Results</button>
-<button onclick="show('transfer')">📤 Transfer</button>
-<button onclick="show('ethics')">🔒 Ethics Room</button>
-<button onclick="show('sports')">⚽ Sports</button>
+<button onclick="showSec('news')">📢 News</button>
+<button onclick="showSec('transfer')">📤 Transfer</button>
+<button onclick="showSec('ethics')">🔒 Ethics</button>
+<button onclick="showSec('sports')">⚽ Sports</button>
 <button onclick="logout()">🚪 Logout</button>
 
 </div>
 
 <!-- NEWS -->
 <div id="news" class="section">
-
-<h3>Post Announcement</h3>
-
-<input id="newsTitle" placeholder="Title">
-
-<textarea id="newsText" placeholder="Write here..."></textarea>
-
-<button onclick="postNews()">Post</button>
-
+<h3>Announcements</h3>
 <div id="newsList"></div>
-
-</div>
-
-<!-- STUDENTS -->
-<div id="students" class="section">
-
-<h3>Student Info</h3>
-
-<input placeholder="Full Name">
-<input placeholder="Reg Number">
-<input placeholder="Course">
-
-<button>Save</button>
-
-</div>
-
-<!-- MATERIALS -->
-<div id="materials" class="section">
-
-<h3>Study Materials</h3>
-
-<input placeholder="Title">
-
-<textarea placeholder="Description"></textarea>
-
-<input type="file">
-
-<button>Upload</button>
-
-</div>
-
-<!-- RESULTS -->
-<div id="results" class="section">
-
-<h3>Results</h3>
-
-<input placeholder="Reg Number">
-
-<button>Check</button>
-
 </div>
 
 <!-- TRANSFER -->
 <div id="transfer" class="section">
 
-<h3>College Transfer</h3>
+<h3>Request Transfer</h3>
 
-<input placeholder="Full Name">
-<input placeholder="Registration Number">
-<input placeholder="Current College">
-<input placeholder="New College">
+<input id="tcollege" placeholder="New College">
 
-<textarea placeholder="Reason for Transfer"></textarea>
+<textarea id="treason" placeholder="Reason"></textarea>
 
-<button onclick="submitTransfer()">Submit</button>
+<button onclick="sendTransfer()">Send</button>
 
-<p id="transferMsg"></p>
-
-<a href="https://www.nactvet.go.tz" target="_blank">
-<button style="background:green;">Open NACTVET</button>
-</a>
+<p id="tmsg"></p>
 
 </div>
 
-<!-- ETHICS ROOM -->
+<!-- ETHICS -->
 <div id="ethics" class="section">
 
-<h3>Private Ethics Room (Anonymous)</h3>
+<h3>Private Ethics Room</h3>
 
-<textarea id="ethicsMsg" placeholder="Write confidential message..."></textarea>
+<textarea id="emsg" placeholder="Confidential message"></textarea>
 
 <button onclick="sendEthics()">Send</button>
 
-<div id="ethicsList"></div>
+<div id="elist"></div>
 
 </div>
 
@@ -223,67 +183,95 @@ border-radius:6px;
 
 <h3>Sports & Games</h3>
 
-<input id="sportTitle" placeholder="Event Title">
-
-<input type="date" id="sportDate">
-
-<textarea id="sportDesc" placeholder="Description"></textarea>
-
-<button onclick="addSport()">Add</button>
-
-<div id="sportList"></div>
+<div id="slist"></div>
 
 </div>
 
 </div>
+
 </div>
-
-<!-- CONTACT -->
-<section style="background:white;padding:20px;">
-
-<h3>📍 Mawasiliano</h3>
-
-<p>Kingdom College of Health and Allied Sciences</p>
-<p>Mbeya - Kyela, Ipinda nyuma ya Lake Oil</p>
-<p>📞 +255785705151 / +255735705151</p>
-
-<iframe
-src="https://www.google.com/maps?q=Kyela+Ipinda+Lake+Oil+Mbeya+Tanzania&output=embed"
-width="100%" height="300">
-</iframe>
-
-</section>
 
 <footer>
-<p>© 2026 Kingdom College | Developed by Carina</p>
+<p>© 2026 Kingdom College | By Carina</p>
 </footer>
 
 <script>
 
+/* REGISTER */
+function register(){
+
+let name=rname.value;
+let reg=rreg.value;
+let pass=rpass.value;
+
+if(!name||!reg||!pass){
+rmsg.innerHTML="Fill all fields";
+return;
+}
+
+let users=JSON.parse(localStorage.users||"[]");
+
+if(users.find(u=>u.reg==reg)){
+rmsg.innerHTML="Reg number exists";
+return;
+}
+
+users.push({name,reg,pass});
+
+localStorage.users=JSON.stringify(users);
+
+rmsg.innerHTML="Registered successfully";
+
+}
+
 /* LOGIN */
 function login(){
 
-let u=user.value;
-let p=pass.value;
+let reg=lreg.value;
+let pass=lpass.value;
 
-if(u=="admin" && p=="1234"){
+let users=JSON.parse(localStorage.users||"[]");
+
+let u=users.find(x=>x.reg==reg && x.pass==pass);
+
+if(!u){
+lmsg.innerHTML="Wrong login";
+return;
+}
+
+localStorage.currentUser=JSON.stringify(u);
 
 loginBox.style.display="none";
-dashboard.style.display="block";
+registerBox.style.display="none";
+studentDash.style.display="block";
 
-}else{
-msg.innerHTML="Wrong Login";
-}
+sname.innerHTML=u.name;
+
+loadData();
 
 }
 
 /* LOGOUT */
 function logout(){
+
+localStorage.removeItem("currentUser");
 location.reload();
+
 }
 
-/* SHOW */
-function show(id){
+/* SWITCH */
+function showLogin(){
+registerBox.style.display="none";
+loginBox.style.display="block";
+}
+
+function showRegister(){
+loginBox.style.display="none";
+registerBox.style.display="block";
+}
+
+/* SHOW SECTION */
+function showSec(id){
 
 document.querySelectorAll(".section")
 .forEach(s=>s.style.display="none");
@@ -292,75 +280,60 @@ document.getElementById(id).style.display="block";
 
 }
 
-/* NEWS */
-function postNews(){
+/* LOAD SESSION */
+function loadData(){
 
-let t=newsTitle.value;
-let c=newsText.value;
+let u=JSON.parse(localStorage.currentUser||"null");
 
-let data=JSON.parse(localStorage.news||"[]");
+if(u){
+
+registerBox.style.display="none";
+loginBox.style.display="none";
+studentDash.style.display="block";
+
+sname.innerHTML=u.name;
+
+}
+
+}
+
+/* TRANSFER */
+function sendTransfer(){
+
+let u=JSON.parse(localStorage.currentUser);
+
+let data=JSON.parse(localStorage.transfer||"[]");
 
 data.unshift({
-title:t,
-text:c,
+name:u.name,
+reg:u.reg,
+college:tcollege.value,
+reason:treason.value,
 date:new Date().toLocaleString()
 });
 
-localStorage.news=JSON.stringify(data);
+localStorage.transfer=JSON.stringify(data);
 
-newsTitle.value="";
-newsText.value="";
-
-loadNews();
-
-}
-
-function loadNews(){
-
-let data=JSON.parse(localStorage.news||"[]");
-
-let html="";
-
-data.forEach(n=>{
-
-html+=`
-<div class="card">
-<h4>${n.title}</h4>
-<small>${n.date}</small>
-<p>${n.text}</p>
-</div>`;
-
-});
-
-newsList.innerHTML=html;
-
-}
-
-loadNews();
-
-/* TRANSFER */
-function submitTransfer(){
-
-transferMsg.innerHTML=
-"Request submitted. Contact NACTVET for approval.";
+tmsg.innerHTML="Sent successfully";
 
 }
 
 /* ETHICS */
 function sendEthics(){
 
-let m=ethicsMsg.value;
+let u=JSON.parse(localStorage.currentUser);
 
 let data=JSON.parse(localStorage.ethics||"[]");
 
 data.unshift({
-msg:m,
+from:u.reg,
+msg:emsg.value,
 date:new Date().toLocaleString()
 });
 
 localStorage.ethics=JSON.stringify(data);
 
-ethicsMsg.value="";
+emsg.value="";
 
 loadEthics();
 
@@ -382,37 +355,11 @@ html+=`
 
 });
 
-ethicsList.innerHTML=html;
+elist.innerHTML=html;
 
 }
-
-loadEthics();
 
 /* SPORTS */
-function addSport(){
-
-let t=sportTitle.value;
-let d=sportDate.value;
-let c=sportDesc.value;
-
-let data=JSON.parse(localStorage.sports||"[]");
-
-data.unshift({
-title:t,
-date:d,
-desc:c
-});
-
-localStorage.sports=JSON.stringify(data);
-
-sportTitle.value="";
-sportDate.value="";
-sportDesc.value="";
-
-loadSports();
-
-}
-
 function loadSports(){
 
 let data=JSON.parse(localStorage.sports||"[]");
@@ -430,13 +377,16 @@ html+=`
 
 });
 
-sportList.innerHTML=html;
+slist.innerHTML=html;
 
 }
 
+/* INIT */
+loadData();
+loadEthics();
 loadSports();
 
 </script>
 
 </body>
-  </html>
+</html>
