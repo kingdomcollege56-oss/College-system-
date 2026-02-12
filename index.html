@@ -3,82 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <title>Kingdom College System</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 
-body{
-font-family:Arial;
-margin:0;
-background:#f2f2f2;
-}
+body{font-family:Arial;background:#f2f2f2;margin:0;}
 
 header{
-background:#0a3d62;
-color:white;
-padding:20px;
-text-align:center;
+background:#0a3d62;color:white;padding:20px;text-align:center;
 }
 
-.container{
-max-width:1000px;
-margin:auto;
-padding:20px;
-}
+.container{max-width:1200px;margin:auto;padding:20px;}
 
-/* BOX */
 .box{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 0 8px gray;
-margin:20px auto;
-max-width:400px;
+background:white;padding:20px;border-radius:10px;
+box-shadow:0 0 8px gray;max-width:400px;margin:20px auto;
 }
 
-input,button{
-width:100%;
-padding:10px;
-margin:6px 0;
+input,textarea,select,button{
+width:100%;padding:10px;margin:6px 0;
 }
 
 button{
-background:#1e3799;
-color:white;
-border:none;
-border-radius:5px;
+background:#1e3799;color:white;border:none;border-radius:5px;
 cursor:pointer;
 }
 
-button:hover{
-background:#4a69bd;
-}
+button:hover{background:#4a69bd;}
 
-/* DASHBOARD */
-#studentDash,#adminDash{
-display:none;
-}
-
-/* MENU */
-.menu button{
-margin:4px 0;
-}
+.menu button{margin:3px;}
 
 .section{
-display:none;
-background:white;
-padding:15px;
-margin-top:10px;
+display:none;background:white;padding:15px;margin-top:10px;
 border-radius:8px;
 }
 
 .card{
-border:1px solid #ccc;
-padding:10px;
-margin:8px 0;
-border-radius:5px;
+border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
 }
+
+#studentDash,#adminDash,#teacherDash{display:none;}
 
 </style>
 </head>
@@ -91,101 +55,155 @@ border-radius:5px;
 
 <div class="container">
 
-<!-- STUDENT REGISTER -->
-<div id="registerBox" class="box">
+<!-- SELECT ROLE -->
+<div id="selectBox" class="box">
 
-<h3>Student Registration</h3>
+<h3>Login As</h3>
 
-<input id="rname" placeholder="Full Name">
-<input id="rreg" placeholder="Reg Number">
-<input id="rpass" type="password" placeholder="Password">
-
-<button onclick="register()">Register</button>
-
-<p id="rmsg"></p>
-
-<hr>
-
-<p>Already have account?</p>
-<button onclick="showLogin()">Login</button>
+<button onclick="openStudent()">Student</button>
+<button onclick="openTeacher()">Teacher</button>
+<button onclick="openAdmin()">Admin</button>
 
 </div>
 
-<!-- STUDENT LOGIN -->
-<div id="loginBox" class="box" style="display:none;">
+<!-- STUDENT -->
+<div id="studentBox" class="box" style="display:none;">
 
-<h3>Student Login</h3>
+<h3>Student</h3>
 
-<input id="lreg" placeholder="Reg Number">
-<input id="lpass" type="password" placeholder="Password">
+<input id="sr" placeholder="Reg Number">
+<input id="sp" type="password" placeholder="Password">
 
-<button onclick="login()">Login</button>
-
-<p id="lmsg"></p>
+<button onclick="studentLogin()">Login</button>
 
 <hr>
 
-<button onclick="showRegister()">Register</button>
+<input id="sn" placeholder="Full Name">
+<input id="sr2" placeholder="Reg Number">
+<input id="sp2" type="password" placeholder="Password">
+
+<button onclick="studentRegister()">Register</button>
+
+<p id="smsg"></p>
 
 </div>
 
-<!-- STUDENT DASHBOARD -->
+<!-- TEACHER -->
+<div id="teacherBox" class="box" style="display:none;">
+
+<h3>Teacher Login</h3>
+
+<input id="tr" placeholder="Username">
+<input id="tp" type="password" placeholder="Password">
+
+<button onclick="teacherLogin()">Login</button>
+
+<hr>
+
+<input id="tn" placeholder="Full Name">
+<input id="ts" placeholder="Subject">
+<input id="tr2" placeholder="Username">
+<input id="tp2" type="password" placeholder="Password">
+
+<button onclick="teacherRegister()">Register</button>
+
+</div>
+
+<!-- ADMIN -->
+<div id="adminBox" class="box" style="display:none;">
+
+<h3>Admin Login</h3>
+
+<input id="au" placeholder="Username">
+<input id="ap" type="password">
+
+<button onclick="adminLogin()">Login</button>
+
+</div>
+
+<!-- STUDENT DASH -->
 <div id="studentDash">
 
-<h3>Welcome, <span id="sname"></span></h3>
+<h3>Student: <span id="sname"></span></h3>
 
 <div class="menu">
 
-<button onclick="showSec('news')">📢 News</button>
-<button onclick="showSec('transfer')">📤 Transfer</button>
-<button onclick="showSec('ethics')">🔒 Ethics</button>
-<button onclick="showSec('sports')">⚽ Sports</button>
+<button onclick="show('sassign')">📄 Assignments</button>
+<button onclick="show('ssubmit')">📤 Submit</button>
+<button onclick="show('smarks')">📊 Results</button>
 <button onclick="logout()">🚪 Logout</button>
 
 </div>
 
-<!-- NEWS -->
-<div id="news" class="section">
-<h3>Announcements</h3>
-<div id="newsList"></div>
-</div>
+<div id="sassign" class="section"></div>
 
-<!-- TRANSFER -->
-<div id="transfer" class="section">
+<div id="ssubmit" class="section">
 
-<h3>Request Transfer</h3>
+<h4>Submit Assignment</h4>
 
-<input id="tcollege" placeholder="New College">
+<select id="aslist"></select>
 
-<textarea id="treason" placeholder="Reason"></textarea>
+<textarea id="sanswer" placeholder="Your Answer"></textarea>
 
-<button onclick="sendTransfer()">Send</button>
-
-<p id="tmsg"></p>
+<button onclick="submitAssign()">Send</button>
 
 </div>
 
-<!-- ETHICS -->
-<div id="ethics" class="section">
-
-<h3>Private Ethics Room</h3>
-
-<textarea id="emsg" placeholder="Confidential message"></textarea>
-
-<button onclick="sendEthics()">Send</button>
-
-<div id="elist"></div>
+<div id="smarks" class="section"></div>
 
 </div>
 
-<!-- SPORTS -->
-<div id="sports" class="section">
+<!-- TEACHER DASH -->
+<div id="teacherDash">
 
-<h3>Sports & Games</h3>
+<h3>Teacher: <span id="tname"></span></h3>
 
-<div id="slist"></div>
+<div class="menu">
+
+<button onclick="show('tassign')">📝 Create Assignment</button>
+<button onclick="show('tsub')">📥 Submissions</button>
+<button onclick="show('tmark')">📊 Mark</button>
+<button onclick="logout()">🚪 Logout</button>
 
 </div>
+
+<div id="tassign" class="section">
+
+<input id="atitle" placeholder="Title">
+<textarea id="adesc" placeholder="Description"></textarea>
+
+<button onclick="createAssign()">Post</button>
+
+</div>
+
+<div id="tsub" class="section"></div>
+
+<div id="tmark" class="section">
+
+<select id="marklist"></select>
+<input id="mark" placeholder="Marks">
+
+<button onclick="saveMark()">Save</button>
+
+</div>
+
+</div>
+
+<!-- ADMIN DASH -->
+<div id="adminDash">
+
+<h3>Admin Panel</h3>
+
+<div class="menu">
+
+<button onclick="show('ausers')">👥 Users</button>
+<button onclick="show('aresults')">📊 All Results</button>
+<button onclick="logout()">🚪 Logout</button>
+
+</div>
+
+<div id="ausers" class="section"></div>
+<div id="aresults" class="section"></div>
 
 </div>
 
@@ -197,172 +215,206 @@ border-radius:5px;
 
 <script>
 
-/* REGISTER */
-function register(){
-
-let name=rname.value;
-let reg=rreg.value;
-let pass=rpass.value;
-
-if(!name||!reg||!pass){
-rmsg.innerHTML="Fill all fields";
-return;
+/* OPEN */
+function openStudent(){hide();studentBox.style.display="block";}
+function openTeacher(){hide();teacherBox.style.display="block";}
+function openAdmin(){hide();adminBox.style.display="block";}
+function hide(){
+selectBox.style.display="none";
+studentBox.style.display="none";
+teacherBox.style.display="none";
+adminBox.style.display="none";
 }
 
-let users=JSON.parse(localStorage.users||"[]");
+/* STUDENT */
+function studentRegister(){
 
-if(users.find(u=>u.reg==reg)){
-rmsg.innerHTML="Reg number exists";
-return;
+let data=JSON.parse(localStorage.students||"[]");
+
+data.push({
+name:sn.value,
+reg:sr2.value,
+pass:sp2.value
+});
+
+localStorage.students=JSON.stringify(data);
+
+alert("Registered");
+
 }
 
-users.push({name,reg,pass});
+function studentLogin(){
 
-localStorage.users=JSON.stringify(users);
+let data=JSON.parse(localStorage.students||"[]");
 
-rmsg.innerHTML="Registered successfully";
+let u=data.find(x=>x.reg==sr.value && x.pass==sp.value);
 
-}
+if(!u){alert("Wrong");return;}
 
-/* LOGIN */
-function login(){
+localStorage.user=JSON.stringify({type:"student",...u});
 
-let reg=lreg.value;
-let pass=lpass.value;
-
-let users=JSON.parse(localStorage.users||"[]");
-
-let u=users.find(x=>x.reg==reg && x.pass==pass);
-
-if(!u){
-lmsg.innerHTML="Wrong login";
-return;
-}
-
-localStorage.currentUser=JSON.stringify(u);
-
-loginBox.style.display="none";
-registerBox.style.display="none";
-studentDash.style.display="block";
-
+hideAll();studentDash.style.display="block";
 sname.innerHTML=u.name;
 
-loadData();
+loadAll();
+
+}
+
+/* TEACHER */
+function teacherRegister(){
+
+let data=JSON.parse(localStorage.teachers||"[]");
+
+data.push({
+name:tn.value,
+subject:ts.value,
+user:tr2.value,
+pass:tp2.value
+});
+
+localStorage.teachers=JSON.stringify(data);
+
+alert("Teacher Registered");
+
+}
+
+function teacherLogin(){
+
+let data=JSON.parse(localStorage.teachers||"[]");
+
+let u=data.find(x=>x.user==tr.value && x.pass==tp.value);
+
+if(!u){alert("Wrong");return;}
+
+localStorage.user=JSON.stringify({type:"teacher",...u});
+
+hideAll();teacherDash.style.display="block";
+tname.innerHTML=u.name+" ("+u.subject+")";
+
+loadAll();
+
+}
+
+/* ADMIN */
+function adminLogin(){
+
+if(au.value=="admin" && ap.value=="1234"){
+
+localStorage.user=JSON.stringify({type:"admin"});
+
+hideAll();adminDash.style.display="block";
+
+loadAll();
+
+}else alert("Wrong");
 
 }
 
 /* LOGOUT */
 function logout(){
-
-localStorage.removeItem("currentUser");
+localStorage.removeItem("user");
 location.reload();
+}
+
+/* HIDE ALL */
+function hideAll(){
+
+studentDash.style.display="none";
+teacherDash.style.display="none";
+adminDash.style.display="none";
+selectBox.style.display="none";
+studentBox.style.display="none";
+teacherBox.style.display="none";
+adminBox.style.display="none";
 
 }
 
-/* SWITCH */
-function showLogin(){
-registerBox.style.display="none";
-loginBox.style.display="block";
-}
-
-function showRegister(){
-loginBox.style.display="none";
-registerBox.style.display="block";
-}
-
-/* SHOW SECTION */
-function showSec(id){
+/* SHOW */
+function show(id){
 
 document.querySelectorAll(".section")
-.forEach(s=>s.style.display="none");
+.forEach(x=>x.style.display="none");
 
 document.getElementById(id).style.display="block";
 
 }
 
-/* LOAD SESSION */
-function loadData(){
+/* ASSIGNMENTS */
+function createAssign(){
 
-let u=JSON.parse(localStorage.currentUser||"null");
+let u=JSON.parse(localStorage.user);
 
-if(u){
+let data=JSON.parse(localStorage.assign||"[]");
 
-registerBox.style.display="none";
-loginBox.style.display="none";
-studentDash.style.display="block";
-
-sname.innerHTML=u.name;
-
-}
-
-}
-
-/* TRANSFER */
-function sendTransfer(){
-
-let u=JSON.parse(localStorage.currentUser);
-
-let data=JSON.parse(localStorage.transfer||"[]");
-
-data.unshift({
-name:u.name,
-reg:u.reg,
-college:tcollege.value,
-reason:treason.value,
-date:new Date().toLocaleString()
+data.push({
+id:Date.now(),
+title:atitle.value,
+desc:adesc.value,
+teacher:u.name,
+subject:u.subject
 });
 
-localStorage.transfer=JSON.stringify(data);
+localStorage.assign=JSON.stringify(data);
 
-tmsg.innerHTML="Sent successfully";
+alert("Posted");
 
-}
-
-/* ETHICS */
-function sendEthics(){
-
-let u=JSON.parse(localStorage.currentUser);
-
-let data=JSON.parse(localStorage.ethics||"[]");
-
-data.unshift({
-from:u.reg,
-msg:emsg.value,
-date:new Date().toLocaleString()
-});
-
-localStorage.ethics=JSON.stringify(data);
-
-emsg.value="";
-
-loadEthics();
+loadAll();
 
 }
 
-function loadEthics(){
+function loadAssign(){
 
-let data=JSON.parse(localStorage.ethics||"[]");
+let data=JSON.parse(localStorage.assign||"[]");
 
 let html="";
 
-data.forEach(e=>{
+data.forEach(a=>{
 
 html+=`
 <div class="card">
-<small>${e.date}</small>
-<p>${e.msg}</p>
+<b>${a.title}</b> (${a.subject})<br>
+${a.desc}<br>
+By: ${a.teacher}
 </div>`;
 
 });
 
-elist.innerHTML=html;
+sassign.innerHTML=html;
+
+let opt="";
+
+data.forEach(a=>{
+opt+=`<option value="${a.id}">${a.title}</option>`;
+});
+
+aslist.innerHTML=opt;
 
 }
 
-/* SPORTS */
-function loadSports(){
+/* SUBMIT */
+function submitAssign(){
 
-let data=JSON.parse(localStorage.sports||"[]");
+let u=JSON.parse(localStorage.user);
+
+let data=JSON.parse(localStorage.subs||"[]");
+
+data.push({
+aid:aslist.value,
+reg:u.reg,
+name:u.name,
+answer:sanswer.value
+});
+
+localStorage.subs=JSON.stringify(data);
+
+alert("Submitted");
+
+}
+
+/* SUBMISSIONS */
+function loadSubs(){
+
+let data=JSON.parse(localStorage.subs||"[]");
 
 let html="";
 
@@ -370,23 +422,124 @@ data.forEach(s=>{
 
 html+=`
 <div class="card">
-<h4>${s.title}</h4>
-<small>${s.date}</small>
-<p>${s.desc}</p>
+${s.name} (${s.reg})<br>
+${s.answer}
 </div>`;
 
 });
 
-slist.innerHTML=html;
+tsub.innerHTML=html;
 
 }
 
-/* INIT */
-loadData();
-loadEthics();
-loadSports();
+/* MARK */
+function loadMark(){
+
+let data=JSON.parse(localStorage.subs||"[]");
+
+let opt="";
+
+data.forEach(s=>{
+
+opt+=`<option value="${s.reg}|${s.aid}">
+${s.name} (${s.reg})
+</option>`;
+});
+
+marklist.innerHTML=opt;
+
+}
+
+function saveMark(){
+
+let [reg,aid]=marklist.value.split("|");
+
+let data=JSON.parse(localStorage.marks||"[]");
+
+data.push({
+reg,aid,mark:mark.value
+});
+
+localStorage.marks=JSON.stringify(data);
+
+alert("Saved");
+
+}
+
+/* RESULTS */
+function loadResults(){
+
+let u=JSON.parse(localStorage.user);
+
+let data=JSON.parse(localStorage.marks||"[]");
+
+let html="";
+
+data.filter(x=>x.reg==u.reg)
+.forEach(r=>{
+
+html+=`
+<div class="card">
+Assignment: ${r.aid}<br>
+Marks: ${r.mark}
+</div>`;
+
+});
+
+smarks.innerHTML=html;
+
+}
+
+/* ADMIN */
+function loadUsers(){
+
+let s=JSON.parse(localStorage.students||"[]");
+let t=JSON.parse(localStorage.teachers||"[]");
+
+let html="<h4>Students</h4>";
+
+s.forEach(x=>html+=x.name+"<br>");
+
+html+="<h4>Teachers</h4>";
+
+t.forEach(x=>html+=x.name+" ("+x.subject+")<br>");
+
+ausers.innerHTML=html;
+
+}
+
+function loadAllResults(){
+
+let d=JSON.parse(localStorage.marks||"[]");
+
+let html="";
+
+d.forEach(r=>{
+
+html+=`
+<div class="card">
+${r.reg} - ${r.aid} : ${r.mark}
+</div>`;
+
+});
+
+aresults.innerHTML=html;
+
+}
+
+/* LOAD */
+function loadAll(){
+
+loadAssign();
+loadSubs();
+loadMark();
+loadResults();
+loadUsers();
+loadAllResults();
+
+}
 
 </script>
 
 </body>
-</html>
+  </html>
