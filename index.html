@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="sw">
 <head>
-<title>College Portal Login</title>
+<meta charset="UTF-8">
+<title>Kingdom College Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -9,7 +10,7 @@ body{
 font-family:Arial;
 background:#f2f2f2;
 text-align:center;
-padding:50px;
+padding:40px;
 }
 
 .box{
@@ -41,46 +42,68 @@ cursor:pointer;
 
 <div class="box">
 
-<h2>College Portal</h2>
+<h2>Student Login</h2>
 
-<input type="text" id="reg" placeholder="Registration Number">
-<input type="password" id="password" placeholder="Password">
+<input id="reg" placeholder="Registration Number">
+<input id="pass" type="password" placeholder="Password">
 
 <button onclick="login()">Login</button>
 <button onclick="register()">Register</button>
 
+<p id="msg"></p>
+
 </div>
 
-<script type="module">
 
-import { auth } from "./firebase.js";
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-import {
-signInWithEmailAndPassword,
-createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+<script>
+
+const firebaseConfig = {
+ apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+ authDomain: "collegeportal-app.firebaseapp.com",
+ databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+ projectId: "collegeportal-app",
+ storageBucket: "collegeportal-app.firebasestorage.app",
+ messagingSenderId: "266762331631",
+ appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
 
-// Convert Reg to Email
-function makeEmail(reg){
-return reg + "@kcs.com";
-}
-
-
-// LOGIN
-function login(){
+function register(){
 
 let reg = document.getElementById("reg").value;
-let pass = document.getElementById("password").value;
+let pass = document.getElementById("pass").value;
 
-if(reg=="" || pass==""){
+if(reg==""||pass==""){
 alert("Fill all fields");
 return;
 }
 
-let email = makeEmail(reg);
+let email = reg + "@kcs.com";
 
-signInWithEmailAndPassword(auth,email,pass)
+auth.createUserWithEmailAndPassword(email,pass)
+.then(()=>{
+document.getElementById("msg").innerText="Registered Successfully ✅";
+})
+.catch(e=>alert(e.message));
+
+}
+
+
+function login(){
+
+let reg = document.getElementById("reg").value;
+let pass = document.getElementById("pass").value;
+
+let email = reg + "@kcs.com";
+
+auth.signInWithEmailAndPassword(email,pass)
 .then(()=>{
 
 localStorage.setItem("student",reg);
@@ -88,33 +111,9 @@ localStorage.setItem("student",reg);
 window.location="student.html";
 
 })
-.catch(()=>alert("Wrong Login"));
+.catch(()=>alert("Wrong Login ❌"));
 
 }
-
-
-// REGISTER
-function register(){
-
-let reg = document.getElementById("reg").value;
-let pass = document.getElementById("password").value;
-
-if(reg=="" || pass==""){
-alert("Fill all fields");
-return;
-}
-
-let email = makeEmail(reg);
-
-createUserWithEmailAndPassword(auth,email,pass)
-.then(()=>alert("Registered Successfully ✅"))
-.catch(e=>alert(e.message));
-
-}
-
-
-window.login = login;
-window.register = register;
 
 </script>
 
