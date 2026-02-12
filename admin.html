@@ -1,315 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Admin Panel - Kingdom College</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>Admin Login</title>
 <style>
 body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#f2f2f2;
+font-family:Arial;
+background:#f4f4f4;
+text-align:center;
+padding:50px;
 }
-
-header{
-    background:#0a3d62;
-    color:white;
-    padding:15px;
-    text-align:center;
+input,button{
+padding:10px;
+margin:10px;
+width:80%;
+max-width:300px;
 }
-
-#loginBox, #dashboard{
-    max-width:400px;
-    margin:40px auto;
-    background:white;
-    padding:20px;
-    border-radius:8px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
-
-input, button{
-    width:100%;
-    padding:10px;
-    margin:8px 0;
-}
-
 button{
-    background:#1e3799;
-    color:white;
-    border:none;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#4a69bd;
-}
-
-.menu button{
-    width:100%;
-    margin:5px 0;
-}
-
-.section{
-    display:none;
-    margin-top:15px;
-}
-
-textarea{
-    width:100%;
-    height:80px;
+background:#007bff;
+color:white;
+border:none;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<h2>Kingdom College - Admin Panel</h2>
-</header>
+<h2>🔐 Admin Login</h2>
 
-<!-- LOGIN -->
-<div id="loginBox">
-
-<h3>Admin Login</h3>
-
-<input type="text" id="username" placeholder="Username">
-<input type="password" id="password" placeholder="Password">
+<input type="text" id="user" placeholder="Username"><br>
+<input type="password" id="pass" placeholder="Password"><br>
 
 <button onclick="login()">Login</button>
 
-<p id="msg" style="color:red;"></p>
-
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" style="display:none;">
-
-<h3>Admin Dashboard</h3>
-
-<div class="menu">
-<button onclick="showNews()">News</button>
-<button onclick="show('news')">📰 News</button>
-<button onclick="show('sports')">⚽ Sports & Games</button>
-<button onclick="show('students')">👨‍🎓 Students</button>
-<button onclick="show('transfer')">🔁 Transfers</button>
-<button onclick="logout()">🚪 Logout</button>
-
-</div>
-
-<!-- NEWS -->
-<div id="news" class="section">
-
-<h4>Post News</h4>
-
-<textarea id="newsText"></textarea>
-
-<button onclick="saveNews()">Save News</button>
-
-<p id="newsList"></p>
-
-</div>
-
-<!-- SPORTS -->
-<div id="sports" class="section">
-
-<h4>Sports Schedule</h4>
-
-<textarea id="sportText"></textarea>
-
-<button onclick="saveSport()">Save Schedule</button>
-
-<p id="sportList"></p>
-
-</div>
-
-<!-- STUDENTS -->
-<div id="students" class="section">
-
-<h4>Students Records</h4>
-
-<input id="studName" placeholder="Student Name">
-<input id="studReg" placeholder="Reg Number">
-
-<button onclick="saveStudent()">Save Student</button>
-
-<p id="studList"></p>
-
-</div>
-
-<!-- TRANSFER -->
-<div id="transfer" class="section">
-
-<h4>Transfer Requests</h4>
-
-<textarea id="transferText"></textarea>
-
-<button onclick="saveTransfer()">Save Request</button>
-
-<p id="transferList"></p>
-
-</div>
-
-</div>
+<p id="msg"></p>
 
 <script>
-
-// Login
 function login(){
-    let u = document.getElementById("username").value;
-    let p = document.getElementById("password").value;
 
-    if(u==="admin" && p==="1234"){
-        document.getElementById("loginBox").style.display="none";
-        document.getElementById("dashboard").style.display="block";
-    }else{
-        document.getElementById("msg").innerHTML="Wrong login!";
-    }
+let u=document.getElementById("user").value;
+let p=document.getElementById("pass").value;
+
+// Badilisha hizi kama unataka
+if(u=="admin" && p=="12345"){
+
+localStorage.setItem("adminLogin","yes");
+window.location="admin-panel.html";
+
+}else{
+document.getElementById("msg").innerHTML="❌ Wrong login!";
 }
-
-// Show sections
-function show(id){
-    let secs = document.getElementsByClassName("section");
-
-    for(let i=0;i<secs.length;i++){
-        secs[i].style.display="none";
-    }
-
-    document.getElementById(id).style.display="block";
 }
-
-// Logout
-function logout(){
-    location.reload();
-}
-
-// NEWS
-function saveNews(){
-    let t = document.getElementById("newsText").value;
-    localStorage.setItem("news", t);
-    loadNews();
-}
-
-function loadNews(){
-    document.getElementById("newsList").innerHTML =
-    localStorage.getItem("news") || "";
-}
-
-// SPORTS
-function saveSport(){
-    let t = document.getElementById("sportText").value;
-    localStorage.setItem("sport", t);
-    loadSport();
-}
-
-function loadSport(){
-    document.getElementById("sportList").innerHTML =
-    localStorage.getItem("sport") || "";
-}
-
-// STUDENTS
-function saveStudent(){
-    let n = document.getElementById("studName").value;
-    let r = document.getElementById("studReg").value;
-
-    let data = n+" - "+r+"<br>";
-
-    let old = localStorage.getItem("students") || "";
-
-    localStorage.setItem("students", old+data);
-
-    loadStudent();
-}
-
-function loadStudent(){
-    document.getElementById("studList").innerHTML =
-    localStorage.getItem("students") || "";
-}
-
-// TRANSFER
-function saveTransfer(){
-    let t = document.getElementById("transferText").value;
-    localStorage.setItem("transfer", t);
-    loadTransfer();
-}
-
-function loadTransfer(){
-    document.getElementById("transferList").innerHTML =
-    localStorage.getItem("transfer") || "";
-}
-
-// Auto load
-loadNews();
-loadSport();
-loadStudent();
-loadTransfer();
-
 </script>
 
-    <!-- NEWS SECTION -->
-<div id="newsSection" style="display:none;" class="card">
-
-  <h2>📢 Post News / Announcement</h2>
-
-  <input type="text" id="newsTitle" placeholder="Title">
-  <textarea id="newsContent" placeholder="Write announcement here..."></textarea>
-
-  <button onclick="postNews()">Post News</button>
-
-  <h3>Posted News</h3>
-  <div id="newsList"></div>
-
-</div>
-
-<script>
-function postNews(){
-
-  let title = document.getElementById("newsTitle").value;
-  let content = document.getElementById("newsContent").value;
-
-  if(title=="" || content==""){
-    alert("Fill all fields");
-    return;
-  }
-
-  let news = {
-    title: title,
-    content: content,
-    date: new Date().toLocaleString()
-  };
-
-  let allNews = JSON.parse(localStorage.getItem("collegeNews")) || [];
-
-  allNews.unshift(news);
-
-  localStorage.setItem("collegeNews", JSON.stringify(allNews));
-
-  document.getElementById("newsTitle").value="";
-  document.getElementById("newsContent").value="";
-
-  loadNews();
-}
-
-function loadNews(){
-
-  let allNews = JSON.parse(localStorage.getItem("collegeNews")) || [];
-
-  let html = "";
-
-  allNews.forEach(n=>{
-    html += `
-      <div style="border:1px solid #ccc;padding:10px;margin:10px 0;">
-        <h4>${n.title}</h4>
-        <small>${n.date}</small>
-        <p>${n.content}</p>
-      </div>
-    `;
-  });
-
-  document.getElementById("newsList").innerHTML = html;
-}
-
-loadNews();
-</script>
 </body>
 </html>
