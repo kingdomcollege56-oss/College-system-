@@ -1,26 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <title>College Portal Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-
 body{
 font-family:Arial;
 background:#f2f2f2;
 text-align:center;
-padding-top:100px;
+padding:50px;
 }
 
 .box{
 background:white;
-width:300px;
+max-width:350px;
 margin:auto;
 padding:20px;
 border-radius:10px;
-box-shadow:0 0 10px gray;
+box-shadow:0 0 5px gray;
 }
 
 input,button{
@@ -33,14 +31,9 @@ button{
 background:#1e3799;
 color:white;
 border:none;
-cursor:pointer;
 border-radius:5px;
+cursor:pointer;
 }
-
-button:hover{
-background:#4a69bd;
-}
-
 </style>
 </head>
 
@@ -48,54 +41,54 @@ background:#4a69bd;
 
 <div class="box">
 
-<h2>College Portal Login</h2>
+<h2>College Portal</h2>
 
-<input type="email" id="email" placeholder="Email">
-
+<input type="text" id="reg" placeholder="Registration Number">
 <input type="password" id="password" placeholder="Password">
 
 <button onclick="login()">Login</button>
-
 <button onclick="register()">Register</button>
 
 </div>
 
+<script type="module">
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+import { auth } from "./firebase.js";
 
-<script>
+import {
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-const firebaseConfig = {
- apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
- authDomain: "collegeportal-app.firebaseapp.com",
- projectId: "collegeportal-app",
- storageBucket: "collegeportal-app.firebasestorage.app",
- messagingSenderId: "266762331631",
- appId: "1:266762331631:web:66ddfbde53d33086ac421a"
-};
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
+// Convert Reg to Email
+function makeEmail(reg){
+return reg + "@kcs.com";
+}
 
 
 // LOGIN
 function login(){
 
-let email = document.getElementById("email").value;
+let reg = document.getElementById("reg").value;
 let pass = document.getElementById("password").value;
 
-auth.signInWithEmailAndPassword(email,pass)
+if(reg=="" || pass==""){
+alert("Fill all fields");
+return;
+}
+
+let email = makeEmail(reg);
+
+signInWithEmailAndPassword(auth,email,pass)
 .then(()=>{
 
-localStorage.setItem("student",email);
+localStorage.setItem("student",reg);
 
 window.location="student.html";
 
 })
-.catch(e=>alert(e.message));
+.catch(()=>alert("Wrong Login"));
 
 }
 
@@ -103,16 +96,25 @@ window.location="student.html";
 // REGISTER
 function register(){
 
-let email = document.getElementById("email").value;
+let reg = document.getElementById("reg").value;
 let pass = document.getElementById("password").value;
 
-auth.createUserWithEmailAndPassword(email,pass)
-.then(()=>{
-alert("Registered Successfully ✅");
-})
+if(reg=="" || pass==""){
+alert("Fill all fields");
+return;
+}
+
+let email = makeEmail(reg);
+
+createUserWithEmailAndPassword(auth,email,pass)
+.then(()=>alert("Registered Successfully ✅"))
 .catch(e=>alert(e.message));
 
 }
+
+
+window.login = login;
+window.register = register;
 
 </script>
 
