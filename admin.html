@@ -88,7 +88,7 @@ textarea{
 <h3>Admin Dashboard</h3>
 
 <div class="menu">
-
+<button onclick="showNews()">News</button>
 <button onclick="show('news')">📰 News</button>
 <button onclick="show('sports')">⚽ Sports & Games</button>
 <button onclick="show('students')">👨‍🎓 Students</button>
@@ -246,5 +246,70 @@ loadTransfer();
 
 </script>
 
+    <!-- NEWS SECTION -->
+<div id="newsSection" style="display:none;" class="card">
+
+  <h2>📢 Post News / Announcement</h2>
+
+  <input type="text" id="newsTitle" placeholder="Title">
+  <textarea id="newsContent" placeholder="Write announcement here..."></textarea>
+
+  <button onclick="postNews()">Post News</button>
+
+  <h3>Posted News</h3>
+  <div id="newsList"></div>
+
+</div>
+
+<script>
+function postNews(){
+
+  let title = document.getElementById("newsTitle").value;
+  let content = document.getElementById("newsContent").value;
+
+  if(title=="" || content==""){
+    alert("Fill all fields");
+    return;
+  }
+
+  let news = {
+    title: title,
+    content: content,
+    date: new Date().toLocaleString()
+  };
+
+  let allNews = JSON.parse(localStorage.getItem("collegeNews")) || [];
+
+  allNews.unshift(news);
+
+  localStorage.setItem("collegeNews", JSON.stringify(allNews));
+
+  document.getElementById("newsTitle").value="";
+  document.getElementById("newsContent").value="";
+
+  loadNews();
+}
+
+function loadNews(){
+
+  let allNews = JSON.parse(localStorage.getItem("collegeNews")) || [];
+
+  let html = "";
+
+  allNews.forEach(n=>{
+    html += `
+      <div style="border:1px solid #ccc;padding:10px;margin:10px 0;">
+        <h4>${n.title}</h4>
+        <small>${n.date}</small>
+        <p>${n.content}</p>
+      </div>
+    `;
+  });
+
+  document.getElementById("newsList").innerHTML = html;
+}
+
+loadNews();
+</script>
 </body>
 </html>
