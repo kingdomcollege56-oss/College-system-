@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f2f2f2;
+}
+
+header{
+background:#0a3d62;
+color:white;
+padding:15px;
+text-align:center;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:15px;
+}
+
+.menu{
+display:flex;
+flex-wrap:wrap;
+gap:5px;
+justify-content:center;
+margin-bottom:10px;
+}
+
+.menu button{
+padding:10px;
+border:none;
+background:#1e3799;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+.menu button:hover{
+background:#4a69bd;
+}
+
+.section{
+display:none;
+background:white;
+padding:15px;
+border-radius:8px;
+box-shadow:0 0 5px gray;
+margin-bottom:15px;
+}
+
+.card{
+border:1px solid #ccc;
+padding:10px;
+border-radius:5px;
+margin:8px 0;
+}
+
+input,textarea,select,button{
+width:100%;
+padding:8px;
+margin:5px 0;
+}
+
+.logout{
+background:red;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>Kingdom College Student Portal</h2>
+<p id="studentName"></p>
+</header>
+
+<div class="container">
+
+<div class="menu">
+
+<button onclick="openSection('profile')">Profile</button>
+<button onclick="openSection('subjects')">Subjects</button>
+<button onclick="openSection('materials')">Materials</button>
+<button onclick="openSection('assignments')">Assignments</button>
+<button onclick="openSection('results')">Results</button>
+<button onclick="openSection('fees')">Fees</button>
+<button onclick="openSection('messages')">Counsellor</button>
+<button onclick="openSection('sports')">Sports</button>
+<button onclick="logout()" class="logout">Logout</button>
+
+</div>
+
+<!-- PROFILE -->
+<div id="profile" class="section">
+
+<h3>My Profile</h3>
+
+<div class="card">
+<p><b>Reg No:</b> <span id="regNo"></span></p>
+<p><b>Level:</b>
+<select id="level" onchange="loadSubjects()">
+<option value="4">Level 4</option>
+<option value="5">Level 5</option>
+<option value="6">Level 6</option>
+</select>
+</p>
+
+<p><b>Semester:</b>
+<select id="semester" onchange="loadSubjects()">
+<option value="1">Semester 1</option>
+<option value="2">Semester 2</option>
+</select>
+</p>
+</div>
+
+</div>
+
+<!-- SUBJECTS -->
+<div id="subjects" class="section">
+
+<h3>My Subjects</h3>
+<div id="subjectList"></div>
+
+</div>
+
+<!-- MATERIALS -->
+<div id="materials" class="section">
+
+<h3>Study Materials</h3>
+
+<div class="card">
+<p>No materials uploaded yet.</p>
+</div>
+
+</div>
+
+<!-- ASSIGNMENTS -->
+<div id="assignments" class="section">
+
+<h3>Assignments</h3>
+
+<input type="text" id="assSubject" placeholder="Subject">
+<textarea id="assText" placeholder="Write assignment..."></textarea>
+
+<button onclick="sendAssignment()">Submit</button>
+
+<div id="assList"></div>
+
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="section">
+
+<h3>My Results</h3>
+
+<div class="card">
+<p>Results not published yet.</p>
+</div>
+
+</div>
+
+<!-- FEES -->
+<div id="fees" class="section">
+
+<h3>Fees Status</h3>
+
+<div class="card">
+<p>Paid: TZS 0</p>
+<p>Balance: TZS 0</p>
+</div>
+
+</div>
+
+<!-- MESSAGES -->
+<div id="messages" class="section">
+
+<h3>Message to Counsellor</h3>
+
+<textarea id="msgText" placeholder="Write message..."></textarea>
+<button onclick="sendMessage()">Send</button>
+
+<div id="msgList"></div>
+
+</div>
+
+<!-- SPORTS -->
+<div id="sports" class="section">
+
+<h3>Sports & Games</h3>
+
+<div class="card">
+<p>Football Team</p>
+<p>Netball Team</p>
+<p>Volleyball Team</p>
+</div>
+
+</div>
+
+</div>
+
+<footer style="text-align:center;padding:10px;">
+© 2026 Kingdom College | By Carina
+</footer>
+
+<script>
+
+// Check Login
+let student = localStorage.getItem("student");
+
+if(!student){
+  window.location.href="index.html";
+}
+
+document.getElementById("studentName").innerText =
+"Welcome: " + student;
+
+document.getElementById("regNo").innerText = student;
+
+
+// Open Section
+function openSection(id){
+
+let sections=document.querySelectorAll(".section");
+
+sections.forEach(s=>s.style.display="none");
+
+document.getElementById(id).style.display="block";
+
+}
+
+
+// Subjects Data
+const subjects = {
+
+4:{
+1:[
+"Communication",
+"Anatomy",
+"Physiology",
+"Computer",
+"Epidemiology & Biostatistics",
+"Medical Ethics",
+"Microbiology"
+],
+2:[
+"Clinical Skills",
+"Clinical Nutrition",
+"Patient Care",
+"Clinical Laboratory",
+"Pathology"
+]
+},
+
+5:{
+1:[
+"Pediatric 1",
+"Internal Medicine 1",
+"Obstetrics 1",
+"Pharmacology",
+"Counselling",
+"Health Promotion"
+],
+2:[
+"Pediatric 2",
+"Internal Medicine 2",
+"Surgery",
+"Obstetrics 2",
+"RSH"
+]
+},
+
+6:{
+1:["Coming Soon"],
+2:["Coming Soon"]
+}
+
+};
+
+
+// Load Subjects
+function loadSubjects(){
+
+let level = document.getElementById("level").value;
+let sem = document.getElementById("semester").value;
+
+let list = subjects[level][sem];
+
+let box = document.getElementById("subjectList");
+
+box.innerHTML="";
+
+list.forEach(sub=>{
+
+box.innerHTML += `<div class="card">${sub}</div>`;
+
+});
+
+}
+
+
+// Assignment
+function sendAssignment(){
+
+let sub = document.getElementById("assSubject").value;
+let text = document.getElementById("assText").value;
+
+if(sub==""||text==""){
+alert("Fill all fields");
+return;
+}
+
+let box = document.getElementById("assList");
+
+box.innerHTML += `
+<div class="card">
+<b>${sub}</b>
+<p>${text}</p>
+<small>Sent</small>
+</div>
+`;
+
+document.getElementById("assSubject").value="";
+document.getElementById("assText").value="";
+
+}
+
+
+// Message
+function sendMessage(){
+
+let msg = document.getElementById("msgText").value;
+
+if(msg==""){
+alert("Write message");
+return;
+}
+
+let box=document.getElementById("msgList");
+
+box.innerHTML += `
+<div class="card">
+<p>${msg}</p>
+<small>Sent</small>
+</div>
+`;
+
+document.getElementById("msgText").value="";
+
+}
+
+
+// Logout
+function logout(){
+
+localStorage.removeItem("student");
+
+window.location.href="index.html";
+
+}
+
+
+// Default
+openSection("profile");
+loadSubjects();
+
+</script>
+
+</body>
+                 </html>
