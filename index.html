@@ -1,171 +1,57 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Kingdom College System</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-body{
-  font-family:Arial;
-  background:#f2f2f2;
-  margin:0;
-}
-
-header{
-  background:#0a3d62;
-  color:white;
-  padding:20px;
-  text-align:center;
-}
-
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
-}
-
-.box{
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 0 8px gray;
-  max-width:400px;
-  margin:20px auto;
-}
-
-input,button{
-  width:100%;
-  padding:10px;
-  margin:6px 0;
-}
-
-button{
-  background:#1e3799;
-  color:white;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-}
-
-button:hover{
-  background:#4a69bd;
-}
-</style>
+<title>Login</title>
 </head>
-
 <body>
 
-<header>
-<h2>Kingdom College Management System</h2>
-</header>
+<h2>College Portal Login</h2>
 
-<div class="container">
-
-<!-- LOGIN -->
-<div class="box">
-
-<h3>Student Login</h3>
-
-<input id="loginReg" placeholder="Reg Number (Example: Ns4882_0014_2022)">
-<input id="loginPass" type="password" placeholder="Password">
+<input type="email" id="email" placeholder="Email"><br><br>
+<input type="password" id="password" placeholder="Password"><br><br>
 
 <button onclick="login()">Login</button>
-
-<hr>
-
-<h3>Register</h3>
-
-<input id="regReg" placeholder="Reg Number (Example: Ns4882_0014_2022)">
-<input id="regPass" type="password" placeholder="Password (min 6 chars)">
-
 <button onclick="register()">Register</button>
 
-</div>
+<script type="module">
 
-</div>
-
-<footer style="text-align:center;padding:15px;">
-© 2026 Kingdom College | By Carina
-</footer>
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-<script>
-
-const firebaseConfig = {
- apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
- authDomain: "collegeportal-app.firebaseapp.com",
- projectId: "collegeportal-app",
- storageBucket: "collegeportal-app.appspot.com",
- messagingSenderId: "266762331631",
- appId: "1:266762331631:web:66ddfbde53d33086ac421a"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
+import { auth } from "./firebase.js";
+import {
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 
-// REGISTER
-function register(){
-
-  let reg = document.getElementById("regReg").value.trim();
-  let pass = document.getElementById("regPass").value;
-
-  if(reg=="" || pass==""){
-    alert("Jaza taarifa zote");
-    return;
-  }
-
-  if(pass.length < 6){
-    alert("Password iwe angalau herufi 6");
-    return;
-  }
-
-  let email = reg + "@kcs.com";
-
-  auth.createUserWithEmailAndPassword(email, pass)
-  .then(()=>{
-    alert("Registered Successfully ✅");
-  })
-  .catch(err=>{
-    alert(err.message);
-  });
-
-}
-
-
-// LOGIN
 function login(){
 
-  let reg = document.getElementById("loginReg").value.trim();
-  let pass = document.getElementById("loginPass").value;
+let email=document.getElementById("email").value;
+let pass=document.getElementById("password").value;
 
-  if(reg=="" || pass==""){
-    alert("Jaza taarifa zote");
-    return;
-  }
-
-  let email = reg + "@kcs.com";
-
-  auth.signInWithEmailAndPassword(email, pass)
-  .then(()=>{
-
-    // HAPA NDIO REDIRECT
-    window.location.href = "student.html";
-
-  })
-  .catch(err=>{
-    alert(err.message);
-  });
+signInWithEmailAndPassword(auth,email,pass)
+.then(()=>{
+window.location="student.html";
+})
+.catch(e=>alert(e.message));
 
 }
+
+function register(){
+
+let email=document.getElementById("email").value;
+let pass=document.getElementById("password").value;
+
+createUserWithEmailAndPassword(auth,email,pass)
+.then(()=>{
+alert("Registered!");
+})
+.catch(e=>alert(e.message));
+
+}
+
+window.login=login;
+window.register=register;
 
 </script>
 
 </body>
 </html>
-
