@@ -213,11 +213,13 @@ background:red;
 
 <script>
 
-// Check Login
+// LOGIN FIX (NO REDIRECT)
+
 let student = localStorage.getItem("student");
 
 if(!student){
-  window.location.href="index.html";
+  student = "Guest-Student";
+  localStorage.setItem("student", student);
 }
 
 document.getElementById("studentName").innerText =
@@ -375,4 +377,4 @@ loadSubjects();
 </script>
 
 </body>
-                 </html>
+</html>
