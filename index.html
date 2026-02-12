@@ -20,7 +20,7 @@ background:white;padding:20px;border-radius:10px;
 box-shadow:0 0 8px gray;max-width:400px;margin:20px auto;
 }
 
-input,textarea,select,button{
+input,button{
 width:100%;padding:10px;margin:6px 0;
 }
 
@@ -31,18 +31,7 @@ cursor:pointer;
 
 button:hover{background:#4a69bd;}
 
-.menu button{margin:3px;}
-
-.section{
-display:none;background:white;padding:15px;margin-top:10px;
-border-radius:8px;
-}
-
-.card{
-border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
-}
-
-#studentDash,#adminDash,#teacherDash{display:none;}
+#studentDash,#teacherDash,#adminDash{display:none;}
 
 </style>
 </head>
@@ -55,7 +44,7 @@ border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
 
 <div class="container">
 
-<!-- SELECT ROLE -->
+<!-- SELECT -->
 <div id="selectBox" class="box">
 
 <h3>Login As</h3>
@@ -78,7 +67,6 @@ border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
 
 <hr>
 
-<input id="sn" placeholder="Full Name">
 <input id="sr2" placeholder="Reg Number">
 <input id="sp2" type="password" placeholder="Password">
 
@@ -98,8 +86,6 @@ border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
 
 <hr>
 
-<input id="tn" placeholder="Full Name">
-<input id="ts" placeholder="Subject">
 <input id="tr2" placeholder="Username">
 <input id="tp2" type="password" placeholder="Password">
 
@@ -121,55 +107,88 @@ border:1px solid #ccc;padding:10px;margin:8px 0;border-radius:6px;
 
 <!-- DASHBOARDS -->
 
-<div id="studentDash"></div>
-<div id="teacherDash"></div>
-<div id="adminDash"></div>
+<div id="studentDash" class="box">
+<h3>Student Dashboard</h3>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div id="teacherDash" class="box">
+<h3>Teacher Dashboard</h3>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div id="adminDash" class="box">
+<h3>Admin Dashboard</h3>
+<button onclick="logout()">Logout</button>
+</div>
 
 </div>
 
 <footer>
-<p>© 2026 Kingdom College | By Carina</p>
+<p style="text-align:center;">© 2026 Kingdom College | By Carina</p>
 </footer>
 
-<!-- FIREBASE SDK -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
 
+// GET ELEMENTS
+const selectBox = document.getElementById("selectBox");
+const studentBox = document.getElementById("studentBox");
+const teacherBox = document.getElementById("teacherBox");
+const adminBox   = document.getElementById("adminBox");
+
+const studentDash = document.getElementById("studentDash");
+const teacherDash = document.getElementById("teacherDash");
+const adminDash   = document.getElementById("adminDash");
+
 /* FIREBASE CONFIG */
 const firebaseConfig = {
  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
  authDomain: "collegeportal-app.firebaseapp.com",
- databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
  projectId: "collegeportal-app",
  storageBucket: "collegeportal-app.firebasestorage.app",
  messagingSenderId: "266762331631",
  appId: "1:266762331631:web:66ddfbde53d33086ac421a"
 };
 
+// INIT
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 /* OPEN */
-function openStudent(){hide();studentBox.style.display="block";}
-function openTeacher(){hide();teacherBox.style.display="block";}
-function openAdmin(){hide();adminBox.style.display="block";}
+function openStudent(){
+ hide();
+ studentBox.style.display="block";
+}
+
+function openTeacher(){
+ hide();
+ teacherBox.style.display="block";
+}
+
+function openAdmin(){
+ hide();
+ adminBox.style.display="block";
+}
 
 function hide(){
-selectBox.style.display="none";
-studentBox.style.display="none";
-teacherBox.style.display="none";
-adminBox.style.display="none";
+ selectBox.style.display="none";
+ studentBox.style.display="none";
+ teacherBox.style.display="none";
+ adminBox.style.display="none";
+ studentDash.style.display="none";
+ teacherDash.style.display="none";
+ adminDash.style.display="none";
 }
 
 /* STUDENT */
 function studentRegister(){
 
 auth.createUserWithEmailAndPassword(sr2.value+"@kcs.com",sp2.value)
-.then(()=>{
-alert("Registered ✅");
-})
+.then(()=>alert("Student Registered ✅"))
 .catch(e=>alert(e.message));
 
 }
@@ -178,9 +197,10 @@ function studentLogin(){
 
 auth.signInWithEmailAndPassword(sr.value+"@kcs.com",sp.value)
 .then(()=>{
-alert("Login OK ✅");
+ hide();
+ studentDash.style.display="block";
 })
-.catch(e=>alert("Wrong Login"));
+.catch(()=>alert("Wrong Login"));
 
 }
 
@@ -188,7 +208,7 @@ alert("Login OK ✅");
 function teacherRegister(){
 
 auth.createUserWithEmailAndPassword(tr2.value+"@kcs.com",tp2.value)
-.then(()=>alert("Teacher Registered"))
+.then(()=>alert("Teacher Registered ✅"))
 .catch(e=>alert(e.message));
 
 }
@@ -196,8 +216,11 @@ auth.createUserWithEmailAndPassword(tr2.value+"@kcs.com",tp2.value)
 function teacherLogin(){
 
 auth.signInWithEmailAndPassword(tr.value+"@kcs.com",tp.value)
-.then(()=>alert("Teacher Login OK"))
-.catch(()=>alert("Wrong"));
+.then(()=>{
+ hide();
+ teacherDash.style.display="block";
+})
+.catch(()=>alert("Wrong Login"));
 
 }
 
@@ -205,10 +228,21 @@ auth.signInWithEmailAndPassword(tr.value+"@kcs.com",tp.value)
 function adminLogin(){
 
 if(au.value=="admin" && ap.value=="1234"){
-alert("Admin OK");
+
+ hide();
+ adminDash.style.display="block";
+
 }else{
-alert("Wrong");
+ alert("Wrong Login");
 }
+
+}
+
+/* LOGOUT */
+function logout(){
+
+auth.signOut();
+location.reload();
 
 }
 
