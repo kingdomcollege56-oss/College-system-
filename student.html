@@ -375,6 +375,13 @@ openSection("profile");
 loadSubjects();
 
 </script>
+<script>
+let student = localStorage.getItem("student");
 
+if(!student){
+ alert("Please login first!");
+ window.location="index.html";
+}
+</script>
 </body>
 </html>
