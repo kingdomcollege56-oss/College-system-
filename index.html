@@ -72,6 +72,7 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
 
 
@@ -108,7 +109,7 @@ auth.signInWithEmailAndPassword(email,pass)
 
 localStorage.setItem("student",reg);
 
-window.location="student.html";
+window.location="profile.html";
 
 })
 .catch(()=>alert("Wrong Login ❌"));
