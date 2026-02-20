@@ -16,10 +16,6 @@ header{background:#0a3d62;color:white;padding:15px;text-align:center;}
 input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 .logout{background:red;}
 </style>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -79,40 +75,41 @@ input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 </footer>
 
 <script>
-// Firebase setup
-const firebaseConfig = {
- apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
- authDomain: "collegeportal-app.firebaseapp.com",
- databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
- projectId: "collegeportal-app",
- storageBucket: "collegeportal-app.firebasestorage.app",
- messagingSenderId: "266762331631",
- appId: "1:266762331631:web:66ddfbde53d33086ac421a"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+// --- Dummy Data ---
+const counsellorAccount = {username:"counsellor", password:"secure123"};
+let messages = [
+  {student:"student1@example.com", text:"I need help with registration", date:"2026-02-20", replies:[]},
+  {student:"student2@example.com", text:"Transfer request question", date:"2026-02-19", replies:[]}
+];
+let transfers = [
+  {student:"student1@example.com", currentCourse:"Biology", currentLevel:2, currentSemester:1, requestedCourse:"Chemistry", requestedLevel:2, requestedSemester:1, requestedInstitution:"Kingdom College", reason:"Change of interest", date:"2026-02-18", status:"Pending"},
+  {student:"student2@example.com", currentCourse:"Physics", currentLevel:1, currentSemester:2, requestedCourse:"Math", requestedLevel:1, requestedSemester:2, requestedInstitution:"Kingdom College", reason:"Better program", date:"2026-02-19", status:"Pending"}
+];
+let announcements = [
+  {title:"Welcome Students", message:"Semester begins next Monday", teacher:"Counsellor", date:"2026-02-15"}
+];
 
-// Single counsellor credentials
-const counsellorAccount = {
- username:"counsellor",
- password:"secure123"
-};
-
-// LOGIN FUNCTION
+// --- LOGIN FUNCTION ---
 function cLogin(){
- let u = document.getElementById("cUsername").value;
- let p = document.getElementById("cPassword").value;
+ let u = document.getElementById("cUsername").value.trim();
+ let p = document.getElementById("cPassword").value.trim();
  if(u===counsellorAccount.username && p===counsellorAccount.password){
    localStorage.setItem("counsellor","loggedin");
-   document.getElementById("loginSection").style.display="none";
-   document.getElementById("dashboard").style.display="block";
-   document.getElementById("counsellorName").innerText = "Welcome Counsellor";
-   loadMessages();
-   loadTransfers();
-   loadAnnouncements();
+   showDashboard();
  } else {
    document.getElementById("loginMsg").innerText="Wrong credentials!";
  }
+}
+
+// Show dashboard
+function showDashboard(){
+ document.getElementById("loginSection").style.display="none";
+ document.getElementById("dashboard").style.display="block";
+ document.getElementById("counsellorName").innerText = "Welcome Counsellor";
+ openSection("messages");
+ loadMessages();
+ loadTransfers();
+ loadAnnouncements();
 }
 
 // LOGOUT
@@ -123,117 +120,93 @@ function logout(){
 
 // Check session
 if(localStorage.getItem("counsellor")){
- document.getElementById("loginSection").style.display="none";
- document.getElementById("dashboard").style.display="block";
- document.getElementById("counsellorName").innerText = "Welcome Counsellor";
- loadMessages();
- loadTransfers();
- loadAnnouncements();
+ showDashboard();
 }
 
-// SECTIONS
+// --- Sections ---
 function openSection(id){
  document.querySelectorAll(".section").forEach(s=>{if(s.id!=="loginSection") s.style.display="none";});
  document.getElementById(id).style.display="block";
 }
 
-// MESSAGES
+// --- MESSAGES ---
 function loadMessages(){
- let list = document.getElementById("msgList");
+ const list = document.getElementById("msgList");
  list.innerHTML="";
- db.ref("messages").once("value").then(snapshot=>{
-   snapshot.forEach(studentSnap=>{
-     studentSnap.forEach(msgSnap=>{
-       let m = msgSnap.val();
-       let div = document.createElement("div");
-       div.className="card";
-       div.innerHTML = `<b>From Student:</b> ${studentSnap.key}<br>${m.text}<br><i>${m.date}</i>
-                        <button onclick="prepareReply('${studentSnap.key}')">Reply</button>`;
-       list.appendChild(div);
+ messages.forEach((m,i)=>{
+   let div = document.createElement("div");
+   div.className="card";
+   div.innerHTML = `<b>From Student:</b> ${m.student}<br>${m.text}<br><i>${m.date}</i>
+   <button onclick="prepareReply(${i})">Reply</button>`;
+   if(m.replies.length>0){
+     m.replies.forEach(r=>{
+       div.innerHTML+=`<div style="margin-left:10px;color:green;"><b>Reply:</b> ${r.text} <i>${r.date}</i></div>`;
      });
-   });
+   }
+   list.appendChild(div);
  });
 }
 
-function prepareReply(student){
- document.getElementById("replyStudent").value=student;
+function prepareReply(index){
+ document.getElementById("replyStudent").value=index;
  document.getElementById("replyText").value="";
 }
 
 function sendReply(){
- let student = document.getElementById("replyStudent").value;
- let text = document.getElementById("replyText").value;
- if(!student || !text){ alert("Select a message and type reply"); return; }
- db.ref("messages/"+student+"/replies").push({
-   text:text,
-   date:new Date().toLocaleString(),
-   by:"Counsellor"
- }).then(()=>{
-   alert("Reply sent ✅");
-   loadMessages();
- });
+ let index = document.getElementById("replyStudent").value;
+ let text = document.getElementById("replyText").value.trim();
+ if(text===""){ alert("Type reply"); return;}
+ messages[index].replies.push({text:text, date:new Date().toLocaleString()});
+ loadMessages();
+ document.getElementById("replyText").value="";
 }
 
-// TRANSFER REQUESTS
+// --- TRANSFERS ---
 function loadTransfers(){
- let list = document.getElementById("transferList");
+ const list = document.getElementById("transferList");
  list.innerHTML="";
- db.ref("transferRequests").once("value").then(snapshot=>{
-   snapshot.forEach(studentSnap=>{
-     studentSnap.forEach(reqSnap=>{
-       let r = reqSnap.val();
-       let div = document.createElement("div");
-       div.className="card";
-       div.innerHTML=`<b>${studentSnap.key}</b><br>
-         Current: ${r.currentCourse} L${r.currentLevel} S${r.currentSemester}<br>
-         Requested: ${r.requestedCourse} L${r.requestedLevel} S${r.requestedSemester}<br>
-         Institution: ${r.requestedInstitution}<br>
-         Reason: ${r.reason}<br>
-         Date: ${r.date}<br>
-         Status: <span id="status_${studentSnap.key}">${r.status||"Pending"}</span>
-         <button onclick="updateStatus('${studentSnap.key}','${reqSnap.key}','Approved')">Approve</button>
-         <button onclick="updateStatus('${studentSnap.key}','${reqSnap.key}','Rejected')">Reject</button>`;
-       list.appendChild(div);
-     });
-   });
+ transfers.forEach((t,i)=>{
+   let div = document.createElement("div");
+   div.className="card";
+   div.innerHTML=`<b>${t.student}</b><br>
+   Current: ${t.currentCourse} L${t.currentLevel} S${t.currentSemester}<br>
+   Requested: ${t.requestedCourse} L${t.requestedLevel} S${t.requestedSemester}<br>
+   Institution: ${t.requestedInstitution}<br>
+   Reason: ${t.reason}<br>
+   Date: ${t.date}<br>
+   Status: <span id="status_${i}">${t.status}</span>
+   <button onclick="updateStatus(${i},'Approved')">Approve</button>
+   <button onclick="updateStatus(${i},'Rejected')">Reject</button>`;
+   list.appendChild(div);
  });
 }
 
-function updateStatus(student,key,status){
- db.ref("transferRequests/"+student+"/"+key).update({status:status}).then(()=>{loadTransfers();});
+function updateStatus(i,status){
+ transfers[i].status=status;
+ loadTransfers();
 }
 
-// ANNOUNCEMENTS
+// --- ANNOUNCEMENTS ---
 function loadAnnouncements(){
- let list = document.getElementById("annList");
+ const list = document.getElementById("annList");
  list.innerHTML="";
- db.ref("announcements").orderByChild("date").once("value").then(snapshot=>{
-   snapshot.forEach(a=>{
-     let val=a.val();
-     let div=document.createElement("div");
-     div.className="card";
-     div.innerHTML=`<b>${val.title}</b><br>${val.message}<br><i>Posted by: ${val.teacher} on ${val.date}</i>`;
-     list.appendChild(div);
-   });
+ announcements.forEach(a=>{
+   let div=document.createElement("div");
+   div.className="card";
+   div.innerHTML=`<b>${a.title}</b><br>${a.message}<br><i>Posted by: ${a.teacher} on ${a.date}</i>`;
+   list.appendChild(div);
  });
 }
 
 function postAnnouncement(){
- let title=document.getElementById("annTitle").value;
- let msg=document.getElementById("annMessage").value;
+ let title=document.getElementById("annTitle").value.trim();
+ let msg=document.getElementById("annMessage").value.trim();
  if(!title || !msg){ alert("Fill all fields"); return; }
- db.ref("announcements").push({
-   title:title,
-   message:msg,
-   teacher:"Counsellor",
-   date:new Date().toLocaleString()
- }).then(()=>{
-   document.getElementById("annTitle").value="";
-   document.getElementById("annMessage").value="";
-   loadAnnouncements();
- });
+ announcements.push({title:title,message:msg,teacher:"Counsellor",date:new Date().toLocaleString()});
+ document.getElementById("annTitle").value="";
+ document.getElementById("annMessage").value="";
+ loadAnnouncements();
 }
-
 </script>
 
 </body>
