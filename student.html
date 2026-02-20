@@ -106,7 +106,7 @@ input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 
 <!-- MESSAGES -->
 <div id="messages" class="section">
-<h3>Message to Counsellor</h3>
+<h3>Send Anonymous Message to Counsellor</h3>
 <textarea id="msgText" placeholder="Write message..."></textarea>
 <button onclick="sendMessage()">Send</button>
 <div id="msgList"></div>
@@ -294,12 +294,20 @@ function loadFees(level,sem){
   });
 }
 
-// MESSAGES
+// MESSAGES - ANONYMOUS
 function sendMessage(){
   let msg = document.getElementById("msgText").value;
   if(!msg){ alert("Write message"); return; }
-  db.ref("messages/"+student).push({text:msg,date:new Date().toLocaleString()})
-  .then(()=>{ document.getElementById("msgText").value=""; alert("Message sent ✅"); });
+
+  // Save anonymous message
+  db.ref("messages/"+student).push({
+    text:msg,
+    date:new Date().toLocaleString(),
+    anonymous:true
+  }).then(()=>{
+    document.getElementById("msgText").value="";
+    alert("Message sent anonymously ✅");
+  });
 }
 
 // UPDATE ALL SECTIONS
@@ -315,6 +323,7 @@ function updateAll(){
 
 // DEFAULT SECTION
 openSection("profile");
+
 </script>
 
 </body>
