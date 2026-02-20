@@ -1,417 +1,237 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Kingdom College Student Portal</title>
+<title>Student Portal</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{font-family:Arial;margin:0;background:#f2f2f2;}
-header{background:#0a3d62;color:white;padding:15px;text-align:center;}
-.container{max-width:1200px;margin:auto;padding:15px;}
-.menu{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:10px;}
-.menu button{padding:10px;border:none;background:#1e3799;color:white;border-radius:5px;cursor:pointer;}
-.menu button:hover{background:#4a69bd;}
-.section{display:none;background:white;padding:15px;border-radius:8px;box-shadow:0 0 5px gray;margin-bottom:15px;}
-.card{border:1px solid #ccc;padding:10px;border-radius:5px;margin:8px 0;}
-input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
-.logout{background:red;}
-.warning{color:red;font-weight:bold;}
-</style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
+<style>
+
+body{
+font-family:Arial;
+background:#f2f2f2;
+margin:0;
+}
+
+/* BOX */
+.box{
+background:white;
+max-width:400px;
+margin:30px auto;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 5px gray;
+}
+
+/* DASHBOARD */
+#dash{
+display:none;
+padding:20px;
+}
+
+/* MENU */
+.menu{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:10px;
+}
+
+.menu button{
+padding:12px;
+background:#1e3799;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+input,button{
+width:100%;
+padding:10px;
+margin:5px 0;
+}
+
+h3{text-align:center;}
+
+</style>
 </head>
+
 <body>
 
-<header>
-<h2>Kingdom College Student Portal</h2>
-<p id="studentName"></p>
-</header>
+<!-- LOGIN -->
+<div id="login" class="box">
 
-<div class="container">
+<h3>Student Login</h3>
 
-<div class="menu">
-<button onclick="openSection('profile')">Profile</button>
-<button onclick="openSection('subjects')">Subjects</button>
-<button onclick="openSection('materials')">Materials</button>
-<button onclick="openSection('assignments')">Assignments</button>
-<button onclick="openSection('results')">Results</button>
-<button onclick="openSection('fees')">Fees</button>
-<button onclick="openSection('messages')">Counsellor</button>
-<button onclick="openSection('transfer')">Transfer Request</button>
-<button onclick="openSection('announcements')">Announcements</button>
-<button onclick="openSection('sports')">Sports</button>
-<button onclick="logout()" class="logout">Logout</button>
+<input id="reg" placeholder="Reg Number">
+<input id="pass" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
+
+<p id="msg"></p>
+
 </div>
+
 
 <!-- PROFILE -->
-<div id="profile" class="section">
-<h3>My Profile</h3>
-<div id="profileContent" class="card">
+<div id="profile" class="box" style="display:none">
 
-<p class="warning" id="profileWarning">Loading profile...</p>
+<h3>Complete Profile</h3>
 
-<label>Full Name:</label>
-<input id="profileName" placeholder="Full Name">
+<input id="name" placeholder="Full Name">
+<input id="course" placeholder="Course">
+<input id="level" placeholder="Level">
+<input id="semester" placeholder="Semester">
 
-<label>Course:</label>
-<input id="profileCourse" placeholder="Course">
+<button onclick="saveProfile()">Save</button>
 
-<label>Level:</label>
-<select id="profileLevel"></select>
+<p id="pmsg"></p>
 
-<label>Semester:</label>
-<select id="profileSemester"></select>
-
-<button onclick="saveProfile()">Save Profile</button>
-
-<p id="profileMsg"></p>
-</div>
 </div>
 
-<!-- SUBJECTS -->
-<div id="subjects" class="section">
-<h3>My Subjects</h3>
-<div id="subjectList"></div>
-</div>
 
-<!-- MATERIALS -->
-<div id="materials" class="section">
-<h3>Study Materials</h3>
-<div id="materialList"></div>
-</div>
+<!-- DASHBOARD -->
+<div id="dash">
 
-<!-- ASSIGNMENTS -->
-<div id="assignments" class="section">
-<h3>Assignments</h3>
-<select id="assSubject"></select>
-<textarea id="assText" placeholder="Write assignment details..."></textarea>
-<input type="file" id="assFile">
-<button onclick="sendAssignment()">Submit Assignment</button>
-<div id="assList"></div>
-</div>
+<h3 style="text-align:center">Student Dashboard</h3>
 
-<!-- RESULTS -->
-<div id="results" class="section">
-<h3>My Results</h3>
-<div id="resultList"></div>
-</div>
+<div class="menu">
 
-<!-- FEES -->
-<div id="fees" class="section">
-<h3>Fees Status</h3>
-<div id="feeList"></div>
-</div>
+<button onclick="alert('Modules - Next Step')">Modules</button>
 
-<!-- MESSAGES -->
-<div id="messages" class="section">
-<h3>Send Anonymous Message to Counsellor</h3>
-<textarea id="msgText" placeholder="Write message..."></textarea>
-<button onclick="sendMessage()">Send</button>
-<div id="msgList"></div>
-</div>
+<button onclick="alert('Assignments - Next Step')">Assignments</button>
 
-<!-- TRANSFER REQUEST -->
-<div id="transfer" class="section">
-<h3>Transfer Request</h3>
-<div class="card">
-<label>Current Course:</label>
-<input id="transferCurrentCourse" disabled>
-<label>Current Level:</label>
-<input id="transferCurrentLevel" disabled>
-<label>Current Semester:</label>
-<input id="transferCurrentSemester" disabled>
+<button onclick="alert('Results - Next Step')">Results</button>
 
-<label>Requested Course:</label>
-<input id="transferRequestedCourse">
-<label>Requested Level:</label>
-<select id="transferRequestedLevel">
-<option value="4">Level 4</option>
-<option value="5">Level 5</option>
-<option value="6">Level 6</option>
-</select>
-<label>Requested Semester:</label>
-<select id="transferRequestedSemester">
-<option value="1">Semester 1</option>
-<option value="2">Semester 2</option>
-</select>
-<label>Requested Institution / Ministry:</label>
-<input id="transferRequestedInstitution" placeholder="Institution or Ministry">
+<button onclick="alert('Fees - Next Step')">Fees</button>
 
-<label>Reason / Comments:</label>
-<textarea id="transferReason"></textarea>
-<button onclick="sendTransferRequest()">Submit Request</button>
-<div id="transferMsg"></div>
-</div>
-</div>
+<button onclick="alert('Counselling - Next Step')">Counselling</button>
 
-<!-- ANNOUNCEMENTS -->
-<div id="announcements" class="section">
-<h3>Announcements / News</h3>
-<div id="announcementList"></div>
-</div>
+<button onclick="alert('Transfer - Next Step')">Transfer</button>
 
-<!-- SPORTS -->
-<div id="sports" class="section">
-<h3>Sports & Games</h3>
-<div class="card">
-<p>Football Team</p>
-<p>Netball Team</p>
-<p>Volleyball Team</p>
-</div>
+<button onclick="logout()">Logout</button>
+
 </div>
 
 </div>
 
-<footer style="text-align:center;padding:10px;">
-© 2026 Kingdom College | By Carina
-</footer>
 
 <script>
-// Firebase setup
+
+// FIREBASE CONFIG
 const firebaseConfig = {
- apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
- authDomain: "collegeportal-app.firebaseapp.com",
- databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
- projectId: "collegeportal-app",
- storageBucket: "collegeportal-app.firebasestorage.app",
- messagingSenderId: "266762331631",
- appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+ apiKey: "YOUR_API_KEY",
+ authDomain: "YOUR_PROJECT.firebaseapp.com",
+ databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+ projectId: "YOUR_PROJECT",
 };
+
 firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
 const db = firebase.database();
-const storage = firebase.storage();
 
-// Check login
-let student = localStorage.getItem("student");
-if(!student){ window.location="index.html"; }
-document.getElementById("studentName").innerText = "Welcome: " + student;
 
-// Subjects data
-const subjectsData = {
-4:{1:["Communication","Anatomy","Physiology","Computer","Epidemiology","Medical Ethics","Microbiology"],
-   2:["Clinical Skills","Clinical Nutrition","Patient Care","Clinical Laboratory","Pathology"]},
-5:{1:["Pediatric 1","Internal Medicine 1","Obstetrics 1","Pharmacology","Counselling","Health Promotion"],
-   2:["Pediatric 2","Internal Medicine 2","Surgery","Obstetrics 2","RSH"]},
-6:{1:["Coming Soon"],2:["Coming Soon"]}
+// REGISTER
+function register(){
+
+let r = reg.value;
+let p = pass.value;
+
+if(!r||!p) return alert("Fill all");
+
+let email = r+"@student.com";
+
+auth.createUserWithEmailAndPassword(email,p)
+.then(()=>msg.innerText="Registered ✅")
+.catch(e=>alert(e.message));
+}
+
+
+// LOGIN
+function login(){
+
+let email = reg.value+"@student.com";
+let p = pass.value;
+
+auth.signInWithEmailAndPassword(email,p)
+.then(user=>{
+
+localStorage.setItem("reg",reg.value);
+
+checkProfile();
+
+})
+.catch(()=>alert("Wrong login"));
+}
+
+
+// CHECK PROFILE
+function checkProfile(){
+
+let r = localStorage.getItem("reg");
+
+db.ref("students/"+r).once("value")
+.then(snap=>{
+
+if(snap.exists()){
+
+login.style.display="none";
+profile.style.display="none";
+dash.style.display="block";
+
+}else{
+
+login.style.display="none";
+profile.style.display="block";
+
+}
+
+});
+}
+
+
+// SAVE PROFILE
+function saveProfile(){
+
+let r = localStorage.getItem("reg");
+
+let data={
+name:name.value,
+course:course.value,
+level:level.value,
+semester:semester.value
 };
 
-// PROFILE
-function loadProfile(){
-  db.ref("students/"+student).once("value").then(snap=>{
-    let data = snap.val();
-    if(data){
-      document.getElementById("profileWarning").style.display="none";
-      document.getElementById("profileName").value = data.name || "";
-      document.getElementById("profileCourse").value = data.course || "";
-      populateLevelSemester(data.level,data.semester);
-      updateAll();
-      // Set transfer current info
-      document.getElementById("transferCurrentCourse").value = data.course;
-      document.getElementById("transferCurrentLevel").value = data.level;
-      document.getElementById("transferCurrentSemester").value = data.semester;
-    } else {
-      document.getElementById("profileWarning").innerText="Profile not complete. Please fill below.";
-      populateLevelSemester(4,1);
-      updateAll();
-    }
-  });
+db.ref("students/"+r).set(data)
+.then(()=>{
+
+pmsg.innerText="Saved ✅";
+
+profile.style.display="none";
+dash.style.display="block";
+
+});
+
 }
 
-function populateLevelSemester(level,semester){
-  let levSel = document.getElementById("profileLevel");
-  levSel.innerHTML="";
-  for(let i=4;i<=6;i++){
-    levSel.innerHTML += `<option value="${i}" ${i==level?"selected":""}>Level ${i}</option>`;
-  }
-  let semSel = document.getElementById("profileSemester");
-  semSel.innerHTML="";
-  for(let i=1;i<=2;i++){
-    semSel.innerHTML += `<option value="${i}" ${i==semester?"selected":""}>Semester ${i}</option>`;
-  }
-}
-
-function saveProfile(){
-  let name = document.getElementById("profileName").value;
-  let course = document.getElementById("profileCourse").value;
-  let level = document.getElementById("profileLevel").value;
-  let semester = document.getElementById("profileSemester").value;
-
-  if(!name || !course || !level || !semester){
-    alert("Fill all fields");
-    return;
-  }
-
-  db.ref("students/"+student).set({
-    name:name,
-    course:course,
-    level:level,
-    semester:semester
-  }).then(()=>{
-    document.getElementById("profileMsg").innerText="Profile saved successfully ✅";
-    document.getElementById("profileWarning").style.display="none";
-    updateAll();
-    // Update transfer section
-    document.getElementById("transferCurrentCourse").value = course;
-    document.getElementById("transferCurrentLevel").value = level;
-    document.getElementById("transferCurrentSemester").value = semester;
-  }).catch(e=>alert(e.message));
-}
-
-// Load profile on start
-loadProfile();
-
-// SECTIONS MANAGEMENT
-function openSection(id){
-  document.querySelectorAll(".section").forEach(s=>s.style.display="none");
-  document.getElementById(id).style.display="block";
-}
 
 // LOGOUT
-function logout(){ localStorage.removeItem("student"); window.location="index.html"; }
+function logout(){
 
-// SUBJECTS
-function loadSubjects(level,sem){
-  let list = subjectsData[level][sem] || [];
-  let box = document.getElementById("subjectList"); box.innerHTML="";
-  list.forEach(sub=>{ box.innerHTML += `<div class="card">${sub}</div>`; });
+auth.signOut();
+
+localStorage.clear();
+
+location.reload();
+
 }
-
-// MATERIALS
-function loadMaterials(level,sem){
-  let subjects = subjectsData[level][sem] || [];
-  let box = document.getElementById("materialList"); box.innerHTML="";
-  subjects.forEach(sub=>{
-    db.ref("materials/"+sub).once("value").then(snap=>{
-      snap.forEach(m=>{
-        let val = m.val();
-        box.innerHTML += `<div class="card"><b>${sub}</b><br><a href="${val.fileUrl}" target="_blank">${val.filename}</a></div>`;
-      });
-    });
-  });
-}
-
-// ASSIGNMENTS
-function populateAssignmentSubjects(level,sem){
-  let sel = document.getElementById("assSubject"); sel.innerHTML="";
-  let list = subjectsData[level][sem] || [];
-  list.forEach(sub=>{ sel.innerHTML += `<option value="${sub}">${sub}</option>`; });
-}
-
-function sendAssignment(){
-  let subject = document.getElementById("assSubject").value;
-  let text = document.getElementById("assText").value;
-  let file = document.getElementById("assFile").files[0];
-  if(!subject || !text || !file){ alert("Fill all fields"); return; }
-  let fileRef = storage.ref(`student_assignments/${student}/${Date.now()}_${file.name}`);
-  fileRef.put(file).then(snap=>{
-    snap.ref.getDownloadURL().then(url=>{
-      db.ref(`assignments/${subject}/${student}`).push({
-        text:text,
-        fileUrl:url,
-        filename:file.name,
-        date:new Date().toLocaleString()
-      }).then(()=>{
-        alert("Assignment sent ✅");
-        document.getElementById("assText").value="";
-        document.getElementById("assFile").value="";
-      });
-    });
-  });
-}
-
-// RESULTS
-function loadResults(level,sem){
-  let list = subjectsData[level][sem] || [];
-  let box = document.getElementById("resultList"); box.innerHTML="";
-  list.forEach(sub=>{
-    db.ref("results/"+sub+"/"+student).once("value").then(snap=>{
-      if(snap.exists()){
-        box.innerHTML += `<div class="card"><b>${sub}</b>: ${snap.val().marks||"Pending"}</div>`;
-      }
-    });
-  });
-}
-
-// FEES
-function loadFees(level,sem){
-  db.ref("fees/"+student).once("value").then(snap=>{
-    let data = snap.val() || {paid:0,balance:0};
-    document.getElementById("feeList").innerHTML=`<div class="card">Paid: TZS ${data.paid}<br>Balance: TZS ${data.balance}</div>`;
-  });
-}
-
-// MESSAGES - ANONYMOUS
-function sendMessage(){
-  let msg = document.getElementById("msgText").value;
-  if(!msg){ alert("Write message"); return; }
-
-  db.ref("messages/"+student).push({
-    text:msg,
-    date:new Date().toLocaleString(),
-    anonymous:true
-  }).then(()=>{
-    document.getElementById("msgText").value="";
-    alert("Message sent anonymously ✅");
-  });
-}
-
-// TRANSFER REQUEST
-function sendTransferRequest(){
-  let reqCourse = document.getElementById("transferRequestedCourse").value;
-  let reqLevel = document.getElementById("transferRequestedLevel").value;
-  let reqSem = document.getElementById("transferRequestedSemester").value;
-  let reqInst = document.getElementById("transferRequestedInstitution").value;
-  let reason = document.getElementById("transferReason").value;
-
-  if(!reqCourse || !reqLevel || !reqSem || !reqInst || !reason){ alert("Fill all fields"); return; }
-
-  db.ref("transferRequests/"+student).push({
-    currentCourse: document.getElementById("transferCurrentCourse").value,
-    currentLevel: document.getElementById("transferCurrentLevel").value,
-    currentSemester: document.getElementById("transferCurrentSemester").value,
-    requestedCourse: reqCourse,
-    requestedLevel: reqLevel,
-    requestedSemester: reqSem,
-    requestedInstitution: reqInst,
-    reason: reason,
-    date: new Date().toLocaleString()
-  }).then(()=>{
-    document.getElementById("transferMsg").innerText="Transfer request submitted ✅";
-    document.getElementById("transferRequestedCourse").value="";
-    document.getElementById("transferRequestedInstitution").value="";
-    document.getElementById("transferReason").value="";
-  });
-}
-
-// ANNOUNCEMENTS
-function loadAnnouncements(){
-  db.ref("announcements").orderByChild("date").once("value").then(snap=>{
-    let box = document.getElementById("announcementList"); box.innerHTML="";
-    snap.forEach(a=>{
-      let val = a.val();
-      box.innerHTML = `<div class="card"><b>${val.title}</b><br>${val.message}<br><i>Posted by: ${val.teacher} on ${val.date}</i></div>` + box.innerHTML;
-    });
-  });
-}
-
-// UPDATE ALL SECTIONS
-function updateAll(){
-  let level = document.getElementById("profileLevel").value;
-  let sem = document.getElementById("profileSemester").value;
-  loadSubjects(level,sem);
-  loadMaterials(level,sem);
-  populateAssignmentSubjects(level,sem);
-  loadResults(level,sem);
-  loadFees(level,sem);
-  loadAnnouncements();
-}
-
-// DEFAULT SECTION
-openSection("profile");
 
 </script>
 
