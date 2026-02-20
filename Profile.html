@@ -1,66 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="sw">
 <head>
 <meta charset="UTF-8">
-<title>Student Profile</title>
+<title>Complete Student Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;background:#f2f2f2;text-align:center;padding:40px;}
+.box{background:white;max-width:400px;margin:auto;padding:20px;border-radius:10px;box-shadow:0 0 5px gray;}
+input,button,select{width:100%;padding:10px;margin:8px 0;}
+button{background:#27ae60;color:white;border:none;border-radius:5px;cursor:pointer;}
+</style>
+</head>
+
+<body>
+<div class="box">
+<h2>Complete Your Profile</h2>
+<input id="name" placeholder="Full Name">
+<input id="course" placeholder="Course">
+<select id="level">
+  <option value="">Select Level</option>
+  <option value="4">Level 4</option>
+  <option value="5">Level 5</option>
+  <option value="6">Level 6</option>
+</select>
+<select id="semester">
+  <option value="">Select Semester</option>
+  <option value="1">Semester 1</option>
+  <option value="2">Semester 2</option>
+</select>
+<button onclick="saveProfile()">Save Profile</button>
+<p id="msg"></p>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<style>
-body{
-font-family:Arial;
-background:#f2f2f2;
-text-align:center;
-padding:40px;
-}
-
-.box{
-background:white;
-max-width:350px;
-margin:auto;
-padding:20px;
-border-radius:10px;
-box-shadow:0 0 5px gray;
-}
-
-input,button{
-width:100%;
-padding:10px;
-margin:8px 0;
-}
-
-button{
-background:#27ae60;
-color:white;
-border:none;
-border-radius:5px;
-cursor:pointer;
-}
-</style>
-
-</head>
-
-<body>
-
-<div class="box">
-
-<h2>Complete Profile</h2>
-
-<input id="name" placeholder="Full Name">
-<input id="course" placeholder="Course">
-<input id="level" placeholder="Level">
-<input id="semester" placeholder="Semester">
-
-<button onclick="saveProfile()">Save Profile</button>
-
-<p id="msg"></p>
-
-</div>
-
-
 <script>
-
 const firebaseConfig = {
  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
  authDomain: "collegeportal-app.firebaseapp.com",
@@ -70,49 +45,35 @@ const firebaseConfig = {
  messagingSenderId: "266762331631",
  appId: "1:266762331631:web:66ddfbde53d33086ac421a"
 };
-
 firebase.initializeApp(firebaseConfig);
-
 const db = firebase.database();
 
 let reg = localStorage.getItem("student");
-
+if(!reg){ window.location="index.html"; }
 
 function saveProfile(){
+ let name = document.getElementById("name").value.trim();
+ let course = document.getElementById("course").value.trim();
+ let level = document.getElementById("level").value;
+ let semester = document.getElementById("semester").value;
 
-let name = document.getElementById("name").value;
-let course = document.getElementById("course").value;
-let level = document.getElementById("level").value;
-let semester = document.getElementById("semester").value;
+ if(!name || !course || !level || !semester){
+   alert("Please fill all fields");
+   return;
+ }
 
-if(!reg){
- alert("Please login first");
- return;
+ db.ref("students/"+reg).set({
+   name:name,
+   course:course,
+   level:level,
+   semester:semester
+ })
+ .then(()=>{
+   document.getElementById("msg").innerText="Profile saved successfully ✅ Redirecting...";
+   setTimeout(()=>{ window.location="student.html"; },1000);
+ })
+ .catch(e=>alert(e.message));
 }
-
-if(name==""||course==""||level==""||semester==""){
- alert("Fill all fields");
- return;
-}
-
-db.ref("students/"+reg).set({
-
- name:name,
- course:course,
- level:level,
- semester:semester
-
-})
-.then(()=>{
-
- document.getElementById("msg").innerText="Profile Saved Successfully ✅";
-
-})
-.catch(e=>alert(e));
-
-}
-
 </script>
-
 </body>
 </html>
