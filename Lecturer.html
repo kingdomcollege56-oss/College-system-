@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>College Portal – Lecturer</title>
+<style>
+    body {font-family: Arial, sans-serif; margin:0; background:#f0f2f5;}
+    header {background:#1a73e8; color:white; padding:15px; text-align:center; font-size:24px;}
+    nav {width:220px; background:#2c3e50; min-height:100vh; float:left; color:white; display:none;}
+    nav ul {list-style:none; padding:0;}
+    nav ul li {padding:15px; border-bottom:1px solid #34495e;}
+    nav ul li a {color:white; text-decoration:none; display:block;}
+    nav ul li a:hover {background:#34495e;}
+    main {margin-left:220px; padding:20px;}
+    .panel {background:white; padding:20px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.1); display:none;}
+    .active {display:block;}
+    input, select, textarea {width:100%; padding:8px; margin:5px 0 10px 0; border:1px solid #ccc; border-radius:4px;}
+    .btn {background:#1a73e8; color:white; padding:8px 12px; border:none; border-radius:4px; cursor:pointer; margin-top:5px;}
+    .btn:hover {background:#155bb5;}
+    .section-title {font-size:20px; color:#1a73e8; margin-bottom:10px;}
+    table {width:100%; border-collapse:collapse;}
+    th, td {border:1px solid #ccc; padding:8px; text-align:left;}
+    footer {clear:both; background:#1a73e8; color:white; text-align:center; padding:10px; margin-top:20px;}
+</style>
+</head>
+<body>
+
+<header>College Portal – Lecturer</header>
+
+<!-- LOGIN -->
+<div id="authPanel" class="panel active">
+    <div class="section-title">Lecturer Login</div>
+    <label>Email:</label>
+    <input type="email" id="authEmail" placeholder="Enter email">
+    <label>Password:</label>
+    <input type="password" id="authPass" placeholder="Enter password">
+    <button class="btn" onclick="login()">Login</button>
+</div>
+
+<!-- Lecturer Dashboard Nav -->
+<nav id="lecturerNav">
+    <ul>
+        <li><a href="#" onclick="showPanelSection('profile')">Profile</a></li>
+        <li><a href="#" onclick="showPanelSection('approveModules')">Approve Modules</a></li>
+        <li><a href="#" onclick="showPanelSection('gradeSubmissions')">Submit Grades</a></li>
+        <li><a href="#" onclick="showPanelSection('uploadMaterials')">Upload Materials</a></li>
+        <li><a href="#" onclick="showPanelSection('viewAssignments')">View Assignments</a></li>
+        <li><a href="#" onclick="logout()">Logout</a></li>
+    </ul>
+</nav>
+
+<main>
+    <!-- Profile -->
+    <div id="profile" class="panel">
+        <div class="section-title">Profile</div>
+        <label>Name:</label><input type="text" id="profileName">
+        <label>Email:</label><input type="email" id="profileEmail">
+        <button class="btn" onclick="saveProfile()">Save Profile</button>
+    </div>
+
+    <!-- Approve Modules -->
+    <div id="approveModules" class="panel">
+        <div class="section-title">Approve Modules for Students</div>
+        <ul id="pendingModules"></ul>
+    </div>
+
+    <!-- Submit Grades -->
+    <div id="gradeSubmissions" class="panel">
+        <div class="section-title">Submit Grades</div>
+        <label>Student Email:</label>
+        <input type="email" id="gradeStudentEmail">
+        <label>Module:</label>
+        <select id="gradeModule">
+            <option>Biochemistry 101</option>
+            <option>Anatomy 102</option>
+            <option>Physiology 103</option>
+        </select>
+        <label>Grade:</label>
+        <input type="text" id="gradeValue">
+        <button class="btn" onclick="submitGrade()">Submit Grade</button>
+    </div>
+
+    <!-- Upload Materials -->
+    <div id="uploadMaterials" class="panel">
+        <div class="section-title">Upload Materials</div>
+        <label>Module:</label>
+        <select id="materialModule">
+            <option>Biochemistry 101</option>
+            <option>Anatomy 102</option>
+            <option>Physiology 103</option>
+        </select>
+        <label>Material File:</label>
+        <input type="file" id="materialFile">
+        <button class="btn" onclick="uploadMaterial()">Upload</button>
+        <ul id="uploadedMaterials"></ul>
+    </div>
+
+    <!-- View Assignments -->
+    <div id="viewAssignments" class="panel">
+        <div class="section-title">View Student Assignments</div>
+        <ul id="assignmentsList"></ul>
+    </div>
+
+</main>
+
+<footer>College Portal &copy; 2026</footer>
+
+<script>
+// Dummy storage for lecturer
+let lecturers = [{email:'lecturer@example.com',pass:'1234',name:'Dr. Smith'}];
+let currentLecturer = null;
+
+// Shared data with Student portal
+let students = [];
+let enrollments = {}; // student email -> modules
+let assignments = {};
+let results = {};
+let materials = [];
+
+// Show/Hide panels
+function showPanelSection(panelId){
+    document.querySelectorAll('main .panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(panelId).classList.add('active');
+}
+
+// Login
+function login(){
+    const email = document.getElementById('authEmail').value;
+    const pass = document.getElementById('authPass').value;
+    const lec = lecturers.find(l=>l.email===email && l.pass===pass);
+    if(lec){
+        currentLecturer = lec;
+        alert('Login successful!');
+        document.getElementById('authPanel').classList.remove('active');
+        document.getElementById('lecturerNav').style.display='block';
+        showPanelSection('profile');
+        document.getElementById('profileName').value = currentLecturer.name;
+        document.getElementById('profileEmail').value = currentLecturer.email;
+        updatePendingModules();
+        updateAssignmentsList();
+        updateMaterialsList();
+    } else alert('Invalid credentials!');
+}
+
+function logout(){
+    currentLecturer=null;
+    document.getElementById('lecturerNav').style.display='none';
+    showPanelSection('authPanel');
+}
+
+// Profile
+function saveProfile(){
+    if(currentLecturer){
+        currentLecturer.name=document.getElementById('profileName').value;
+        currentLecturer.email=document.getElementById('profileEmail').value;
+        alert('Profile saved!');
+    }
+}
+
+// Approve Modules
+function updatePendingModules(){
+    const ul=document.getElementById('pendingModules');
+    ul.innerHTML='';
+    for(const email in enrollments){
+        enrollments[email].forEach(m=>{
+            ul.innerHTML+=`<li>${email} requested ${m} 
+            <button onclick="approveModule('${email}','${m}')">Approve</button></li>`;
+        });
+    }
+}
+function approveModule(studentEmail,module){
+    // Here in real system we mark as approved
+    alert(`${module} for ${studentEmail} approved!`);
+}
+
+// Submit Grades
+function submitGrade(){
+    const studentEmail=document.getElementById('gradeStudentEmail').value;
+    const module=document.getElementById('gradeModule').value;
+    const grade=document.getElementById('gradeValue').value;
+    if(!results[studentEmail]) results[studentEmail]=[];
+    results[studentEmail].push({module,grade});
+    alert('Grade submitted!');
+}
+
+// Upload Materials
+function uploadMaterial(){
+    const module=document.getElementById('materialModule').value;
+    const file=document.getElementById('materialFile').value;
+    materials.push({module,file});
+    updateMaterialsList();
+    alert('Material uploaded!');
+}
+function updateMaterialsList(){
+    const ul=document.getElementById('uploadedMaterials');
+    ul.innerHTML='';
+    materials.forEach(m=>ul.innerHTML+=`<li>${m.module}: ${m.file}</li>`);
+}
+
+// View Assignments
+function updateAssignmentsList(){
+    const ul=document.getElementById('assignmentsList');
+    ul.innerHTML='';
+    for(const studentEmail in assignments){
+        assignments[studentEmail].forEach(a=>{
+            ul.innerHTML+=`<li>${studentEmail} - ${a.module}: ${a.file} - ${a.status}</li>`;
+        });
+    }
+}
+</script>
+
+</body>
+          </html>
