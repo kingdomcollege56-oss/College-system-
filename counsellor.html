@@ -11,7 +11,7 @@ header{background:#0a3d62;color:white;padding:15px;text-align:center;}
 .menu{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:10px;}
 .menu button{padding:10px;border:none;background:#1e3799;color:white;border-radius:5px;cursor:pointer;}
 .menu button:hover{background:#4a69bd;}
-.section{display:none;background:white;padding:15px;border-radius:8px;box-shadow:0 0 5px gray;margin-bottom:15px;}
+.subsection{display:none;background:white;padding:15px;border-radius:8px;box-shadow:0 0 5px gray;margin-bottom:15px;}
 .card{border:1px solid #ccc;padding:10px;border-radius:5px;margin:8px 0;}
 input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 .logout{background:red;}
@@ -27,7 +27,7 @@ input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 <div class="container">
 
 <!-- LOGIN SECTION -->
-<div id="loginSection" class="section" style="display:block;">
+<div id="loginSection" class="subsection" style="display:block;">
 <h3>Login</h3>
 <input id="cUsername" placeholder="Username">
 <input id="cPassword" type="password" placeholder="Password">
@@ -36,16 +36,16 @@ input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 </div>
 
 <!-- DASHBOARD SECTION -->
-<div id="dashboard" class="section">
+<div id="dashboard" style="display:none;">
 <div class="menu">
-<button onclick="openSection('messages')">Messages</button>
-<button onclick="openSection('transfers')">Transfer Requests</button>
-<button onclick="openSection('announcements')">Announcements</button>
+<button onclick="openSubsection('messagesPanel')">Messages</button>
+<button onclick="openSubsection('transfersPanel')">Transfer Requests</button>
+<button onclick="openSubsection('announcementsPanel')">Announcements</button>
 <button onclick="logout()" class="logout">Logout</button>
 </div>
 
 <!-- MESSAGES -->
-<div id="messages" class="section">
+<div id="messagesPanel" class="subsection">
 <h3>Anonymous Messages</h3>
 <div id="msgList"></div>
 <textarea id="replyText" placeholder="Type reply..."></textarea>
@@ -54,13 +54,13 @@ input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 </div>
 
 <!-- TRANSFER REQUESTS -->
-<div id="transfers" class="section">
+<div id="transfersPanel" class="subsection">
 <h3>Transfer Requests</h3>
 <div id="transferList"></div>
 </div>
 
 <!-- ANNOUNCEMENTS -->
-<div id="announcements" class="section">
+<div id="announcementsPanel" class="subsection">
 <h3>Post Announcement</h3>
 <input id="annTitle" placeholder="Title">
 <textarea id="annMessage" placeholder="Message"></textarea>
@@ -106,7 +106,7 @@ function showDashboard(){
  document.getElementById("loginSection").style.display="none";
  document.getElementById("dashboard").style.display="block";
  document.getElementById("counsellorName").innerText = "Welcome Counsellor";
- openSection("messages");
+ openSubsection("messagesPanel");
  loadMessages();
  loadTransfers();
  loadAnnouncements();
@@ -123,9 +123,11 @@ if(localStorage.getItem("counsellor")){
  showDashboard();
 }
 
-// --- Sections ---
-function openSection(id){
- document.querySelectorAll(".section").forEach(s=>{if(s.id!=="loginSection") s.style.display="none";});
+// --- Subsection navigation ---
+function openSubsection(id){
+ document.querySelectorAll(".subsection").forEach(s=>{
+   if(s.id!=="loginSection") s.style.display="none";
+ });
  document.getElementById(id).style.display="block";
 }
 
