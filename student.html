@@ -5,7 +5,6 @@
 <title>Kingdom College Student Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Styles -->
 <style>
 body{ font-family: Arial; margin:0; background:#f2f2f2; }
 header{ background:#0a3d62; color:white; padding:15px; text-align:center; }
@@ -19,7 +18,6 @@ input,textarea,select,button{ width:100%; padding:8px; margin:5px 0; }
 .logout{ background:red; }
 </style>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -35,7 +33,6 @@ input,textarea,select,button{ width:100%; padding:8px; margin:5px 0; }
 
 <div class="container">
 
-<!-- Menu -->
 <div class="menu">
 <button onclick="openSection('profile')">Profile</button>
 <button onclick="openSection('subjects')">Subjects</button>
@@ -89,6 +86,9 @@ input,textarea,select,button{ width:100%; padding:8px; margin:5px 0; }
 <input type="text" id="assSubject" placeholder="Subject">
 <textarea id="assText" placeholder="Write assignment..."></textarea>
 <input type="file" id="assFile">
+<select id="assLecturer">
+<option value="">Select Lecturer</option>
+</select>
 <button onclick="sendAssignment()">Submit</button>
 <div id="assList"></div>
 </div>
@@ -135,7 +135,7 @@ input,textarea,select,button{ width:100%; padding:8px; margin:5px 0; }
 </footer>
 
 <script>
-// Firebase Config
+// Firebase
 const firebaseConfig = {
  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
  authDomain: "collegeportal-app.firebaseapp.com",
@@ -149,17 +149,32 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-// Check Login
+// Login check
 let reg = localStorage.getItem("student");
 if(!reg){ window.location="index.html"; }
 document.getElementById("studentName").innerText="Welcome: "+reg;
 document.getElementById("regNo").innerText=reg;
 
-// Sections
-function openSection(id){
-  document.querySelectorAll(".section").forEach(s=>s.style.display="none");
-  document.getElementById(id).style.display="block";
+// Example lecturers mapping
+const lecturers = {
+  "Communication": "lecturer1",
+  "Anatomy": "lecturer2",
+  "Physiology": "lecturer3",
+  "Computer": "lecturer4",
+  "Epidemiology & Biostatistics": "lecturer5",
+  "Medical Ethics": "lecturer6",
+  "Microbiology": "lecturer7"
+};
+
+// Populate lecturers select
+function populateLecturers(){
+  let assLecturer = document.getElementById("assLecturer");
+  assLecturer.innerHTML='<option value="">Select Lecturer</option>';
+  Object.values(lecturers).forEach(l=>{
+    assLecturer.innerHTML += `<option value="${l}">${l}</option>`;
+  });
 }
+populateLecturers();
 
 // Subjects Data
 const subjects = {
@@ -182,33 +197,33 @@ function loadSubjects(){
   });
 }
 
-// Assignments with File Upload
+// Assignments
 function sendAssignment(){
   let sub = document.getElementById("assSubject").value;
   let text = document.getElementById("assText").value;
   let fileInput = document.getElementById("assFile");
   let file = fileInput.files[0];
-  if(!sub || !text || !file){ alert("Fill all fields and attach a file"); return; }
-  
-  let fileRef = storage.ref(`assignments/${reg}/${Date.now()}_${file.name}`);
-  fileRef.put(file).then(snapshot=>{
-    snapshot.ref.getDownloadURL().then(url=>{
-      db.ref(`assignments/${reg}`).push({
+  let lecturerId = document.getElementById("assLecturer").value;
+
+  if(!sub || !text || !file || !lecturerId){ alert("Fill all fields and select Lecturer"); return; }
+
+  let fileRef = storage.ref(`assignments/${lecturerId}/${reg}/${Date.now()}_${file.name}`);
+  fileRef.put(file).then(snap=>{
+    snap.ref.getDownloadURL().then(url=>{
+      db.ref(`assignments/${lecturerId}/${reg}`).push({
         subject: sub,
         text: text,
         fileUrl: url,
         filename: file.name,
         date: new Date().toLocaleString()
       }).then(()=>{
-        let box = document.getElementById("assList");
-        box.innerHTML += `
-          <div class="card">
-            <b>${sub}</b>
-            <p>${text}</p>
-            <p>File: <a href="${url}" target="_blank">${file.name}</a></p>
-            <small>Sent</small>
-          </div>
-        `;
+        document.getElementById("assList").innerHTML += `
+        <div class="card">
+          <b>${sub}</b>
+          <p>${text}</p>
+          <p>File: <a href="${url}" target="_blank">${file.name}</a></p>
+          <small>Sent</small>
+        </div>`;
         document.getElementById("assSubject").value="";
         document.getElementById("assText").value="";
         document.getElementById("assFile").value="";
@@ -221,13 +236,8 @@ function sendAssignment(){
 function sendMessage(){
   let msg = document.getElementById("msgText").value;
   if(!msg){ alert("Write message"); return; }
-  db.ref(`messages/${reg}`).push({msg: msg, date: new Date().toLocaleString()});
-  document.getElementById("msgList").innerHTML += `
-    <div class="card">
-      <p>${msg}</p>
-      <small>Sent</small>
-    </div>
-  `;
+  db.ref(`messages/counsellor/${reg}`).push({msg: msg, date: new Date().toLocaleString()});
+  document.getElementById("msgList").innerHTML += `<div class="card"><p>${msg}</p><small>Sent</small></div>`;
   document.getElementById("msgText").value="";
 }
 
@@ -240,7 +250,7 @@ function logout(){
 // Default
 openSection("profile");
 loadSubjects();
-
 </script>
+
 </body>
-</html>
+ </html>
