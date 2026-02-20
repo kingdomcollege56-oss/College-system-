@@ -1,177 +1,131 @@
 <!DOCTYPE html>
 <html lang="sw">
 <head>
-    <meta charset="UTF-8">
-    <title>Kingdom College of Health and Allied Sciences</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Kingdom College Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <style>
-        body{
-            margin:0;
-            font-family: Arial, sans-serif;
-            background:#f4f6f9;
-        }
+<style>
+body{
+font-family:Arial;
+background:#f2f2f2;
+text-align:center;
+padding:40px;
+}
 
-        header{
-            background:#0a3d62;
-            color:white;
-            padding:20px;
-            text-align:center;
-        }
+.box{
+background:white;
+max-width:350px;
+margin:auto;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 5px gray;
+}
 
-        nav{
-            background:#1e3799;
-            padding:12px;
-            text-align:center;
-        }
+input,button{
+width:100%;
+padding:10px;
+margin:8px 0;
+}
 
-        nav a{
-            color:white;
-            margin:10px;
-            text-decoration:none;
-            font-weight:bold;
-        }
-
-        nav a:hover{
-            color:yellow;
-        }
-
-        section{
-            padding:20px;
-            background:white;
-            margin:15px;
-            border-radius:8px;
-            box-shadow:0 0 5px rgba(0,0,0,0.1);
-        }
-
-        h2{
-            color:#0a3d62;
-        }
-
-        footer{
-            background:#0a3d62;
-            color:white;
-            text-align:center;
-            padding:15px;
-            font-size:14px;
-        }
-
-        input, button{
-            padding:8px;
-            margin:6px;
-            width:90%;
-            max-width:300px;
-        }
-
-        button{
-            background:#1e3799;
-            color:white;
-            border:none;
-            cursor:pointer;
-            border-radius:4px;
-        }
-
-        button:hover{
-            background:#4a69bd;
-        }
-    </style>
+button{
+background:#1e3799;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+</style>
 </head>
 
 <body>
 
-<header>
-    <h1>Kingdom College of Health and Allied Sciences</h1>
-    <p>Mbeya – Kyela | Njia Panda Ipinda (Nyuma ya Lake Oil)</p>
-    <p>☎️ +255 785 705 151 | +255 735 705 151</p>
-</header>
+<div class="box">
 
-<nav>
-    <a href="#home">Mwanzo</a>
-    <a href="#login">Ingia</a>
-    <a href="#materials">Masomo</a>
-    <a href="#assignments">Kazi</a>
-    <a href="#results">Matokeo</a>
-    <a href="#staff">Wafanyakazi</a>
-    <a href="#about">Kuhusu Sisi</a>
-    <a href="#contact">Mawasiliano</a>
-</nav>
+<h2>Student Login</h2>
 
-<section id="home">
-    <h2>Karibu</h2>
-    <p>
-        Karibu Kingdom College of Health and Allied Sciences.
-        Tunatoa elimu bora ya afya na ujuzi wa vitendo kwa wanafunzi wetu.
-    </p>
-</section>
+<input id="reg" placeholder="Registration Number">
+<input id="pass" type="password" placeholder="Password">
 
-<section id="login">
-    <h2>Student Login</h2>
+<button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
 
-    <input type="text" placeholder="Jina la Mtumiaji"><br>
-    <input type="password" placeholder="Nenosiri"><br>
+<p id="msg"></p>
 
-    <button>Ingia</button>
-</section>
+</div>
 
-<section id="materials">
-    <h2>Vifaa vya Masomo</h2>
-    <ul>
-        <li>Pathology Notes</li>
-        <li>Anatomy Guide</li>
-        <li>Clinical Practice Manual</li>
-        <li>Physiology Slides</li>
-    </ul>
-</section>
 
-<section id="assignments">
-    <h2>Uwasilishaji wa Kazi</h2>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-    <input type="file"><br>
-    <button>Tuma Kazi</button>
-</section>
+<script>
 
-<section id="results">
-    <h2>Matokeo</h2>
+const firebaseConfig = {
+ apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+ authDomain: "collegeportal-app.firebaseapp.com",
+ databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+ projectId: "collegeportal-app",
+ storageBucket: "collegeportal-app.firebasestorage.app",
+ messagingSenderId: "266762331631",
+ appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+};
 
-    <p>Weka Namba ya Usajili:</p>
+firebase.initializeApp(firebaseConfig);
 
-    <input type="text" placeholder="KCAS/2026/001"><br>
+const auth = firebase.auth();
 
-    <button>Angalia Matokeo</button>
-</section>
 
-<section id="staff">
-    <h2>Wafanyakazi</h2>
+function register(){
 
-    <ul>
-        <li>Dkt. Mkuu wa Chuo</li>
-        <li>Msajili</li>
-        <li>Afisa TEHAMA</li>
-        <li>Wakufunzi</li>
-    </ul>
-</section>
+let reg = document.getElementById("reg").value;
+let pass = document.getElementById("pass").value;
 
-<section id="about">
-    <h2>Kuhusu Chuo</h2>
+if(reg==""||pass==""){
+ alert("Fill all fields");
+ return;
+}
 
-    <p>
-        Kingdom College of Health and Allied Sciences
-        imeanzishwa kwa lengo la kutoa elimu ya kiwango cha juu
-        katika sekta ya afya na huduma za jamii.
-    </p>
-</section>
+let email = reg + "@kcs.com";
 
-<section id="contact">
-    <h2>Mawasiliano</h2>
+auth.createUserWithEmailAndPassword(email,pass)
+.then(()=>{
+ document.getElementById("msg").innerText="Registered Successfully ✅";
+})
+.catch(e=>alert(e.message));
 
-    <p>📍 Mbeya – Kyela, Njia Panda Ipinda (Nyuma ya Lake Oil)</p>
-    <p>☎️ +255 785 705 151</p>
-    <p>☎️ +255 735 705 151</p>
-</section>
+}
 
-<footer>
-    <p>&copy; 2026 Kingdom College of Health and Allied Sciences</p>
-</footer>
+
+function login(){
+
+let reg = document.getElementById("reg").value;
+let pass = document.getElementById("pass").value;
+
+if(reg==""||pass==""){
+ alert("Fill all fields");
+ return;
+}
+
+let email = reg + "@kcs.com";
+
+auth.signInWithEmailAndPassword(email,pass)
+.then(()=>{
+
+ alert("Login Successful ✅");
+
+ localStorage.setItem("student",reg);
+
+ setTimeout(function(){
+   window.location.href = "profile.html";
+ },500);
+
+})
+.catch((e)=>alert(e.message));
+
+}
+
+</script>
 
 </body>
 </html>
