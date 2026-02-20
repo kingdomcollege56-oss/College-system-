@@ -15,6 +15,7 @@ header{background:#0a3d62;color:white;padding:15px;text-align:center;}
 .card{border:1px solid #ccc;padding:10px;border-radius:5px;margin:8px 0;}
 input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 .logout{background:red;}
+.warning{color:red;font-weight:bold;}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -47,13 +48,14 @@ input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 <!-- PROFILE -->
 <div id="profile" class="section">
 <h3>My Profile</h3>
-<div class="card">
+<div id="profileContent" class="card">
+<p class="warning" id="profileWarning">Loading profile...</p>
 <p><b>Reg No:</b> <span id="regNo"></span></p>
 <p><b>Level:</b>
-<select id="level" onchange="loadSubjects()"></select>
+<select id="level" onchange="updateAll()"></select>
 </p>
 <p><b>Semester:</b>
-<select id="semester" onchange="loadSubjects()"></select>
+<select id="semester" onchange="updateAll()"></select>
 </p>
 </div>
 </div>
@@ -137,22 +139,30 @@ if(!student){ window.location="index.html"; }
 document.getElementById("studentName").innerText = "Welcome: " + student;
 document.getElementById("regNo").innerText = student;
 
-// Profile load
+// Subjects data
+const subjectsData = {
+4:{1:["Communication","Anatomy","Physiology","Computer","Epidemiology","Medical Ethics","Microbiology"],
+   2:["Clinical Skills","Clinical Nutrition","Patient Care","Clinical Laboratory","Pathology"]},
+5:{1:["Pediatric 1","Internal Medicine 1","Obstetrics 1","Pharmacology","Counselling","Health Promotion"],
+   2:["Pediatric 2","Internal Medicine 2","Surgery","Obstetrics 2","RSH"]},
+6:{1:["Coming Soon"],2:["Coming Soon"]}
+};
+
+// Load profile
 db.ref("students/"+student).once("value").then(snap=>{
   if(snap.exists()){
     let data = snap.val();
+    document.getElementById("profileWarning").style.display="none";
     populateDropdowns(data.level,data.semester);
-    loadSubjects(data.level,data.semester);
-    loadMaterials(data.level,data.semester);
-    loadResults(data.level,data.semester);
-    loadFees(data.level,data.semester);
-    populateAssignmentSubjects(data.level,data.semester);
+    updateAll();
   } else {
-    window.location="profile.html"; // redirect if profile not complete
+    document.getElementById("profileWarning").innerText="Profile not complete. Please update in Profile section.";
+    populateDropdowns(4,1); // default
+    updateAll();
   }
 });
 
-// Populate level/semester dropdowns
+// Populate dropdowns
 function populateDropdowns(level,semester){
   let levelSel = document.getElementById("level");
   levelSel.innerHTML="";
@@ -166,26 +176,25 @@ function populateDropdowns(level,semester){
   }
 }
 
-// Subjects data example
-const subjectsData = {
-4:{1:["Communication","Anatomy","Physiology","Computer","Epidemiology","Medical Ethics","Microbiology"],
-   2:["Clinical Skills","Clinical Nutrition","Patient Care","Clinical Laboratory","Pathology"]},
-5:{1:["Pediatric 1","Internal Medicine 1","Obstetrics 1","Pharmacology","Counselling","Health Promotion"],
-   2:["Pediatric 2","Internal Medicine 2","Surgery","Obstetrics 2","RSH"]},
-6:{1:["Coming Soon"],2:["Coming Soon"]}
-};
+// Update all sections
+function updateAll(){
+  let level = document.getElementById("level").value;
+  let sem = document.getElementById("semester").value;
+  loadSubjects(level,sem);
+  loadMaterials(level,sem);
+  populateAssignmentSubjects(level,sem);
+  loadResults(level,sem);
+  loadFees(level,sem);
+}
 
 // Load subjects
 function loadSubjects(level,sem){
-  level = level || document.getElementById("level").value;
-  sem = sem || document.getElementById("semester").value;
   let list = subjectsData[level][sem] || [];
-  let box = document.getElementById("subjectList");
-  box.innerHTML="";
+  let box = document.getElementById("subjectList"); box.innerHTML="";
   list.forEach(sub=>{ box.innerHTML += `<div class="card">${sub}</div>`; });
 }
 
-// Load materials from Firebase
+// Load materials
 function loadMaterials(level,sem){
   let subjects = subjectsData[level][sem] || [];
   let box = document.getElementById("materialList"); box.innerHTML="";
@@ -199,10 +208,9 @@ function loadMaterials(level,sem){
   });
 }
 
-// Populate assignment subject dropdown
+// Populate assignment subjects
 function populateAssignmentSubjects(level,sem){
-  let sel = document.getElementById("assSubject");
-  sel.innerHTML="";
+  let sel = document.getElementById("assSubject"); sel.innerHTML="";
   let list = subjectsData[level][sem] || [];
   list.forEach(sub=>{ sel.innerHTML += `<option value="${sub}">${sub}</option>`; });
 }
@@ -251,7 +259,7 @@ function loadFees(level,sem){
   });
 }
 
-// Send message to counsellor
+// Send message
 function sendMessage(){
   let msg = document.getElementById("msgText").value;
   if(!msg){ alert("Write message"); return; }
