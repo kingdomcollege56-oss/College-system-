@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kingdom College Counsellor Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;margin:0;background:#f2f2f2;}
+header{background:#0a3d62;color:white;padding:15px;text-align:center;}
+.container{max-width:1200px;margin:auto;padding:15px;}
+.menu{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:10px;}
+.menu button{padding:10px;border:none;background:#1e3799;color:white;border-radius:5px;cursor:pointer;}
+.menu button:hover{background:#4a69bd;}
+.section{display:none;background:white;padding:15px;border-radius:8px;box-shadow:0 0 5px gray;margin-bottom:15px;}
+.card{border:1px solid #ccc;padding:10px;border-radius:5px;margin:8px 0;}
+input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
+.logout{background:red;}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<header>
+<h2>Kingdom College Counsellor Panel</h2>
+<p id="counsellorName"></p>
+</header>
+
+<div class="container">
+
+<!-- LOGIN SECTION -->
+<div id="loginSection" class="section" style="display:block;">
+<h3>Login</h3>
+<input id="cUsername" placeholder="Username">
+<input id="cPassword" type="password" placeholder="Password">
+<button onclick="cLogin()">Login</button>
+<p id="loginMsg" style="color:red;"></p>
+</div>
+
+<!-- DASHBOARD SECTION -->
+<div id="dashboard" class="section">
+<div class="menu">
+<button onclick="openSection('messages')">Messages</button>
+<button onclick="openSection('transfers')">Transfer Requests</button>
+<button onclick="openSection('announcements')">Announcements</button>
+<button onclick="logout()" class="logout">Logout</button>
+</div>
+
+<!-- MESSAGES -->
+<div id="messages" class="section">
+<h3>Anonymous Messages</h3>
+<div id="msgList"></div>
+<textarea id="replyText" placeholder="Type reply..."></textarea>
+<input id="replyStudent" type="hidden">
+<button onclick="sendReply()">Send Reply</button>
+</div>
+
+<!-- TRANSFER REQUESTS -->
+<div id="transfers" class="section">
+<h3>Transfer Requests</h3>
+<div id="transferList"></div>
+</div>
+
+<!-- ANNOUNCEMENTS -->
+<div id="announcements" class="section">
+<h3>Post Announcement</h3>
+<input id="annTitle" placeholder="Title">
+<textarea id="annMessage" placeholder="Message"></textarea>
+<button onclick="postAnnouncement()">Post</button>
+<div id="annList"></div>
+</div>
+
+</div>
+
+<footer style="text-align:center;padding:10px;">
+© 2026 Kingdom College | By Carina
+</footer>
+
+<script>
+// Firebase setup
+const firebaseConfig = {
+ apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+ authDomain: "collegeportal-app.firebaseapp.com",
+ databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+ projectId: "collegeportal-app",
+ storageBucket: "collegeportal-app.firebasestorage.app",
+ messagingSenderId: "266762331631",
+ appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Single counsellor credentials
+const counsellorAccount = {
+ username:"counsellor",
+ password:"secure123"
+};
+
+// LOGIN FUNCTION
+function cLogin(){
+ let u = document.getElementById("cUsername").value;
+ let p = document.getElementById("cPassword").value;
+ if(u===counsellorAccount.username && p===counsellorAccount.password){
+   localStorage.setItem("counsellor","loggedin");
+   document.getElementById("loginSection").style.display="none";
+   document.getElementById("dashboard").style.display="block";
+   document.getElementById("counsellorName").innerText = "Welcome Counsellor";
+   loadMessages();
+   loadTransfers();
+   loadAnnouncements();
+ } else {
+   document.getElementById("loginMsg").innerText="Wrong credentials!";
+ }
+}
+
+// LOGOUT
+function logout(){
+ localStorage.removeItem("counsellor");
+ location.reload();
+}
+
+// Check session
+if(localStorage.getItem("counsellor")){
+ document.getElementById("loginSection").style.display="none";
+ document.getElementById("dashboard").style.display="block";
+ document.getElementById("counsellorName").innerText = "Welcome Counsellor";
+ loadMessages();
+ loadTransfers();
+ loadAnnouncements();
+}
+
+// SECTIONS
+function openSection(id){
+ document.querySelectorAll(".section").forEach(s=>{if(s.id!=="loginSection") s.style.display="none";});
+ document.getElementById(id).style.display="block";
+}
+
+// MESSAGES
+function loadMessages(){
+ let list = document.getElementById("msgList");
+ list.innerHTML="";
+ db.ref("messages").once("value").then(snapshot=>{
+   snapshot.forEach(studentSnap=>{
+     studentSnap.forEach(msgSnap=>{
+       let m = msgSnap.val();
+       let div = document.createElement("div");
+       div.className="card";
+       div.innerHTML = `<b>From Student:</b> ${studentSnap.key}<br>${m.text}<br><i>${m.date}</i>
+                        <button onclick="prepareReply('${studentSnap.key}')">Reply</button>`;
+       list.appendChild(div);
+     });
+   });
+ });
+}
+
+function prepareReply(student){
+ document.getElementById("replyStudent").value=student;
+ document.getElementById("replyText").value="";
+}
+
+function sendReply(){
+ let student = document.getElementById("replyStudent").value;
+ let text = document.getElementById("replyText").value;
+ if(!student || !text){ alert("Select a message and type reply"); return; }
+ db.ref("messages/"+student+"/replies").push({
+   text:text,
+   date:new Date().toLocaleString(),
+   by:"Counsellor"
+ }).then(()=>{
+   alert("Reply sent ✅");
+   loadMessages();
+ });
+}
+
+// TRANSFER REQUESTS
+function loadTransfers(){
+ let list = document.getElementById("transferList");
+ list.innerHTML="";
+ db.ref("transferRequests").once("value").then(snapshot=>{
+   snapshot.forEach(studentSnap=>{
+     studentSnap.forEach(reqSnap=>{
+       let r = reqSnap.val();
+       let div = document.createElement("div");
+       div.className="card";
+       div.innerHTML=`<b>${studentSnap.key}</b><br>
+         Current: ${r.currentCourse} L${r.currentLevel} S${r.currentSemester}<br>
+         Requested: ${r.requestedCourse} L${r.requestedLevel} S${r.requestedSemester}<br>
+         Institution: ${r.requestedInstitution}<br>
+         Reason: ${r.reason}<br>
+         Date: ${r.date}<br>
+         Status: <span id="status_${studentSnap.key}">${r.status||"Pending"}</span>
+         <button onclick="updateStatus('${studentSnap.key}','${reqSnap.key}','Approved')">Approve</button>
+         <button onclick="updateStatus('${studentSnap.key}','${reqSnap.key}','Rejected')">Reject</button>`;
+       list.appendChild(div);
+     });
+   });
+ });
+}
+
+function updateStatus(student,key,status){
+ db.ref("transferRequests/"+student+"/"+key).update({status:status}).then(()=>{loadTransfers();});
+}
+
+// ANNOUNCEMENTS
+function loadAnnouncements(){
+ let list = document.getElementById("annList");
+ list.innerHTML="";
+ db.ref("announcements").orderByChild("date").once("value").then(snapshot=>{
+   snapshot.forEach(a=>{
+     let val=a.val();
+     let div=document.createElement("div");
+     div.className="card";
+     div.innerHTML=`<b>${val.title}</b><br>${val.message}<br><i>Posted by: ${val.teacher} on ${val.date}</i>`;
+     list.appendChild(div);
+   });
+ });
+}
+
+function postAnnouncement(){
+ let title=document.getElementById("annTitle").value;
+ let msg=document.getElementById("annMessage").value;
+ if(!title || !msg){ alert("Fill all fields"); return; }
+ db.ref("announcements").push({
+   title:title,
+   message:msg,
+   teacher:"Counsellor",
+   date:new Date().toLocaleString()
+ }).then(()=>{
+   document.getElementById("annTitle").value="";
+   document.getElementById("annMessage").value="";
+   loadAnnouncements();
+ });
+}
+
+</script>
+
+</body>
+</html>
