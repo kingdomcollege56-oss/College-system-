@@ -49,14 +49,24 @@ input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 <div id="profile" class="section">
 <h3>My Profile</h3>
 <div id="profileContent" class="card">
+
 <p class="warning" id="profileWarning">Loading profile...</p>
-<p><b>Reg No:</b> <span id="regNo"></span></p>
-<p><b>Level:</b>
-<select id="level" onchange="updateAll()"></select>
-</p>
-<p><b>Semester:</b>
-<select id="semester" onchange="updateAll()"></select>
-</p>
+
+<label>Full Name:</label>
+<input id="profileName" placeholder="Full Name">
+
+<label>Course:</label>
+<input id="profileCourse" placeholder="Course">
+
+<label>Level:</label>
+<select id="profileLevel"></select>
+
+<label>Semester:</label>
+<select id="profileSemester"></select>
+
+<button onclick="saveProfile()">Save Profile</button>
+
+<p id="profileMsg"></p>
 </div>
 </div>
 
@@ -137,7 +147,6 @@ const storage = firebase.storage();
 let student = localStorage.getItem("student");
 if(!student){ window.location="index.html"; }
 document.getElementById("studentName").innerText = "Welcome: " + student;
-document.getElementById("regNo").innerText = student;
 
 // Subjects data
 const subjectsData = {
@@ -148,53 +157,80 @@ const subjectsData = {
 6:{1:["Coming Soon"],2:["Coming Soon"]}
 };
 
-// Load profile
-db.ref("students/"+student).once("value").then(snap=>{
-  if(snap.exists()){
+// PROFILE FUNCTIONS
+function loadProfile(){
+  db.ref("students/"+student).once("value").then(snap=>{
     let data = snap.val();
-    document.getElementById("profileWarning").style.display="none";
-    populateDropdowns(data.level,data.semester);
-    updateAll();
-  } else {
-    document.getElementById("profileWarning").innerText="Profile not complete. Please update in Profile section.";
-    populateDropdowns(4,1); // default
-    updateAll();
-  }
-});
+    if(data){
+      document.getElementById("profileWarning").style.display="none";
+      document.getElementById("profileName").value = data.name || "";
+      document.getElementById("profileCourse").value = data.course || "";
+      populateLevelSemester(data.level,data.semester);
+      updateAll();
+    } else {
+      document.getElementById("profileWarning").innerText="Profile not complete. Please fill below.";
+      populateLevelSemester(4,1);
+      updateAll();
+    }
+  });
+}
 
-// Populate dropdowns
-function populateDropdowns(level,semester){
-  let levelSel = document.getElementById("level");
-  levelSel.innerHTML="";
+function populateLevelSemester(level,semester){
+  let levSel = document.getElementById("profileLevel");
+  levSel.innerHTML="";
   for(let i=4;i<=6;i++){
-    levelSel.innerHTML += `<option value="${i}" ${i==level?"selected":""}>Level ${i}</option>`;
+    levSel.innerHTML += `<option value="${i}" ${i==level?"selected":""}>Level ${i}</option>`;
   }
-  let semSel = document.getElementById("semester");
+  let semSel = document.getElementById("profileSemester");
   semSel.innerHTML="";
   for(let i=1;i<=2;i++){
     semSel.innerHTML += `<option value="${i}" ${i==semester?"selected":""}>Semester ${i}</option>`;
   }
 }
 
-// Update all sections
-function updateAll(){
-  let level = document.getElementById("level").value;
-  let sem = document.getElementById("semester").value;
-  loadSubjects(level,sem);
-  loadMaterials(level,sem);
-  populateAssignmentSubjects(level,sem);
-  loadResults(level,sem);
-  loadFees(level,sem);
+function saveProfile(){
+  let name = document.getElementById("profileName").value;
+  let course = document.getElementById("profileCourse").value;
+  let level = document.getElementById("profileLevel").value;
+  let semester = document.getElementById("profileSemester").value;
+
+  if(!name || !course || !level || !semester){
+    alert("Fill all fields");
+    return;
+  }
+
+  db.ref("students/"+student).set({
+    name:name,
+    course:course,
+    level:level,
+    semester:semester
+  }).then(()=>{
+    document.getElementById("profileMsg").innerText="Profile saved successfully ✅";
+    document.getElementById("profileWarning").style.display="none";
+    updateAll();
+  }).catch(e=>alert(e.message));
 }
 
-// Load subjects
+// Load profile on start
+loadProfile();
+
+// SECTIONS MANAGEMENT
+function openSection(id){
+  document.querySelectorAll(".section").forEach(s=>s.style.display="none");
+  document.getElementById(id).style.display="block";
+}
+
+// LOGOUT
+function logout(){ localStorage.removeItem("student"); window.location="index.html"; }
+
+// SUBJECTS
 function loadSubjects(level,sem){
   let list = subjectsData[level][sem] || [];
   let box = document.getElementById("subjectList"); box.innerHTML="";
   list.forEach(sub=>{ box.innerHTML += `<div class="card">${sub}</div>`; });
 }
 
-// Load materials
+// MATERIALS
 function loadMaterials(level,sem){
   let subjects = subjectsData[level][sem] || [];
   let box = document.getElementById("materialList"); box.innerHTML="";
@@ -208,14 +244,13 @@ function loadMaterials(level,sem){
   });
 }
 
-// Populate assignment subjects
+// ASSIGNMENTS
 function populateAssignmentSubjects(level,sem){
   let sel = document.getElementById("assSubject"); sel.innerHTML="";
   let list = subjectsData[level][sem] || [];
   list.forEach(sub=>{ sel.innerHTML += `<option value="${sub}">${sub}</option>`; });
 }
 
-// Send assignment
 function sendAssignment(){
   let subject = document.getElementById("assSubject").value;
   let text = document.getElementById("assText").value;
@@ -238,7 +273,7 @@ function sendAssignment(){
   });
 }
 
-// Load results
+// RESULTS
 function loadResults(level,sem){
   let list = subjectsData[level][sem] || [];
   let box = document.getElementById("resultList"); box.innerHTML="";
@@ -251,7 +286,7 @@ function loadResults(level,sem){
   });
 }
 
-// Load fees
+// FEES
 function loadFees(level,sem){
   db.ref("fees/"+student).once("value").then(snap=>{
     let data = snap.val() || {paid:0,balance:0};
@@ -259,7 +294,7 @@ function loadFees(level,sem){
   });
 }
 
-// Send message
+// MESSAGES
 function sendMessage(){
   let msg = document.getElementById("msgText").value;
   if(!msg){ alert("Write message"); return; }
@@ -267,16 +302,18 @@ function sendMessage(){
   .then(()=>{ document.getElementById("msgText").value=""; alert("Message sent ✅"); });
 }
 
-// Logout
-function logout(){ localStorage.removeItem("student"); window.location="index.html"; }
-
-// Open section
-function openSection(id){
-  document.querySelectorAll(".section").forEach(s=>s.style.display="none");
-  document.getElementById(id).style.display="block";
+// UPDATE ALL SECTIONS
+function updateAll(){
+  let level = document.getElementById("profileLevel").value;
+  let sem = document.getElementById("profileSemester").value;
+  loadSubjects(level,sem);
+  loadMaterials(level,sem);
+  populateAssignmentSubjects(level,sem);
+  loadResults(level,sem);
+  loadFees(level,sem);
 }
 
-// Default
+// DEFAULT SECTION
 openSection("profile");
 </script>
 
