@@ -2,100 +2,190 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Kingdom College Login</title>
+<title>Kingdom College Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
-  font-family: Arial;
-  background:#f2f2f2;
-  text-align:center;
-  padding:40px;
+margin:0;
+font-family:Arial, sans-serif;
+background:#f4f6f9;
 }
 
-.box{
-  background:white;
-  max-width:350px;
-  margin:auto;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 0 5px gray;
+/* HEADER */
+header{
+background:#1e3799;
+color:white;
+padding:20px;
+text-align:center;
 }
 
-input,button{
-  width:100%;
-  padding:10px;
-  margin:8px 0;
+/* HERO */
+.hero{
+background:linear-gradient(to right,#4a69bd,#6a89cc);
+color:white;
+padding:40px 20px;
+text-align:center;
 }
 
-button{
-  background:#1e3799;
-  color:white;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
+.hero h1{
+font-size:28px;
+}
+
+.hero p{
+font-size:16px;
+}
+
+/* LOGIN AREA */
+.login-area{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+padding:20px;
+max-width:900px;
+margin:auto;
+}
+
+.login-box{
+background:white;
+padding:20px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 0 5px gray;
+}
+
+.login-box h3{
+color:#1e3799;
+}
+
+.login-box button{
+background:#1e3799;
+color:white;
+border:none;
+padding:10px;
+width:100%;
+border-radius:5px;
+cursor:pointer;
+}
+
+/* INFO */
+.info{
+background:white;
+margin:20px;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 5px gray;
+}
+
+/* MAP */
+.map{
+margin:20px;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 0 5px gray;
+}
+
+/* FOOTER */
+footer{
+background:#1e3799;
+color:white;
+text-align:center;
+padding:15px;
+margin-top:20px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-<h2>Student Login</h2>
+<!-- HEADER -->
+<header>
+<h2>Kingdom College of Health and Allied Sciences</h2>
+<p>Mbeya – Kyela | Njia Panda Ipinda (Nyuma ya Lake Oil)</p>
+</header>
 
-<input id="reg" placeholder="Registration Number">
-<input id="pass" type="password" placeholder="Password">
 
-<button onclick="login()">Login</button>
-<button onclick="register()">Register</button>
-
-<p id="msg"></p>
+<!-- HERO -->
+<div class="hero">
+<h1>Welcome to Student Portal</h1>
+<p>Access Education | Results | Assignments | Messages</p>
 </div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<!-- LOGIN -->
+<div class="login-area">
+
+<div class="login-box">
+<h3>Student</h3>
+<button onclick="go('student-login.html')">Login</button>
+</div>
+
+<div class="login-box">
+<h3>Lecturer</h3>
+<button onclick="go('lecturer-login.html')">Login</button>
+</div>
+
+<div class="login-box">
+<h3>Counsellor</h3>
+<button onclick="go('counsellor-login.html')">Login</button>
+</div>
+
+<div class="login-box">
+<h3>Rector</h3>
+<button onclick="go('rector-login.html')">Login</button>
+</div>
+
+</div>
+
+
+<!-- COLLEGE INFO -->
+<div class="info">
+
+<h3>📞 Contact Us</h3>
+<p>
++255 85705151<br>
++255 35705151
+</p>
+
+<h3>🎓 Entry Requirements (Clinical Medicine)</h3>
+<ul>
+<li>Form Six OR Form Four</li>
+<li>At least D in 4 subjects</li>
+<li>Biology, Chemistry & Physics required</li>
+</ul>
+
+<h3>📘 About Our College</h3>
+<p>
+Kingdom College of Health and Allied Sciences provides quality medical education
+and prepares students for professional healthcare services.
+</p>
+
+</div>
+
+
+<!-- MAP -->
+<div class="map">
+
+<iframe 
+src="https://maps.google.com/maps?q=Kyela%20Mbeya%20Tanzania&t=&z=14&ie=UTF8&iwloc=&output=embed"
+width="100%" 
+height="300" 
+frameborder="0"
+allowfullscreen>
+</iframe>
+
+</div>
+
+
+<!-- FOOTER -->
+<footer>
+<p>© 2026 Kingdom College Portal | Powered by Rector Office</p>
+</footer>
+
 
 <script>
-const firebaseConfig = {
- apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
- authDomain: "collegeportal-app.firebaseapp.com",
- databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
- projectId: "collegeportal-app",
- storageBucket: "collegeportal-app.firebasestorage.app",
- messagingSenderId: "266762331631",
- appId: "1:266762331631:web:66ddfbde53d33086ac421a"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-function register(){
-  let reg = document.getElementById("reg").value;
-  let pass = document.getElementById("pass").value;
-  if(reg==""||pass==""){ alert("Fill all fields"); return; }
-  
-  let email = reg+"@kcs.com"; // generate dummy email from registration number
-  
-  auth.createUserWithEmailAndPassword(email,pass)
-  .then(()=>{
-    document.getElementById("msg").innerText="Registered Successfully ✅";
-  })
-  .catch(e=>alert(e.message));
-}
-
-function login(){
-  let reg = document.getElementById("reg").value;
-  let pass = document.getElementById("pass").value;
-  if(reg==""||pass==""){ alert("Fill all fields"); return; }
-  
-  let email = reg+"@kcs.com";
-  
-  auth.signInWithEmailAndPassword(email,pass)
-  .then(()=>{
-    localStorage.setItem("student", reg);
-    window.location="student.html";
-  })
-  .catch(()=>alert("Wrong Login ❌"));
+function go(page){
+window.location = page;
 }
 </script>
 
