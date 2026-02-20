@@ -4,18 +4,17 @@
 <meta charset="UTF-8">
 <title>Kingdom College Student Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-body{ font-family: Arial; margin:0; background:#f2f2f2; }
-header{ background:#0a3d62; color:white; padding:15px; text-align:center; }
-.container{ max-width:1200px; margin:auto; padding:15px; }
-.menu{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-bottom:10px; }
-.menu button{ padding:10px; border:none; background:#1e3799; color:white; border-radius:5px; cursor:pointer; }
-.menu button:hover{ background:#4a69bd; }
-.section{ display:none; background:white; padding:15px; border-radius:8px; box-shadow:0 0 5px gray; margin-bottom:15px; }
-.card{ border:1px solid #ccc; padding:10px; border-radius:5px; margin:8px 0; }
-input,textarea,select,button{ width:100%; padding:8px; margin:5px 0; }
-.logout{ background:red; }
+body{font-family:Arial;margin:0;background:#f2f2f2;}
+header{background:#0a3d62;color:white;padding:15px;text-align:center;}
+.container{max-width:1200px;margin:auto;padding:15px;}
+.menu{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:10px;}
+.menu button{padding:10px;border:none;background:#1e3799;color:white;border-radius:5px;cursor:pointer;}
+.menu button:hover{background:#4a69bd;}
+.section{display:none;background:white;padding:15px;border-radius:8px;box-shadow:0 0 5px gray;margin-bottom:15px;}
+.card{border:1px solid #ccc;padding:10px;border-radius:5px;margin:8px 0;}
+input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
+.logout{background:red;}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -51,17 +50,10 @@ input,textarea,select,button{ width:100%; padding:8px; margin:5px 0; }
 <div class="card">
 <p><b>Reg No:</b> <span id="regNo"></span></p>
 <p><b>Level:</b>
-<select id="level" onchange="loadSubjects()">
-<option value="4">Level 4</option>
-<option value="5">Level 5</option>
-<option value="6">Level 6</option>
-</select>
+<select id="level" onchange="loadSubjects()"></select>
 </p>
 <p><b>Semester:</b>
-<select id="semester" onchange="loadSubjects()">
-<option value="1">Semester 1</option>
-<option value="2">Semester 2</option>
-</select>
+<select id="semester" onchange="loadSubjects()"></select>
 </p>
 </div>
 </div>
@@ -75,39 +67,29 @@ input,textarea,select,button{ width:100%; padding:8px; margin:5px 0; }
 <!-- MATERIALS -->
 <div id="materials" class="section">
 <h3>Study Materials</h3>
-<div id="materialList">
-<p>No materials uploaded yet.</p>
-</div>
+<div id="materialList"></div>
 </div>
 
 <!-- ASSIGNMENTS -->
 <div id="assignments" class="section">
 <h3>Assignments</h3>
-<input type="text" id="assSubject" placeholder="Subject">
-<textarea id="assText" placeholder="Write assignment..."></textarea>
+<select id="assSubject"></select>
+<textarea id="assText" placeholder="Write assignment details..."></textarea>
 <input type="file" id="assFile">
-<select id="assLecturer">
-<option value="">Select Lecturer</option>
-</select>
-<button onclick="sendAssignment()">Submit</button>
+<button onclick="sendAssignment()">Submit Assignment</button>
 <div id="assList"></div>
 </div>
 
 <!-- RESULTS -->
 <div id="results" class="section">
 <h3>My Results</h3>
-<div id="resultsList">
-<p>Results not published yet.</p>
-</div>
+<div id="resultList"></div>
 </div>
 
 <!-- FEES -->
 <div id="fees" class="section">
 <h3>Fees Status</h3>
-<div id="feesList">
-<p>Paid: TZS 0</p>
-<p>Balance: TZS 0</p>
-</div>
+<div id="feeList"></div>
 </div>
 
 <!-- MESSAGES -->
@@ -135,7 +117,7 @@ input,textarea,select,button{ width:100%; padding:8px; margin:5px 0; }
 </footer>
 
 <script>
-// Firebase
+// Firebase setup
 const firebaseConfig = {
  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
  authDomain: "collegeportal-app.firebaseapp.com",
@@ -149,108 +131,146 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-// Login check
-let reg = localStorage.getItem("student");
-if(!reg){ window.location="index.html"; }
-document.getElementById("studentName").innerText="Welcome: "+reg;
-document.getElementById("regNo").innerText=reg;
+// Check login
+let student = localStorage.getItem("student");
+if(!student){ window.location="index.html"; }
+document.getElementById("studentName").innerText = "Welcome: " + student;
+document.getElementById("regNo").innerText = student;
 
-// Example lecturers mapping
-const lecturers = {
-  "Communication": "lecturer1",
-  "Anatomy": "lecturer2",
-  "Physiology": "lecturer3",
-  "Computer": "lecturer4",
-  "Epidemiology & Biostatistics": "lecturer5",
-  "Medical Ethics": "lecturer6",
-  "Microbiology": "lecturer7"
-};
+// Profile load
+db.ref("students/"+student).once("value").then(snap=>{
+  if(snap.exists()){
+    let data = snap.val();
+    populateDropdowns(data.level,data.semester);
+    loadSubjects(data.level,data.semester);
+    loadMaterials(data.level,data.semester);
+    loadResults(data.level,data.semester);
+    loadFees(data.level,data.semester);
+    populateAssignmentSubjects(data.level,data.semester);
+  } else {
+    window.location="profile.html"; // redirect if profile not complete
+  }
+});
 
-// Populate lecturers select
-function populateLecturers(){
-  let assLecturer = document.getElementById("assLecturer");
-  assLecturer.innerHTML='<option value="">Select Lecturer</option>';
-  Object.values(lecturers).forEach(l=>{
-    assLecturer.innerHTML += `<option value="${l}">${l}</option>`;
-  });
+// Populate level/semester dropdowns
+function populateDropdowns(level,semester){
+  let levelSel = document.getElementById("level");
+  levelSel.innerHTML="";
+  for(let i=4;i<=6;i++){
+    levelSel.innerHTML += `<option value="${i}" ${i==level?"selected":""}>Level ${i}</option>`;
+  }
+  let semSel = document.getElementById("semester");
+  semSel.innerHTML="";
+  for(let i=1;i<=2;i++){
+    semSel.innerHTML += `<option value="${i}" ${i==semester?"selected":""}>Semester ${i}</option>`;
+  }
 }
-populateLecturers();
 
-// Subjects Data
-const subjects = {
-4:{1:["Communication","Anatomy","Physiology","Computer","Epidemiology & Biostatistics","Medical Ethics","Microbiology"],
+// Subjects data example
+const subjectsData = {
+4:{1:["Communication","Anatomy","Physiology","Computer","Epidemiology","Medical Ethics","Microbiology"],
    2:["Clinical Skills","Clinical Nutrition","Patient Care","Clinical Laboratory","Pathology"]},
 5:{1:["Pediatric 1","Internal Medicine 1","Obstetrics 1","Pharmacology","Counselling","Health Promotion"],
    2:["Pediatric 2","Internal Medicine 2","Surgery","Obstetrics 2","RSH"]},
 6:{1:["Coming Soon"],2:["Coming Soon"]}
 };
 
-// Load Subjects
-function loadSubjects(){
-  let level = document.getElementById("level").value;
-  let sem = document.getElementById("semester").value;
-  let list = subjects[level][sem];
+// Load subjects
+function loadSubjects(level,sem){
+  level = level || document.getElementById("level").value;
+  sem = sem || document.getElementById("semester").value;
+  let list = subjectsData[level][sem] || [];
   let box = document.getElementById("subjectList");
-  box.innerHTML = "";
-  list.forEach(sub=>{
-    box.innerHTML += `<div class="card">${sub}</div>`;
+  box.innerHTML="";
+  list.forEach(sub=>{ box.innerHTML += `<div class="card">${sub}</div>`; });
+}
+
+// Load materials from Firebase
+function loadMaterials(level,sem){
+  let subjects = subjectsData[level][sem] || [];
+  let box = document.getElementById("materialList"); box.innerHTML="";
+  subjects.forEach(sub=>{
+    db.ref("materials/"+sub).once("value").then(snap=>{
+      snap.forEach(m=>{
+        let val = m.val();
+        box.innerHTML += `<div class="card"><b>${sub}</b><br><a href="${val.fileUrl}" target="_blank">${val.filename}</a></div>`;
+      });
+    });
   });
 }
 
-// Assignments
+// Populate assignment subject dropdown
+function populateAssignmentSubjects(level,sem){
+  let sel = document.getElementById("assSubject");
+  sel.innerHTML="";
+  let list = subjectsData[level][sem] || [];
+  list.forEach(sub=>{ sel.innerHTML += `<option value="${sub}">${sub}</option>`; });
+}
+
+// Send assignment
 function sendAssignment(){
-  let sub = document.getElementById("assSubject").value;
+  let subject = document.getElementById("assSubject").value;
   let text = document.getElementById("assText").value;
-  let fileInput = document.getElementById("assFile");
-  let file = fileInput.files[0];
-  let lecturerId = document.getElementById("assLecturer").value;
-
-  if(!sub || !text || !file || !lecturerId){ alert("Fill all fields and select Lecturer"); return; }
-
-  let fileRef = storage.ref(`assignments/${lecturerId}/${reg}/${Date.now()}_${file.name}`);
+  let file = document.getElementById("assFile").files[0];
+  if(!subject || !text || !file){ alert("Fill all fields"); return; }
+  let fileRef = storage.ref(`student_assignments/${student}/${Date.now()}_${file.name}`);
   fileRef.put(file).then(snap=>{
     snap.ref.getDownloadURL().then(url=>{
-      db.ref(`assignments/${lecturerId}/${reg}`).push({
-        subject: sub,
-        text: text,
-        fileUrl: url,
-        filename: file.name,
-        date: new Date().toLocaleString()
+      db.ref(`assignments/${subject}/${student}`).push({
+        text:text,
+        fileUrl:url,
+        filename:file.name,
+        date:new Date().toLocaleString()
       }).then(()=>{
-        document.getElementById("assList").innerHTML += `
-        <div class="card">
-          <b>${sub}</b>
-          <p>${text}</p>
-          <p>File: <a href="${url}" target="_blank">${file.name}</a></p>
-          <small>Sent</small>
-        </div>`;
-        document.getElementById("assSubject").value="";
+        alert("Assignment sent ✅");
         document.getElementById("assText").value="";
         document.getElementById("assFile").value="";
       });
     });
-  }).catch(e=>alert("Upload failed: "+e.message));
+  });
 }
 
-// Messages
+// Load results
+function loadResults(level,sem){
+  let list = subjectsData[level][sem] || [];
+  let box = document.getElementById("resultList"); box.innerHTML="";
+  list.forEach(sub=>{
+    db.ref("results/"+sub+"/"+student).once("value").then(snap=>{
+      if(snap.exists()){
+        box.innerHTML += `<div class="card"><b>${sub}</b>: ${snap.val().marks||"Pending"}</div>`;
+      }
+    });
+  });
+}
+
+// Load fees
+function loadFees(level,sem){
+  db.ref("fees/"+student).once("value").then(snap=>{
+    let data = snap.val() || {paid:0,balance:0};
+    document.getElementById("feeList").innerHTML=`<div class="card">Paid: TZS ${data.paid}<br>Balance: TZS ${data.balance}</div>`;
+  });
+}
+
+// Send message to counsellor
 function sendMessage(){
   let msg = document.getElementById("msgText").value;
   if(!msg){ alert("Write message"); return; }
-  db.ref(`messages/counsellor/${reg}`).push({msg: msg, date: new Date().toLocaleString()});
-  document.getElementById("msgList").innerHTML += `<div class="card"><p>${msg}</p><small>Sent</small></div>`;
-  document.getElementById("msgText").value="";
+  db.ref("messages/"+student).push({text:msg,date:new Date().toLocaleString()})
+  .then(()=>{ document.getElementById("msgText").value=""; alert("Message sent ✅"); });
 }
 
 // Logout
-function logout(){
-  localStorage.removeItem("student");
-  window.location="index.html";
+function logout(){ localStorage.removeItem("student"); window.location="index.html"; }
+
+// Open section
+function openSection(id){
+  document.querySelectorAll(".section").forEach(s=>s.style.display="none");
+  document.getElementById(id).style.display="block";
 }
 
 // Default
 openSection("profile");
-loadSubjects();
 </script>
 
 </body>
- </html>
+</html>
