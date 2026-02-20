@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kingdom College Portal – Full Integrated</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f2f2f2;}
+header{background:#1a1a2e;color:white;padding:15px;text-align:center;}
+.container{max-width:1200px;margin:auto;padding:15px;}
+.menu{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:10px;}
+.menu button{padding:10px;border:none;background:#162447;color:white;border-radius:5px;cursor:pointer;}
+.menu button:hover{background:#1f4068;}
+.subsection{display:none;background:white;padding:15px;border-radius:8px;box-shadow:0 0 5px gray;margin-bottom:15px;}
+input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
+.logout{background:red;color:white;}
+h3{margin-top:0;}
+table{width:100%;border-collapse:collapse;}
+th,td{border:1px solid #ccc;padding:8px;text-align:left;}
+footer{text-align:center;padding:10px;background:#1a1a2e;color:white;margin-top:20px;}
+</style>
+</head>
+<body>
+
+<header>
+<h2>Kingdom College Portal</h2>
+<p id="welcomeMsg"></p>
+</header>
+
+<div class="container">
+
+<!-- Login Section -->
+<div id="loginSection" class="subsection" style="display:block;">
+<h3>Login</h3>
+<select id="roleSelect">
+  <option value="student">Student</option>
+  <option value="lecturer">Lecturer</option>
+  <option value="counsellor">Counsellor</option>
+  <option value="rector">Rector</option>
+</select>
+<input id="loginEmail" placeholder="Email / Username">
+<input id="loginPassword" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="loginMsg" style="color:red;"></p>
+</div>
+
+<!-- Student Dashboard -->
+<div id="studentDashboard" class="subsection">
+<div class="menu">
+<button onclick="showPanel('studentProfile')">Profile</button>
+<button onclick="showPanel('studentModules')">Modules</button>
+<button onclick="showPanel('studentAssignments')">Assignments</button>
+<button onclick="showPanel('studentResults')">Results</button>
+<button onclick="showPanel('studentSports')">Sports</button>
+<button onclick="showPanel('studentTransfers')">Transfer</button>
+<button onclick="showPanel('studentCounselling')">Counselling</button>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div id="studentProfile" class="subsection">
+<h3>Student Profile</h3>
+<label>Name:</label><input id="stuName">
+<label>Email:</label><input id="stuEmail">
+<button onclick="saveStudentProfile()">Save</button>
+</div>
+
+<div id="studentModules" class="subsection">
+<h3>Modules</h3>
+<label>Request Module:</label>
+<input id="stuModuleRequest" placeholder="Module Name">
+<button onclick="requestModule()">Request</button>
+<ul id="stuModuleList"></ul>
+</div>
+
+<div id="studentAssignments" class="subsection">
+<h3>Assignments</h3>
+<label>Module:</label><input id="stuAssModule" placeholder="Module">
+<label>File Name:</label><input id="stuAssFile" placeholder="File Name">
+<button onclick="submitAssignment()">Submit Assignment</button>
+<ul id="stuAssignmentsList"></ul>
+</div>
+
+<div id="studentResults" class="subsection">
+<h3>Results</h3>
+<ul id="stuResultsList"></ul>
+</div>
+
+<div id="studentSports" class="subsection">
+<h3>Sports & Games</h3>
+<p>Scores, schedules, events...</p>
+</div>
+
+<div id="studentTransfers" class="subsection">
+<h3>Transfer Requests</h3>
+<label>From Course:</label><input id="transferFrom">
+<label>To Course:</label><input id="transferTo">
+<label>Institution:</label><input id="transferInstitution">
+<textarea id="transferReason" placeholder="Reason"></textarea>
+<button onclick="submitTransfer()">Submit Transfer</button>
+<ul id="transferList"></ul>
+</div>
+
+<div id="studentCounselling" class="subsection">
+<h3>Anonymous Counselling</h3>
+<textarea id="counsellingMsg" placeholder="Type message"></textarea>
+<button onclick="sendCounselling()">Send Message</button>
+<ul id="counsellingList"></ul>
+</div>
+
+<!-- Lecturer Dashboard -->
+<div id="lecturerDashboard" class="subsection">
+<div class="menu">
+<button onclick="showPanel('lecProfile')">Profile</button>
+<button onclick="showPanel('approveModules')">Approve Modules</button>
+<button onclick="showPanel('gradeSubmissions')">Submit Grades</button>
+<button onclick="showPanel('uploadMaterials')">Upload Materials</button>
+<button onclick="showPanel('viewAssignments')">View Assignments</button>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div id="lecProfile" class="subsection">
+<h3>Lecturer Profile</h3>
+<label>Name:</label><input id="lecName">
+<label>Email:</label><input id="lecEmail">
+<button onclick="saveLecturerProfile()">Save</button>
+</div>
+
+<div id="approveModules" class="subsection">
+<h3>Approve Student Modules</h3>
+<ul id="pendingModules"></ul>
+</div>
+
+<div id="gradeSubmissions" class="subsection">
+<h3>Submit Grades</h3>
+<label>Student Email:</label><input id="gradeStudentEmail">
+<label>Module:</label><input id="gradeModule">
+<label>Grade:</label><input id="gradeValue">
+<button onclick="submitGrade()">Submit Grade</button>
+</div>
+
+<div id="uploadMaterials" class="subsection">
+<h3>Upload Materials</h3>
+<label>Module:</label><input id="materialModule">
+<label>File:</label><input id="materialFile">
+<button onclick="uploadMaterial()">Upload</button>
+<ul id="uploadedMaterials"></ul>
+</div>
+
+<div id="viewAssignments" class="subsection">
+<h3>View Assignments</h3>
+<ul id="assignmentsList"></ul>
+</div>
+
+<!-- Counsellor Dashboard -->
+<div id="counsellorDashboard" class="subsection">
+<div class="menu">
+<button onclick="showPanel('cMessages')">Messages</button>
+<button onclick="showPanel('cTransfers')">Transfer Requests</button>
+<button onclick="showPanel('cAnnouncements')">Announcements</button>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div id="cMessages" class="subsection">
+<h3>Messages</h3>
+<ul id="cMsgList"></ul>
+</div>
+
+<div id="cTransfers" class="subsection">
+<h3>Transfer Requests</h3>
+<ul id="cTransferList"></ul>
+</div>
+
+<div id="cAnnouncements" class="subsection">
+<h3>Announcements</h3>
+<ul id="cAnnList"></ul>
+</div>
+
+<!-- Rector Dashboard -->
+<div id="rectorDashboard" class="subsection">
+<div class="menu" id="rectorMenu"></div>
+<div id="rectorOverview" class="subsection"><h3>Rector Overview</h3></div>
+</div>
+
+</div>
+
+<footer>© 2026 Kingdom College | By Carina</footer>
+
+<script>
+// --- Dummy Data ---
+let students=[{email:"student1@example.com",name:"Alice"},{email:"student2@example.com",name:"Bob"}];
+let lecturers=[{email:"lecturer@example.com",name:"Dr. Smith"}];
+let counsellors=[{username:"counsellor",password:"secure123",name:"Counsellor"}];
+let rector={username:"rector",password:"admin123",name:"Rector"};
+
+let studentAssignments=[];
+let studentModules=[];
+let studentResults=[];
+let transfers=[];
+let counsellingMessages=[];
+let uploadedMaterials=[];
+let pendingModules=[];
+let grades=[];
+
+// --- Session ---
+let currentRole=null;
+let currentUser=null;
+
+// --- Helper ---
+function showPanel(id){
+ document.querySelectorAll(".subsection").forEach(s=>s.style.display="none");
+ if(currentRole==="student") document.getElementById("studentDashboard").style.display="block";
+ if(currentRole==="lecturer") document.getElementById("lecturerDashboard").style.display="block";
+ if(currentRole==="counsellor") document.getElementById("counsellorDashboard").style.display="block";
+ if(currentRole==="rector") document.getElementById("rectorDashboard").style.display="block";
+ document.getElementById(id).style.display="block";
+}
+
+// --- Login ---
+function login(){
+ let role=document.getElementById("roleSelect").value;
+ let email=document.getElementById("loginEmail").value.trim();
+ let pass=document.getElementById("loginPassword").value.trim();
+ if(role==="student"){
+   let stu=students.find(s=>s.email===email);
+   if(stu){currentRole="student"; currentUser=stu; showPanel('studentProfile'); document.getElementById("stuName").value=stu.name; document.getElementById("stuEmail").value=stu.email; document.getElementById("welcomeMsg").innerText="Welcome Student"; updateStudentModules(); updateAssignments(); updateResults();} 
+   else{document.getElementById("loginMsg").innerText="Student not found";}
+ } 
+ else if(role==="lecturer"){
+   let lec=lecturers.find(l=>l.email===email);
+   if(lec){currentRole="lecturer"; currentUser=lec; showPanel('lecProfile'); document.getElementById("lecName").value=lec.name; document.getElementById("lecEmail").value=lec.email; document.getElementById("welcomeMsg").innerText="Welcome Lecturer"; updatePendingModules(); updateAssignmentsList(); updateMaterialsList();} 
+   else{document.getElementById("loginMsg").innerText="Lecturer not found";}
+ }
+ else if(role==="counsellor"){
+   let con=counsellors.find(c=>c.username===email && c.password===pass);
+   if(con){currentRole="counsellor"; currentUser=con; showPanel('cMessages'); document.getElementById("welcomeMsg").innerText="Welcome Counsellor"; loadCounsellorData();} 
+   else{document.getElementById("loginMsg").innerText="Wrong credentials";}
+ }
+ else if(role==="rector"){
+   if(email===rector.username && pass===rector.password){currentRole="rector"; currentUser=rector; showPanel('rectorOverview'); document.getElementById("welcomeMsg").innerText="Welcome Rector"; loadRectorMenu();}
+   else{document.getElementById("loginMsg").innerText="Wrong credentials";}
+ }
+}
+
+// --- Logout ---
+function logout(){currentRole=null; currentUser=null; location.reload();}
+
+// --- Student Functions ---
+function saveStudentProfile(){if(currentUser){currentUser.name=document.getElementById("stuName").value;currentUser.email=document.getElementById("stuEmail").value;alert("Saved");}}
+function requestModule(){
+ let mod=document.getElementById("stuModuleRequest").value;
+ if(!mod){alert("Enter module");return;}
+ studentModules.push({student:currentUser.email,module:mod,status:"Pending"});
+ alert("Module requested"); updateStudentModules(); updatePendingModules();
+}
+function updateStudentModules(){
+ let ul=document.getElementById("stuModuleList");
+ ul.innerHTML="";
+ studentModules.filter(m=>m.student===currentUser.email).forEach(m=>ul.innerHTML+=`<li>${m.module} - ${m.status}</li>`);
+}
+function submitAssignment(){
+ let mod=document.getElementById("stuAssModule").value;
+ let file=document.getElementById("stuAssFile").value;
+ if(!mod || !file){alert("Fill fields");return;}
+ studentAssignments.push({student:currentUser.email,module:mod,file:file,status:"Pending"});
+ alert("Assignment submitted"); updateAssignments();
+}
+function updateAssignments(){
+ let ul=document.getElementById("stuAssignmentsList");
+ ul.innerHTML="";
+ studentAssignments.filter(a=>a.student===currentUser.email).forEach(a=>ul.innerHTML+=`<li>${a.module}: ${a.file} - ${a.status}</li>`);
+}
+function updateResults(){
+ let ul=document.getElementById("stuResultsList");
+ ul.innerHTML="";
+ studentResults.filter(r=>r.student===currentUser.email).forEach(r=>ul.innerHTML+=`<li>${r.module}: ${r.grade}</li>`);
+}
+function submitTransfer(){
+ let from=document.getElementById("transferFrom").value;
+ let to=document.getElementById("transferTo").value;
+ let inst=document.getElementById("transferInstitution").value;
+ let reason=document.getElementById("transferReason").value;
+ if(!from || !to || !inst || !reason){alert("Fill all");return;}
+ let req={student:currentUser.email,from,to,inst,reason,status:"Pending"};
+ transfers.push(req); alert("Transfer requested"); updateTransferList();
+}
+function updateTransferList(){
+ let ul=document.getElementById("transferList");
+ ul.innerHTML="";
+ transfers.filter(t=>t.student===currentUser.email).forEach(t=>ul.innerHTML+=`<li>${t.from}->${t.to} at ${t.inst} - ${t.status}</li>`);
+}
+function sendCounselling(){
+ let msg=document.getElementById("counsellingMsg").value;
+ if(!msg){alert("Enter message");return;}
+ counsellingMessages.push({student:currentUser.email,text:msg});
+ alert("Message sent"); loadCounsellorData();
+}
+
+// --- Lecturer Functions ---
+function saveLecturerProfile(){if(currentUser){currentUser.name=document.getElementById("lecName").value;currentUser.email=document.getElementById("lecEmail").value;alert("Saved");}}
+function updatePendingModules(){
+ let ul=document.getElementById("pendingModules");
+ ul.innerHTML="";
+ studentModules.filter(m=>m.status==="Pending").forEach(m=>ul.innerHTML+=`<li>${m.student} requested ${m.module} 
+<button onclick="approveModule('${m.student}','${m.module}')">Approve</button></li>`);
+}
+function approveModule(student,module){
+ studentModules.forEach(m=>{if(m.student===student && m.module===module){m.status="Approved";}});
+ alert("Module approved"); updatePendingModules(); updateStudentModules();
+}
+function submitGrade(){
+ let studentEmail=document.getElementById("gradeStudentEmail").value;
+ let mod=document.getElementById("gradeModule").value;
+ let grade=document.getElementById("gradeValue").value;
+ if(!studentEmail || !mod || !grade){alert("Fill fields");return;}
+ studentResults.push({student:studentEmail,module:mod,grade:grade});
+ alert("Grade submitted"); updateResults();
+}
+function uploadMaterial(){
+ let mod=document.getElementById("materialModule").value;
+ let file=document.getElementById("materialFile").value;
+ if(!mod||!file){alert("Fill");return;}
+ uploadedMaterials.push({module:mod,file:file});
+ updateMaterialsList();
+ alert("Material uploaded");
+}
+function updateMaterialsList(){
+ let ul=document.getElementById("uploadedMaterials");
+ ul.innerHTML="";
+ uploadedMaterials.forEach(m=>ul.innerHTML+=`<li>${m.module}: ${m.file}</li>`);
+}
+function updateAssignmentsList(){
+ let ul=document.getElementById("assignmentsList");
+ ul.innerHTML="";
+ studentAssignments.forEach(a=>ul.innerHTML+=`<li>${a.student} - ${a.module}: ${a.file} - ${a.status}</li>`);
+}
+
+// --- Counsellor Functions ---
+function loadCounsellorData(){
+ let msgUl=document.getElementById("cMsgList");
+ msgUl.innerHTML="";
+ counsellingMessages.forEach(m=>msgUl.innerHTML+=`<li>${m.text} from ${m.student}</li>`);
+ let transferUl=document.getElementById("cTransferList");
+ transferUl.innerHTML="";
+ transfers.forEach(t=>transferUl.innerHTML+=`<li>${t.student} ${t.from}->${t.to} at ${t.inst} - ${t.status}
+<button onclick="approveTransfer('${t.student}','${t.from}','${t.to}')">Approve</button>
+<button onclick="rejectTransfer('${t.student}','${t.from}','${t.to}')">Reject</button></li>`);
+ let annUl=document.getElementById("cAnnList");
+ annUl.innerHTML="";
+}
+function approveTransfer(student,from,to){
+ transfers.forEach(t=>{if(t.student===student && t.from===from && t.to===to){t.status="Approved";}});
+ alert("Transfer Approved"); loadCounsellorData(); updateTransferList();
+}
+function rejectTransfer(student,from,to){
+ transfers.forEach(t=>{if(t.student===student && t.from===from && t.to===to){t.status="Rejected";}});
+ alert("Transfer Rejected"); loadCounsellorData(); updateTransferList();
+}
+
+// --- Rector Functions ---
+function loadRectorMenu(){
+ let menu=document.getElementById("rectorMenu");
+ menu.innerHTML="";
+ let sections=["rectorOverview"];
+ sections.forEach(s=>{let btn=document.createElement("button"); btn.innerText=s.replace(/([A-Z])/g," $1"); btn.onclick=()=>showPanel(s); menu.appendChild(btn);});
+ menu.appendChild(Object.assign(document.createElement("button"),{innerText:"Logout",className:"logout",onclick:logout}));
+}
+
+</script>
+
+</body>
+ </html>
