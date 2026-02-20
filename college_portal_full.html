@@ -122,6 +122,7 @@ footer{text-align:center;padding:10px;background:#1a1a2e;color:white;margin-top:
 <h3>Lecturer Profile</h3>
 <label>Name:</label><input id="lecName">
 <label>Email:</label><input id="lecEmail">
+<label>Password:</label><input id="lecPass" type="password" placeholder="Change password">
 <button onclick="saveLecturerProfile()">Save</button>
 </div>
 
@@ -188,7 +189,7 @@ footer{text-align:center;padding:10px;background:#1a1a2e;color:white;margin-top:
 <script>
 // --- Dummy Data ---
 let students=[{email:"student1@example.com",name:"Alice"},{email:"student2@example.com",name:"Bob"}];
-let lecturers=[{email:"lecturer@example.com",name:"Dr. Smith"}];
+let lecturers=[{email:"lecturer@example.com",name:"Dr. Smith",password:"1234"}];
 let counsellors=[{username:"counsellor",password:"secure123",name:"Counsellor"}];
 let rector={username:"rector",password:"admin123",name:"Rector"};
 
@@ -226,9 +227,9 @@ function login(){
    else{document.getElementById("loginMsg").innerText="Student not found";}
  } 
  else if(role==="lecturer"){
-   let lec=lecturers.find(l=>l.email===email);
+   let lec=lecturers.find(l=>l.email===email && l.password===pass);
    if(lec){currentRole="lecturer"; currentUser=lec; showPanel('lecProfile'); document.getElementById("lecName").value=lec.name; document.getElementById("lecEmail").value=lec.email; document.getElementById("welcomeMsg").innerText="Welcome Lecturer"; updatePendingModules(); updateAssignmentsList(); updateMaterialsList();} 
-   else{document.getElementById("loginMsg").innerText="Lecturer not found";}
+   else{document.getElementById("loginMsg").innerText="Wrong credentials";}
  }
  else if(role==="counsellor"){
    let con=counsellors.find(c=>c.username===email && c.password===pass);
@@ -296,7 +297,7 @@ function sendCounselling(){
 }
 
 // --- Lecturer Functions ---
-function saveLecturerProfile(){if(currentUser){currentUser.name=document.getElementById("lecName").value;currentUser.email=document.getElementById("lecEmail").value;alert("Saved");}}
+function saveLecturerProfile(){if(currentUser){currentUser.name=document.getElementById("lecName").value;currentUser.email=document.getElementById("lecEmail").value;let pass=document.getElementById("lecPass").value;if(pass) currentUser.password=pass; alert("Saved");}}
 function updatePendingModules(){
  let ul=document.getElementById("pendingModules");
  ul.innerHTML="";
@@ -347,6 +348,8 @@ function loadCounsellorData(){
  let annUl=document.getElementById("cAnnList");
  annUl.innerHTML="";
 }
+
+// Counsellor approve/reject
 function approveTransfer(student,from,to){
  transfers.forEach(t=>{if(t.student===student && t.from===from && t.to===to){t.status="Approved";}});
  alert("Transfer Approved"); loadCounsellorData(); updateTransferList();
@@ -364,8 +367,7 @@ function loadRectorMenu(){
  sections.forEach(s=>{let btn=document.createElement("button"); btn.innerText=s.replace(/([A-Z])/g," $1"); btn.onclick=()=>showPanel(s); menu.appendChild(btn);});
  menu.appendChild(Object.assign(document.createElement("button"),{innerText:"Logout",className:"logout",onclick:logout}));
 }
-
 </script>
 
 </body>
- </html>
+                        </html>
