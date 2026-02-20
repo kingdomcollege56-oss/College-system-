@@ -2,77 +2,66 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Student Dashboard</title>
+<title>Kingdom College Student Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-
 body{
-font-family:Arial;
-margin:0;
-background:#f2f2f2;
+  font-family:Arial;
+  margin:0;
+  background:#f2f2f2;
 }
-
 header{
-background:#0a3d62;
-color:white;
-padding:15px;
-text-align:center;
+  background:#0a3d62;
+  color:white;
+  padding:15px;
+  text-align:center;
 }
-
 .container{
-max-width:1200px;
-margin:auto;
-padding:15px;
+  max-width:1200px;
+  margin:auto;
+  padding:15px;
 }
-
 .menu{
-display:flex;
-flex-wrap:wrap;
-gap:5px;
-justify-content:center;
-margin-bottom:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  justify-content:center;
+  margin-bottom:10px;
 }
-
 .menu button{
-padding:10px;
-border:none;
-background:#1e3799;
-color:white;
-border-radius:5px;
-cursor:pointer;
+  padding:10px;
+  border:none;
+  background:#1e3799;
+  color:white;
+  border-radius:5px;
+  cursor:pointer;
 }
-
 .menu button:hover{
-background:#4a69bd;
+  background:#4a69bd;
 }
-
 .section{
-display:none;
-background:white;
-padding:15px;
-border-radius:8px;
-box-shadow:0 0 5px gray;
-margin-bottom:15px;
+  display:none;
+  background:white;
+  padding:15px;
+  border-radius:8px;
+  box-shadow:0 0 5px gray;
+  margin-bottom:15px;
 }
-
 .card{
-border:1px solid #ccc;
-padding:10px;
-border-radius:5px;
-margin:8px 0;
+  border:1px solid #ccc;
+  padding:10px;
+  border-radius:5px;
+  margin:8px 0;
 }
-
 input,textarea,select,button{
-width:100%;
-padding:8px;
-margin:5px 0;
+  width:100%;
+  padding:8px;
+  margin:5px 0;
 }
-
 .logout{
-background:red;
+  background:red;
 }
-
 </style>
 </head>
 
@@ -86,123 +75,90 @@ background:red;
 <div class="container">
 
 <div class="menu">
-
-<button onclick="openSection('profile')">Profile</button>
-<button onclick="openSection('subjects')">Subjects</button>
-<button onclick="openSection('materials')">Materials</button>
-<button onclick="openSection('assignments')">Assignments</button>
-<button onclick="openSection('results')">Results</button>
-<button onclick="openSection('fees')">Fees</button>
-<button onclick="openSection('messages')">Counsellor</button>
-<button onclick="openSection('sports')">Sports</button>
-<button onclick="logout()" class="logout">Logout</button>
-
+  <button onclick="openSection('profile')">Profile</button>
+  <button onclick="openSection('subjects')">Subjects</button>
+  <button onclick="openSection('materials')">Materials</button>
+  <button onclick="openSection('assignments')">Assignments</button>
+  <button onclick="openSection('results')">Results</button>
+  <button onclick="openSection('fees')">Fees</button>
+  <button onclick="openSection('messages')">Counsellor</button>
+  <button onclick="openSection('sports')">Sports</button>
+  <button onclick="logout()" class="logout">Logout</button>
 </div>
 
 <!-- PROFILE -->
 <div id="profile" class="section">
-
 <h3>My Profile</h3>
-
 <div class="card">
 <p><b>Reg No:</b> <span id="regNo"></span></p>
+<p><b>Full Name:</b> <input id="fullname"></p>
 <p><b>Level:</b>
 <select id="level" onchange="loadSubjects()">
-<option value="4">Level 4</option>
-<option value="5">Level 5</option>
-<option value="6">Level 6</option>
+  <option value="4">Level 4</option>
+  <option value="5">Level 5</option>
+  <option value="6">Level 6</option>
 </select>
 </p>
-
 <p><b>Semester:</b>
 <select id="semester" onchange="loadSubjects()">
-<option value="1">Semester 1</option>
-<option value="2">Semester 2</option>
+  <option value="1">Semester 1</option>
+  <option value="2">Semester 2</option>
 </select>
 </p>
+<button onclick="saveProfile()">Save Profile</button>
+<p id="profileMsg"></p>
 </div>
-
 </div>
 
 <!-- SUBJECTS -->
 <div id="subjects" class="section">
-
 <h3>My Subjects</h3>
 <div id="subjectList"></div>
-
 </div>
 
 <!-- MATERIALS -->
 <div id="materials" class="section">
-
 <h3>Study Materials</h3>
-
-<div class="card">
-<p>No materials uploaded yet.</p>
-</div>
-
+<div id="materialList"></div>
 </div>
 
 <!-- ASSIGNMENTS -->
 <div id="assignments" class="section">
-
 <h3>Assignments</h3>
-
-<input type="text" id="assSubject" placeholder="Subject">
+<select id="assSubject"></select>
 <textarea id="assText" placeholder="Write assignment..."></textarea>
-
-<button onclick="sendAssignment()">Submit</button>
-
+<button onclick="sendAssignment()">Submit Assignment</button>
 <div id="assList"></div>
-
 </div>
 
 <!-- RESULTS -->
 <div id="results" class="section">
-
 <h3>My Results</h3>
-
-<div class="card">
-<p>Results not published yet.</p>
-</div>
-
+<div id="resultList"></div>
 </div>
 
 <!-- FEES -->
 <div id="fees" class="section">
-
 <h3>Fees Status</h3>
-
 <div class="card">
-<p>Paid: TZS 0</p>
-<p>Balance: TZS 0</p>
+<p id="feePaid">Paid: TZS 0</p>
+<p id="feeBalance">Balance: TZS 0</p>
+<button onclick="updateFees()">Update Fees</button>
 </div>
-
 </div>
 
 <!-- MESSAGES -->
 <div id="messages" class="section">
-
 <h3>Message to Counsellor</h3>
-
 <textarea id="msgText" placeholder="Write message..."></textarea>
 <button onclick="sendMessage()">Send</button>
-
 <div id="msgList"></div>
-
 </div>
 
 <!-- SPORTS -->
 <div id="sports" class="section">
-
 <h3>Sports & Games</h3>
-
-<div class="card">
-<p>Football Team</p>
-<p>Netball Team</p>
-<p>Volleyball Team</p>
-</div>
-
+<div class="card" id="sportsList"></div>
 </div>
 
 </div>
@@ -211,187 +167,177 @@ background:red;
 © 2026 Kingdom College | By Carina
 </footer>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <script>
+const firebaseConfig = {
+ apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+ authDomain: "collegeportal-app.firebaseapp.com",
+ databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+ projectId: "collegeportal-app",
+ storageBucket: "collegeportal-app.firebasestorage.app",
+ messagingSenderId: "266762331631",
+ appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
 
-// LOGIN FIX (NO REDIRECT)
+let reg = localStorage.getItem("student");
+if(!reg){ window.location="index.html"; }
+document.getElementById("studentName").innerText="Welcome: "+reg;
+document.getElementById("regNo").innerText=reg;
 
-let student = localStorage.getItem("student");
-
-if(!student){
-  student = "Guest-Student";
-  localStorage.setItem("student", student);
-}
-
-document.getElementById("studentName").innerText =
-"Welcome: Student";
-
-document.getElementById("regNo").innerText = student;
-
-
-// Open Section
+// OPEN SECTION
 function openSection(id){
-
-let sections=document.querySelectorAll(".section");
-
-sections.forEach(s=>s.style.display="none");
-
-document.getElementById(id).style.display="block";
-
+  document.querySelectorAll(".section").forEach(s=>s.style.display="none");
+  document.getElementById(id).style.display="block";
 }
 
-
-// Subjects Data
-const subjects = {
-
-4:{
-1:[
-"Communication",
-"Anatomy",
-"Physiology",
-"Computer",
-"Epidemiology & Biostatistics",
-"Medical Ethics",
-"Microbiology"
-],
-2:[
-"Clinical Skills",
-"Clinical Nutrition",
-"Patient Care",
-"Clinical Laboratory",
-"Pathology"
-]
-},
-
-5:{
-1:[
-"Pediatric 1",
-"Internal Medicine 1",
-"Obstetrics 1",
-"Pharmacology",
-"Counselling",
-"Health Promotion"
-],
-2:[
-"Pediatric 2",
-"Internal Medicine 2",
-"Surgery",
-"Obstetrics 2",
-"RSH"
-]
-},
-
-6:{
-1:["Coming Soon"],
-2:["Coming Soon"]
-}
-
+// SUBJECTS DATA
+const subjectsData = {
+4:{1:["Communication","Anatomy","Physiology","Computer","Epidemiology & Biostatistics","Medical Ethics","Microbiology"],
+   2:["Clinical Skills","Clinical Nutrition","Patient Care","Clinical Laboratory","Pathology"]},
+5:{1:["Pediatric 1","Internal Medicine 1","Obstetrics 1","Pharmacology","Counselling","Health Promotion"],
+   2:["Pediatric 2","Internal Medicine 2","Surgery","Obstetrics 2","RSH"]},
+6:{1:["Coming Soon"],2:["Coming Soon"]}
 };
 
-
-// Load Subjects
+// LOAD SUBJECTS
 function loadSubjects(){
-
-let level = document.getElementById("level").value;
-let sem = document.getElementById("semester").value;
-
-let list = subjects[level][sem];
-
-let box = document.getElementById("subjectList");
-
-box.innerHTML="";
-
-list.forEach(sub=>{
-
-box.innerHTML += `<div class="card">${sub}</div>`;
-
-});
-
+  let level = document.getElementById("level").value;
+  let sem = document.getElementById("semester").value;
+  let list = subjectsData[level][sem] || [];
+  document.getElementById("subjectList").innerHTML="";
+  let assSelect = document.getElementById("assSubject");
+  assSelect.innerHTML="";
+  list.forEach(sub=>{
+    document.getElementById("subjectList").innerHTML += `<div class="card">${sub}</div>`;
+    assSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+  });
 }
 
+// PROFILE SAVE
+function saveProfile(){
+  let name = document.getElementById("fullname").value;
+  let level = document.getElementById("level").value;
+  let sem = document.getElementById("semester").value;
+  if(!name){ alert("Enter name"); return; }
+  db.ref("students/"+reg).set({name:name,level:level,semester:sem})
+  .then(()=>{ document.getElementById("profileMsg").innerText="Profile Saved ✅"; })
+  .catch(e=>alert(e));
+}
 
-// Assignment
+// MATERIALS
+function loadMaterials(){
+  db.ref("materials").once("value").then(snap=>{
+    let data = snap.val()||{};
+    let html="";
+    for(let key in data){
+      let mat = data[key];
+      if(mat.level==document.getElementById("level").value && mat.sem==document.getElementById("semester").value){
+        html += `<div class="card"><b>${mat.subject}</b><br>${mat.desc}</div>`;
+      }
+    }
+    document.getElementById("materialList").innerHTML=html||"<p>No materials yet.</p>";
+  });
+}
+
+// ASSIGNMENTS
 function sendAssignment(){
-
-let sub = document.getElementById("assSubject").value;
-let text = document.getElementById("assText").value;
-
-if(sub==""||text==""){
-alert("Fill all fields");
-return;
+  let sub = document.getElementById("assSubject").value;
+  let text = document.getElementById("assText").value;
+  if(!sub||!text){ alert("Fill all fields"); return; }
+  let key = Date.now();
+  db.ref("assignments/"+key).set({reg:reg,subject:sub,text:text,time:new Date().toISOString()})
+  .then(()=>{ loadAssignments(); document.getElementById("assText").value=""; })
+  .catch(e=>alert(e));
+}
+function loadAssignments(){
+  db.ref("assignments").orderByChild("reg").equalTo(reg).once("value").then(snap=>{
+    let data = snap.val()||{};
+    let html="";
+    for(let key in data){
+      let a = data[key];
+      html+=`<div class="card"><b>${a.subject}</b><p>${a.text}</p><small>Sent</small></div>`;
+    }
+    document.getElementById("assList").innerHTML=html||"<p>No assignments sent yet.</p>";
+  });
 }
 
-let box = document.getElementById("assList");
-
-box.innerHTML += `
-<div class="card">
-<b>${sub}</b>
-<p>${text}</p>
-<small>Sent</small>
-</div>
-`;
-
-document.getElementById("assSubject").value="";
-document.getElementById("assText").value="";
-
+// RESULTS
+function loadResults(){
+  db.ref("results").orderByChild("reg").equalTo(reg).once("value").then(snap=>{
+    let data = snap.val()||{};
+    let html="";
+    for(let key in data){
+      let r = data[key];
+      html+=`<div class="card"><b>${r.subject}</b>: ${r.mark}</div>`;
+    }
+    document.getElementById("resultList").innerHTML=html||"<p>Results not published yet.</p>";
+  });
 }
 
+// FEES
+function updateFees(){
+  let paid = prompt("Enter paid amount TZS:");
+  let balance = prompt("Enter balance amount TZS:");
+  db.ref("fees/"+reg).set({paid:paid,balance:balance}).then(loadFees);
+}
+function loadFees(){
+  db.ref("fees/"+reg).once("value").then(snap=>{
+    let f = snap.val()||{paid:0,balance:0};
+    document.getElementById("feePaid").innerText="Paid: TZS "+f.paid;
+    document.getElementById("feeBalance").innerText="Balance: TZS "+f.balance;
+  });
+}
 
-// Message
+// MESSAGES
 function sendMessage(){
-
-let msg = document.getElementById("msgText").value;
-
-if(msg==""){
-alert("Write message");
-return;
+  let msg = document.getElementById("msgText").value;
+  if(!msg){ alert("Write message"); return; }
+  let key = Date.now();
+  db.ref("messages/"+reg+"/"+key).set({text:msg,time:new Date().toISOString()})
+  .then(()=>{ loadMessages(); document.getElementById("msgText").value=""; });
+}
+function loadMessages(){
+  db.ref("messages/"+reg).once("value").then(snap=>{
+    let data = snap.val()||{};
+    let html="";
+    for(let key in data){
+      html+=`<div class="card"><p>${data[key].text}</p></div>`;
+    }
+    document.getElementById("msgList").innerHTML=html||"<p>No messages yet.</p>";
+  });
 }
 
-let box=document.getElementById("msgList");
-
-box.innerHTML += `
-<div class="card">
-<p>${msg}</p>
-<small>Sent</small>
-</div>
-`;
-
-document.getElementById("msgText").value="";
-
+// SPORTS
+function loadSports(){
+  let sports=["Football Team","Netball Team","Volleyball Team"];
+  let html="";
+  sports.forEach(s=>{ html+=`<p>${s}</p>`; });
+  document.getElementById("sportsList").innerHTML=html;
 }
 
-
-// Logout
+// LOGOUT
 function logout(){
-
-localStorage.removeItem("student");
-
-window.location.href="index.html";
-
+  localStorage.removeItem("student");
+  window.location="index.html";
 }
 
-
-// Default
+// DEFAULT
 openSection("profile");
 loadSubjects();
-
+loadMaterials();
+loadAssignments();
+loadResults();
+loadFees();
+loadMessages();
+loadSports();
 </script>
-<script>
-let student = localStorage.getItem("student");
 
-if(!student){
- alert("Please login first!");
- window.location="index.html";
-}
-  <body>
-
-<button onclick="logout()" style="float:right; background:red; color:white;">
-Logout
-</button>
-</script>
 </body>
-  <script>
-if(!localStorage.getItem("student")){
- window.location="index.html";
-}
-  </script>
 </html>
