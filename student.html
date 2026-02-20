@@ -41,6 +41,8 @@ input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 <button onclick="openSection('results')">Results</button>
 <button onclick="openSection('fees')">Fees</button>
 <button onclick="openSection('messages')">Counsellor</button>
+<button onclick="openSection('transfer')">Transfer Request</button>
+<button onclick="openSection('announcements')">Announcements</button>
 <button onclick="openSection('sports')">Sports</button>
 <button onclick="logout()" class="logout">Logout</button>
 </div>
@@ -112,6 +114,46 @@ input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
 <div id="msgList"></div>
 </div>
 
+<!-- TRANSFER REQUEST -->
+<div id="transfer" class="section">
+<h3>Transfer Request</h3>
+<div class="card">
+<label>Current Course:</label>
+<input id="transferCurrentCourse" disabled>
+<label>Current Level:</label>
+<input id="transferCurrentLevel" disabled>
+<label>Current Semester:</label>
+<input id="transferCurrentSemester" disabled>
+
+<label>Requested Course:</label>
+<input id="transferRequestedCourse">
+<label>Requested Level:</label>
+<select id="transferRequestedLevel">
+<option value="4">Level 4</option>
+<option value="5">Level 5</option>
+<option value="6">Level 6</option>
+</select>
+<label>Requested Semester:</label>
+<select id="transferRequestedSemester">
+<option value="1">Semester 1</option>
+<option value="2">Semester 2</option>
+</select>
+<label>Requested Institution / Ministry:</label>
+<input id="transferRequestedInstitution" placeholder="Institution or Ministry">
+
+<label>Reason / Comments:</label>
+<textarea id="transferReason"></textarea>
+<button onclick="sendTransferRequest()">Submit Request</button>
+<div id="transferMsg"></div>
+</div>
+</div>
+
+<!-- ANNOUNCEMENTS -->
+<div id="announcements" class="section">
+<h3>Announcements / News</h3>
+<div id="announcementList"></div>
+</div>
+
 <!-- SPORTS -->
 <div id="sports" class="section">
 <h3>Sports & Games</h3>
@@ -157,7 +199,7 @@ const subjectsData = {
 6:{1:["Coming Soon"],2:["Coming Soon"]}
 };
 
-// PROFILE FUNCTIONS
+// PROFILE
 function loadProfile(){
   db.ref("students/"+student).once("value").then(snap=>{
     let data = snap.val();
@@ -167,6 +209,10 @@ function loadProfile(){
       document.getElementById("profileCourse").value = data.course || "";
       populateLevelSemester(data.level,data.semester);
       updateAll();
+      // Set transfer current info
+      document.getElementById("transferCurrentCourse").value = data.course;
+      document.getElementById("transferCurrentLevel").value = data.level;
+      document.getElementById("transferCurrentSemester").value = data.semester;
     } else {
       document.getElementById("profileWarning").innerText="Profile not complete. Please fill below.";
       populateLevelSemester(4,1);
@@ -208,6 +254,10 @@ function saveProfile(){
     document.getElementById("profileMsg").innerText="Profile saved successfully ✅";
     document.getElementById("profileWarning").style.display="none";
     updateAll();
+    // Update transfer section
+    document.getElementById("transferCurrentCourse").value = course;
+    document.getElementById("transferCurrentLevel").value = level;
+    document.getElementById("transferCurrentSemester").value = semester;
   }).catch(e=>alert(e.message));
 }
 
@@ -299,7 +349,6 @@ function sendMessage(){
   let msg = document.getElementById("msgText").value;
   if(!msg){ alert("Write message"); return; }
 
-  // Save anonymous message
   db.ref("messages/"+student).push({
     text:msg,
     date:new Date().toLocaleString(),
@@ -307,6 +356,45 @@ function sendMessage(){
   }).then(()=>{
     document.getElementById("msgText").value="";
     alert("Message sent anonymously ✅");
+  });
+}
+
+// TRANSFER REQUEST
+function sendTransferRequest(){
+  let reqCourse = document.getElementById("transferRequestedCourse").value;
+  let reqLevel = document.getElementById("transferRequestedLevel").value;
+  let reqSem = document.getElementById("transferRequestedSemester").value;
+  let reqInst = document.getElementById("transferRequestedInstitution").value;
+  let reason = document.getElementById("transferReason").value;
+
+  if(!reqCourse || !reqLevel || !reqSem || !reqInst || !reason){ alert("Fill all fields"); return; }
+
+  db.ref("transferRequests/"+student).push({
+    currentCourse: document.getElementById("transferCurrentCourse").value,
+    currentLevel: document.getElementById("transferCurrentLevel").value,
+    currentSemester: document.getElementById("transferCurrentSemester").value,
+    requestedCourse: reqCourse,
+    requestedLevel: reqLevel,
+    requestedSemester: reqSem,
+    requestedInstitution: reqInst,
+    reason: reason,
+    date: new Date().toLocaleString()
+  }).then(()=>{
+    document.getElementById("transferMsg").innerText="Transfer request submitted ✅";
+    document.getElementById("transferRequestedCourse").value="";
+    document.getElementById("transferRequestedInstitution").value="";
+    document.getElementById("transferReason").value="";
+  });
+}
+
+// ANNOUNCEMENTS
+function loadAnnouncements(){
+  db.ref("announcements").orderByChild("date").once("value").then(snap=>{
+    let box = document.getElementById("announcementList"); box.innerHTML="";
+    snap.forEach(a=>{
+      let val = a.val();
+      box.innerHTML = `<div class="card"><b>${val.title}</b><br>${val.message}<br><i>Posted by: ${val.teacher} on ${val.date}</i></div>` + box.innerHTML;
+    });
   });
 }
 
@@ -319,6 +407,7 @@ function updateAll(){
   populateAssignmentSubjects(level,sem);
   loadResults(level,sem);
   loadFees(level,sem);
+  loadAnnouncements();
 }
 
 // DEFAULT SECTION
