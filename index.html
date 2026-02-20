@@ -82,15 +82,15 @@ let reg = document.getElementById("reg").value;
 let pass = document.getElementById("pass").value;
 
 if(reg==""||pass==""){
-alert("Fill all fields");
-return;
+ alert("Fill all fields");
+ return;
 }
 
 let email = reg + "@kcs.com";
 
 auth.createUserWithEmailAndPassword(email,pass)
 .then(()=>{
-document.getElementById("msg").innerText="Registered Successfully ✅";
+ document.getElementById("msg").innerText="Registered Successfully ✅";
 })
 .catch(e=>alert(e.message));
 
@@ -102,17 +102,26 @@ function login(){
 let reg = document.getElementById("reg").value;
 let pass = document.getElementById("pass").value;
 
+if(reg==""||pass==""){
+ alert("Fill all fields");
+ return;
+}
+
 let email = reg + "@kcs.com";
 
 auth.signInWithEmailAndPassword(email,pass)
 .then(()=>{
 
-localStorage.setItem("student",reg);
+ alert("Login Successful ✅");
 
-window.location="profile.html";
+ localStorage.setItem("student",reg);
+
+ setTimeout(function(){
+   window.location.href = "profile.html";
+ },500);
 
 })
-.catch(()=>alert("Wrong Login ❌"));
+.catch((e)=>alert(e.message));
 
 }
 
