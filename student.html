@@ -6,6 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -68,7 +69,7 @@ h3{text-align:center;}
 
 <h3>Student Login</h3>
 
-<input id="reg" placeholder="Reg Number">
+<input id="reg" placeholder="Registration Number">
 <input id="pass" type="password" placeholder="Password">
 
 <button onclick="login()">Login</button>
@@ -89,7 +90,7 @@ h3{text-align:center;}
 <input id="level" placeholder="Level">
 <input id="semester" placeholder="Semester">
 
-<button onclick="saveProfile()">Save</button>
+<button onclick="saveProfile()">Save Profile</button>
 
 <p id="pmsg"></p>
 
@@ -103,17 +104,17 @@ h3{text-align:center;}
 
 <div class="menu">
 
-<button onclick="alert('Modules - Next Step')">Modules</button>
+<button onclick="alert('Modules - Coming Soon')">Modules</button>
 
-<button onclick="alert('Assignments - Next Step')">Assignments</button>
+<button onclick="alert('Assignments - Coming Soon')">Assignments</button>
 
-<button onclick="alert('Results - Next Step')">Results</button>
+<button onclick="alert('Results - Coming Soon')">Results</button>
 
-<button onclick="alert('Fees - Next Step')">Fees</button>
+<button onclick="alert('Fees - Coming Soon')">Fees</button>
 
-<button onclick="alert('Counselling - Next Step')">Counselling</button>
+<button onclick="alert('Counselling - Coming Soon')">Counselling</button>
 
-<button onclick="alert('Transfer - Next Step')">Transfer</button>
+<button onclick="alert('Transfer - Coming Soon')">Transfer</button>
 
 <button onclick="logout()">Logout</button>
 
@@ -124,55 +125,82 @@ h3{text-align:center;}
 
 <script>
 
-// FIREBASE CONFIG
+//////////////////////////////////////////////////
+// FIREBASE CONFIG (YAKO HALISI)
+//////////////////////////////////////////////////
+
 const firebaseConfig = {
- apiKey: "YOUR_API_KEY",
- authDomain: "YOUR_PROJECT.firebaseapp.com",
- databaseURL: "https://YOUR_PROJECT.firebaseio.com",
- projectId: "YOUR_PROJECT",
+  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+  authDomain: "collegeportal-app.firebaseapp.com",
+  databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+  projectId: "collegeportal-app",
+  storageBucket: "collegeportal-app.firebasestorage.app",
+  messagingSenderId: "266762331631",
+  appId: "1:266762331631:web:66ddfbde53d33086ac421a"
 };
 
+// Initialize
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.database();
 
 
+//////////////////////////////////////////////////
 // REGISTER
+//////////////////////////////////////////////////
+
 function register(){
 
-let r = reg.value;
-let p = pass.value;
+let r = document.getElementById("reg").value;
+let p = document.getElementById("pass").value;
 
-if(!r||!p) return alert("Fill all");
+if(r=="" || p==""){
+ alert("Fill all fields");
+ return;
+}
 
 let email = r+"@student.com";
 
 auth.createUserWithEmailAndPassword(email,p)
-.then(()=>msg.innerText="Registered ✅")
+.then(()=>{
+
+document.getElementById("msg").innerText="Registered Successfully ✅";
+
+})
 .catch(e=>alert(e.message));
+
 }
 
 
+//////////////////////////////////////////////////
 // LOGIN
+//////////////////////////////////////////////////
+
 function login(){
 
-let email = reg.value+"@student.com";
-let p = pass.value;
+let r = document.getElementById("reg").value;
+let p = document.getElementById("pass").value;
+
+let email = r+"@student.com";
 
 auth.signInWithEmailAndPassword(email,p)
-.then(user=>{
+.then(()=>{
 
-localStorage.setItem("reg",reg.value);
+localStorage.setItem("reg",r);
 
 checkProfile();
 
 })
-.catch(()=>alert("Wrong login"));
+.catch(()=>alert("Wrong Login ❌"));
+
 }
 
 
+//////////////////////////////////////////////////
 // CHECK PROFILE
+//////////////////////////////////////////////////
+
 function checkProfile(){
 
 let r = localStorage.getItem("reg");
@@ -182,47 +210,61 @@ db.ref("students/"+r).once("value")
 
 if(snap.exists()){
 
-login.style.display="none";
-profile.style.display="none";
-dash.style.display="block";
+document.getElementById("login").style.display="none";
+document.getElementById("profile").style.display="none";
+document.getElementById("dash").style.display="block";
 
 }else{
 
-login.style.display="none";
-profile.style.display="block";
+document.getElementById("login").style.display="none";
+document.getElementById("profile").style.display="block";
 
 }
 
 });
+
 }
 
 
+//////////////////////////////////////////////////
 // SAVE PROFILE
+//////////////////////////////////////////////////
+
 function saveProfile(){
 
 let r = localStorage.getItem("reg");
 
-let data={
-name:name.value,
-course:course.value,
-level:level.value,
-semester:semester.value
+let data = {
+
+ name:document.getElementById("name").value,
+ course:document.getElementById("course").value,
+ level:document.getElementById("level").value,
+ semester:document.getElementById("semester").value
+
 };
+
+if(data.name=="" || data.course=="" || data.level=="" || data.semester==""){
+ alert("Fill all fields");
+ return;
+}
 
 db.ref("students/"+r).set(data)
 .then(()=>{
 
-pmsg.innerText="Saved ✅";
+document.getElementById("pmsg").innerText="Profile Saved ✅";
 
-profile.style.display="none";
-dash.style.display="block";
+document.getElementById("profile").style.display="none";
+document.getElementById("dash").style.display="block";
 
 });
 
 }
 
 
+//////////////////////////////////////////////////
 // LOGOUT
+//////////////////////////////////////////////////
+
 function logout(){
 
 auth.signOut();
