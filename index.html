@@ -1,82 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Kingdom College Portal</title>
+<title>Kingdom College Management System</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
 
+/* GENERAL */
 body{
 margin:0;
 font-family:Arial;
-background:#f4f6f9;
+background:#eef3f9;
+}
+
+/* HEADER */
+header{
+background:#0a3d62;
+color:white;
+padding:25px;
+text-align:center;
 }
 
 /* NAV */
 nav{
 background:#1e3799;
-color:white;
 display:flex;
+justify-content:center;
 flex-wrap:wrap;
-justify-content:space-between;
-align-items:center;
-padding:10px 20px;
 }
-
-nav h2{margin:0;}
 
 nav a{
 color:white;
+padding:12px 18px;
 text-decoration:none;
-margin:5px 10px;
-font-size:14px;
+font-weight:bold;
+}
+
+nav a:hover{
+background:#4a69bd;
+}
+
+/* HERO */
+.hero{
+background:#cce5ff;
+padding:40px;
+text-align:center;
+}
+
+/* LOGIN */
+.login-box{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:15px;
+margin-top:25px;
+}
+
+.login-box a{
+background:#1e3799;
+color:white;
+padding:15px;
+border-radius:6px;
+text-decoration:none;
+font-weight:bold;
 }
 
 /* SECTIONS */
 section{
-padding:30px 20px;
-max-width:1000px;
-margin:auto;
-}
-
-/* HERO */
-#home{
-background:linear-gradient(to right,#4a69bd,#6a89cc);
-color:white;
-text-align:center;
-padding:50px 20px;
-}
-
-/* BOX */
-.box{
-background:white;
-padding:20px;
-margin:15px 0;
+margin:20px;
+padding:25px;
 border-radius:10px;
-box-shadow:0 0 5px gray;
+box-shadow:0 0 5px #ccc;
 }
 
-/* LOGIN GRID */
-.grid{
+/* COLORS */
+.about{background:#e3f2fd;}
+.courses{background:#e8f5e9;}
+.gallery-sec{background:#fffde7;}
+.news{background:#fce4ec;}
+.map-sec{background:#ede7f6;}
+.contact{background:#e0f7fa;}
+
+/* GALLERY */
+.gallery{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:15px;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:10px;
 }
 
-.btn{
-background:#1e3799;
-color:white;
-border:none;
-padding:10px;
+.gallery img{
 width:100%;
+height:150px;
+object-fit:cover;
 border-radius:5px;
-cursor:pointer;
+}
+
+/* ANNOUNCE */
+.announce{
+background:white;
+padding:10px;
+margin:8px 0;
+border-left:5px solid #1e3799;
 }
 
 /* FOOTER */
 footer{
-background:#1e3799;
+background:#0a3d62;
 color:white;
 text-align:center;
 padding:15px;
@@ -87,165 +121,244 @@ padding:15px;
 
 <body>
 
+<!-- HEADER -->
+<header>
+
+<h1>Kingdom College Management System</h1>
+
+<p>Kingdom College of Health & Allied Sciences</p>
+
+<p>Mbeya - Kyela | Nyuma ya Lake Oil</p>
+
+<p>📞 +255(0)85705151 | +255(0)35705151</p>
+
+</header>
+
+
 <!-- NAV -->
 <nav>
-<h2>Kingdom College</h2>
 
-<div>
 <a href="#home">Home</a>
 <a href="#about">About</a>
-<a href="#history">History</a>
-<a href="#admission">Admission</a>
+<a href="#courses">Courses</a>
+<a href="#gallery">Gallery</a>
 <a href="#news">News</a>
-<a href="#login">Login</a>
-<a href="#contact">Contact</a>
 <a href="#map">Map</a>
-</div>
+<a href="#contact">Contact</a>
+
 </nav>
 
 
-<!-- HOME -->
-<section id="home">
-<h1>Kingdom College of Health and Allied Sciences</h1>
-<p>Professional Medical Training | Quality Education</p>
-</section>
+<!-- HERO -->
+<div class="hero" id="home">
+
+<h2>Welcome to Kingdom College</h2>
+
+<p>Building Future Health Professionals</p>
+
+<div class="login-box">
+
+<a href="student.html">Student Portal</a>
+
+<a href="lecturer.html">Lecturer Portal</a>
+
+<a href="academics.html">Academic Affairs</a>
+
+<a href="bursar.html">Bursar Office</a>
+
+<a href="counsellor.html">Counselling Unit</a>
+
+<a href="registrar.html">Registrar Office</a>
+
+<a href="rector.html">Rector Panel</a>
+
+</div>
+
+</div>
 
 
 <!-- ABOUT -->
-<section id="about">
-<div class="box">
+<section id="about" class="about">
 
-<h3>About Us</h3>
+<h2>About Our College</h2>
 
 <p>
-We provide quality health education and prepare competent medical professionals.
+Kingdom College of Health and Allied Sciences
+offers professional training in medical sciences.
 </p>
 
-</div>
+<h3>History</h3>
+
+<p id="history">
+(Updated by Rector)
+</p>
+
 </section>
 
 
-<!-- HISTORY -->
-<section id="history">
-<div class="box">
+<!-- COURSES -->
+<section id="courses" class="courses">
 
-<h3>Our History</h3>
+<h2>Courses Offered</h2>
 
-<p id="historyText">
-To be updated by Rector.
-</p>
-
-</div>
-</section>
-
-
-<!-- ADMISSION -->
-<section id="admission">
-<div class="box">
+<ul>
+<li>Clinical Medicine</li>
+<li>Nursing</li>
+<li>Laboratory Technology</li>
+<li>Pharmacy</li>
+</ul>
 
 <h3>Entry Requirements (Clinical Medicine)</h3>
 
-<ul>
-<li>Form Six OR Form Four</li>
-<li>At least D in 4 subjects</li>
-<li>Biology, Chemistry & Physics required</li>
-</ul>
+<p>
+Form Six or Form Four with D in
+Biology, Chemistry and Physics
+</p>
+
+</section>
+
+
+<!-- GALLERY -->
+<section id="gallery" class="gallery-sec">
+
+<h2>College Gallery</h2>
+
+<div class="gallery">
+
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
 
 </div>
+
 </section>
 
 
 <!-- NEWS -->
-<section id="news">
-<div class="box">
+<section id="news" class="news">
 
-<h3>Announcements</h3>
+<h2>Announcements & News</h2>
 
-<div id="newsList">
-No announcements yet.
-</div>
+<div id="newsBox">Loading...</div>
 
-</div>
-</section>
-
-
-<!-- LOGIN -->
-<section id="login">
-<div class="box">
-
-<h3>Login Panel</h3>
-
-<div class="grid">
-
-<button class="btn" onclick="go('student.html')">
-Student Login
-</button>
-
-<button class="btn" onclick="go('lecturer.html')">
-Lecturer Login
-</button>
-
-<button class="btn" onclick="go('counsellor.html')">
-Counsellor Login
-</button>
-
-<button class="btn" onclick="go('rector.html')">
-Rector Login
-</button>
-
-</div>
-
-</div>
-</section>
-
-
-<!-- CONTACT -->
-<section id="contact">
-<div class="box">
-
-<h3>Contact Us</h3>
-
-<p>
-📞 +255 85705151<br>
-📞 +255 35705151<br><br>
-
-📍 Mbeya – Kyela, Njia Panda Ipinda (Nyuma ya Lake Oil)
-</p>
-
-</div>
 </section>
 
 
 <!-- MAP -->
-<section id="map">
-<div class="box">
+<section id="map" class="map-sec">
 
-<h3>Our Location</h3>
+<h2>Our Location</h2>
 
 <iframe
-src="https://maps.google.com/maps?q=Kyela%20Mbeya%20Tanzania&t=&z=14&ie=UTF8&iwloc=&output=embed"
+src="https://www.google.com/maps?q=Kyela%20Mbeya%20Lake%20Oil&output=embed"
 width="100%"
-height="300"
-frameborder="0">
+height="250"
+style="border:0;"
+loading="lazy">
 </iframe>
 
-</div>
+</section>
+
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+
+<h2>Contact Us</h2>
+
+<p>
+📍 Mbeya - Kyela  
+<br>📞 +255(0)85705151  
+<br>📧 kingdomcollege@gmail.com
+</p>
+
 </section>
 
 
 <!-- FOOTER -->
 <footer>
-<p>© 2026 Kingdom College Portal | Rector Office</p>
+
+<p>
+© 2026 Kingdom College of Health & Allied Sciences
+</p>
+
+<p>
+Developed by: <b>Carina 💙</b>
+</p>
+
 </footer>
 
 
 <script>
 
-function go(page){
-window.location = page;
+//////////////////////////////////////
+// FIREBASE CONFIG
+//////////////////////////////////////
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+  authDomain: "collegeportal-app.firebaseapp.com",
+  databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+  projectId: "collegeportal-app",
+  storageBucket: "collegeportal-app.firebasestorage.app",
+  messagingSenderId: "266762331631",
+  appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+
+
+//////////////////////////////////////
+// LOAD ANNOUNCEMENTS
+//////////////////////////////////////
+
+db.ref("announcements").on("value",snap=>{
+
+let box=document.getElementById("newsBox");
+
+box.innerHTML="";
+
+if(!snap.exists()){
+box.innerHTML="No announcements yet.";
+return;
 }
+
+snap.forEach(item=>{
+
+let d=item.val();
+
+box.innerHTML+=`
+<div class="announce">
+<b>${d.title}</b><br>
+${d.message}
+</div>
+`;
+
+});
+
+});
+
+
+//////////////////////////////////////
+// LOAD HISTORY
+//////////////////////////////////////
+
+db.ref("college/history").on("value",snap=>{
+
+if(snap.exists()){
+
+document.getElementById("history").innerText =
+snap.val();
+
+}
+
+});
 
 </script>
 
 </body>
-</html>
+                </html>
