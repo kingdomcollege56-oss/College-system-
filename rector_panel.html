@@ -1,231 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kingdom College – Rector Panel</title>
+<title>Rector Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
-body{font-family:Arial,sans-serif;margin:0;background:#f2f2f2;}
-header{background:#1a1a2e;color:white;padding:15px;text-align:center;}
-.container{max-width:1200px;margin:auto;padding:15px;}
-.menu{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:10px;}
-.menu button{padding:10px;border:none;background:#162447;color:white;border-radius:5px;cursor:pointer;}
-.menu button:hover{background:#1f4068;}
-.subsection{display:none;background:white;padding:15px;border-radius:8px;box-shadow:0 0 5px gray;margin-bottom:15px;}
-.card{border:1px solid #ccc;padding:10px;border-radius:5px;margin:8px 0;}
-input,textarea,select,button{width:100%;padding:8px;margin:5px 0;}
-.logout{background:red;color:white;}
-h3{margin-top:0;}
-table{width:100%;border-collapse:collapse;}
-th,td{border:1px solid #ccc;padding:8px;text-align:left;}
-footer{text-align:center;padding:10px;background:#1a1a2e;color:white;margin-top:20px;}
+body{
+font-family:Arial;
+background:#eef3f9;
+margin:0;
+}
+
+/* HEADER */
+header{
+background:#0a3d62;
+color:white;
+padding:20px;
+text-align:center;
+}
+
+/* NAV */
+nav{
+background:#1e3799;
+padding:10px;
+text-align:center;
+}
+
+nav button{
+background:#ff4757;
+color:white;
+border:none;
+padding:8px 15px;
+border-radius:5px;
+cursor:pointer;
+}
+
+/* CONTENT */
+section{
+margin:20px;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 5px #ccc;
+}
+
+.card{
+background:#f1f5ff;
+padding:15px;
+margin:10px 0;
+border-left:5px solid #1e3799;
+}
 </style>
 </head>
+
 <body>
 
 <header>
-<h2>Kingdom College – Rector Panel</h2>
-<p id="rectorWelcome"></p>
+<h1>Rector Panel</h1>
+<p id="welcome"></p>
 </header>
 
-<div class="container">
+<nav>
+<button onclick="logout()">Logout</button>
+</nav>
 
-<!-- Login Section -->
-<div id="authSection" class="subsection" style="display:block;">
-<h3>Rector Login</h3>
-<input id="rectorUsername" placeholder="Username">
-<input id="rectorPassword" type="password" placeholder="Password">
-<button onclick="loginRector()">Login</button>
-<p id="authMsg" style="color:red;"></p>
+<section>
+
+<h2>Dashboard</h2>
+
+<div class="card">
+📌 Manage Users
 </div>
 
-<!-- Dashboard -->
-<div id="dashboard" style="display:none;">
-<div class="menu" id="dashboardMenu"></div>
-
-<!-- Dashboard Overview -->
-<div id="overview" class="subsection">
-<h3>Dashboard Overview</h3>
-<ul>
-<li>Total Students: <span id="totalStudents">0</span></li>
-<li>Total Lecturers: <span id="totalLecturers">0</span></li>
-<li>Total Modules: <span id="totalModules">0</span></li>
-<li>Pending Transfers: <span id="totalTransfers">0</span></li>
-<li>Total Assignments Submitted: <span id="totalAssignments">0</span></li>
-</ul>
+<div class="card">
+📢 Manage Announcements
 </div>
 
-<!-- Student Management -->
-<div id="manageStudents" class="subsection">
-<h3>Student Management</h3>
-<ul id="studentList"></ul>
+<div class="card">
+🖼 Upload Gallery Photos
 </div>
 
-<!-- Lecturer Management -->
-<div id="manageLecturers" class="subsection">
-<h3>Lecturer Management</h3>
-<ul id="lecturerList"></ul>
+<div class="card">
+📩 Read Secret Messages
 </div>
 
-<!-- Module Management -->
-<div id="manageModules" class="subsection">
-<h3>Modules</h3>
-<input id="newModule" placeholder="Module Name">
-<button onclick="addModule()">Add Module</button>
-<ul id="moduleList"></ul>
+<div class="card">
+📚 Update College History
 </div>
 
-<!-- Transfers Management -->
-<div id="manageTransfers" class="subsection">
-<h3>Transfer Requests</h3>
-<ul id="transferList"></ul>
-</div>
-
-<!-- Announcements Management -->
-<div id="manageAnnouncements" class="subsection">
-<h3>Announcements</h3>
-<input id="annTitle" placeholder="Title">
-<textarea id="annMessage" placeholder="Message"></textarea>
-<button onclick="postAnnouncement()">Post Announcement</button>
-<ul id="annList"></ul>
-</div>
-
-</div> <!-- dashboard -->
-
-</div> <!-- container -->
-
-<footer>© 2026 Kingdom College | By Carina</footer>
+</section>
 
 <script>
-// Dummy Data
-let rector={username:"rector",password:"admin123",name:"Rector"};
-let students=[{email:"student1@example.com",name:"Alice"},{email:"student2@example.com",name:"Bob"}];
-let lecturers=[{email:"lecturer@example.com",name:"Dr. Smith"}];
-let modules=["Biochemistry 101","Anatomy 102"];
-let transfers=[{student:"student1@example.com",currentCourse:"Physics",requestedCourse:"Biochemistry",status:"Pending"}];
-let announcements=[];
-let assignments=[{student:"student1@example.com",module:"Biochemistry 101",file:"ass1.doc"}];
 
-// Current session
-let currentUser=null;
+// Check Login
+const rectorID = localStorage.getItem("rectorID");
+const rectorName = localStorage.getItem("rectorName");
 
-// Login
-function loginRector(){
- let u=document.getElementById("rectorUsername").value.trim();
- let p=document.getElementById("rectorPassword").value.trim();
- if(u===rector.username && p===rector.password){
-   currentUser=rector;
-   document.getElementById("authSection").style.display="none";
-   document.getElementById("dashboard").style.display="block";
-   document.getElementById("rectorWelcome").innerText=`Welcome ${rector.name}`;
-   loadDashboardMenu();
-   openPanel("overview");
- } else{ document.getElementById("authMsg").innerText="Wrong credentials"; }
+if(!rectorID){
+window.location="rector-login.html";
 }
 
-// Dashboard Menu
-function loadDashboardMenu(){
- let menu=document.getElementById("dashboardMenu");
- menu.innerHTML="";
- const panels=["overview","manageStudents","manageLecturers","manageModules","manageTransfers","manageAnnouncements"];
- panels.forEach(p=>{
-   let btn=document.createElement("button");
-   btn.innerText=p.replace(/([A-Z])/g," $1").replace("manage ","").replace("overview","Dashboard");
-   btn.onclick=()=>openPanel(p);
-   menu.appendChild(btn);
- });
- menu.appendChild(Object.assign(document.createElement("button"),{innerText:"Logout",className:"logout",onclick:logout}));
- updateAll();
-}
-
-function openPanel(id){
- document.querySelectorAll(".subsection").forEach(s=>s.style.display="none");
- document.getElementById(id).style.display="block";
-}
+// Welcome
+document.getElementById("welcome").innerText =
+"Welcome, " + rectorName;
 
 // Logout
-function logout(){currentUser=null; location.reload();}
-
-// --- Overview ---
-function updateOverview(){
- document.getElementById("totalStudents").innerText=students.length;
- document.getElementById("totalLecturers").innerText=lecturers.length;
- document.getElementById("totalModules").innerText=modules.length;
- document.getElementById("totalTransfers").innerText=transfers.filter(t=>t.status==="Pending").length;
- document.getElementById("totalAssignments").innerText=assignments.length;
+function logout(){
+localStorage.clear();
+window.location="rector-login.html";
 }
 
-// --- Students ---
-function updateStudents(){
- let ul=document.getElementById("studentList");
- ul.innerHTML="";
- students.forEach((s,i)=>{ 
-   ul.innerHTML+=`<li>${s.name} (${s.email}) <button onclick="editStudent(${i})">Edit</button> <button onclick="deleteStudent(${i})">Delete</button></li>`;
- });
-}
-function editStudent(i){
- let n=prompt("Edit Name",students[i].name);
- if(n) { students[i].name=n; updateStudents(); updateOverview(); }
-}
-function deleteStudent(i){ 
- if(confirm("Delete student?")) { students.splice(i,1); updateStudents(); updateOverview(); }
-}
-
-// --- Lecturers ---
-function updateLecturers(){
- let ul=document.getElementById("lecturerList");
- ul.innerHTML="";
- lecturers.forEach((l,i)=>{ 
-   ul.innerHTML+=`<li>${l.name} (${l.email}) <button onclick="editLecturer(${i})">Edit</button> <button onclick="deleteLecturer(${i})">Delete</button></li>`;
- });
-}
-function editLecturer(i){ let n=prompt("Edit Name",lecturers[i].name); if(n) { lecturers[i].name=n; updateLecturers(); updateOverview(); }}
-function deleteLecturer(i){ if(confirm("Delete lecturer?")) { lecturers.splice(i,1); updateLecturers(); updateOverview(); }}
-
-// --- Modules ---
-function addModule(){
- let m=document.getElementById("newModule").value.trim();
- if(m!==""){ modules.push(m); document.getElementById("newModule").value=""; updateModules(); updateOverview(); }
-}
-function updateModules(){
- let ul=document.getElementById("moduleList"); ul.innerHTML="";
- modules.forEach((m,i)=>{ ul.innerHTML+=`<li>${m} <button onclick="deleteModule(${i})">Delete</button></li>`; });
-}
-function deleteModule(i){ if(confirm("Delete module?")){ modules.splice(i,1); updateModules(); updateOverview(); }}
-
-// --- Transfers ---
-function updateTransfers(){
- let ul=document.getElementById("transferList"); ul.innerHTML="";
- transfers.forEach((t,i)=>{ 
-   ul.innerHTML+=`<li>${t.student}: ${t.currentCourse} => ${t.requestedCourse} (${t.status}) 
-   <button onclick="updateTransferStatus(${i},'Approved')">Approve</button>
-   <button onclick="updateTransferStatus(${i},'Rejected')">Reject</button></li>`; 
- });
-}
-function updateTransferStatus(i,status){ transfers[i].status=status; updateTransfers(); updateOverview(); }
-
-// --- Announcements ---
-function postAnnouncement(){
- let t=document.getElementById("annTitle").value.trim();
- let m=document.getElementById("annMessage").value.trim();
- if(t&&m){ announcements.push({title:t,message:m,date:new Date().toLocaleString()}); document.getElementById("annTitle").value=""; document.getElementById("annMessage").value=""; updateAnnouncements(); }
-}
-function updateAnnouncements(){
- let ul=document.getElementById("annList");
- ul.innerHTML="";
- announcements.forEach(a=>{ ul.innerHTML+=`<li><b>${a.title}</b>: ${a.message} (${a.date})</li>`; });
-}
-
-// Update all sections
-function updateAll(){
- updateOverview();
- updateStudents();
- updateLecturers();
- updateModules();
- updateTransfers();
- updateAnnouncements();
-}
 </script>
 
 </body>
- </html>
+</html>
