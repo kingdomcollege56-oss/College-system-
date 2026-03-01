@@ -5,49 +5,47 @@
 <title>Rector Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
 body{
-font-family:Arial;
-background:#eef3f9;
+  font-family: Arial;
+  background:#eef3f9;
 }
 
 .box{
-width:320px;
-margin:120px auto;
-background:white;
-padding:25px;
-border-radius:10px;
-text-align:center;
-box-shadow:0 0 10px #ccc;
+  max-width:350px;
+  background:white;
+  padding:25px;
+  margin:100px auto;
+  border-radius:10px;
+  box-shadow:0 0 10px #aaa;
 }
 
-input{
-width:90%;
-padding:10px;
-margin:10px 0;
-border:1px solid #ccc;
-border-radius:5px;
+input,button{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
 }
 
 button{
-padding:10px 25px;
-background:#1e3799;
-color:white;
-border:none;
-border-radius:5px;
-cursor:pointer;
+  background:#1e3799;
+  color:white;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
 }
 
 button:hover{
-background:#4a69bd;
+  background:#4a69bd;
 }
 
 #error{
-color:red;
-font-size:14px;
+  color:red;
+  text-align:center;
 }
 </style>
 </head>
@@ -55,70 +53,70 @@ font-size:14px;
 <body>
 
 <div class="box">
+
 <h2>Rector Login</h2>
 
-<input type="text" id="username" placeholder="Username">
+<input type="email" id="email" placeholder="Email">
 <input type="password" id="password" placeholder="Password">
 
 <button onclick="login()">Login</button>
 
 <p id="error"></p>
+
 </div>
 
 <script>
-// Firebase Config
+//////////////// FIREBASE //////////////////
+
 const firebaseConfig = {
-apiKey:"AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
-authDomain:"collegeportal-app.firebaseapp.com",
-databaseURL:"https://collegeportal-app-default-rtdb.firebaseio.com",
-projectId:"collegeportal-app",
-storageBucket:"collegeportal-app.firebasestorage.app",
-messagingSenderId:"266762331631",
-appId:"1:266762331631:web:66ddfbde53d33086ac421a"
+  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+  authDomain: "collegeportal-app.firebaseapp.com",
+  databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+  projectId: "collegeportal-app",
+  storageBucket: "collegeportal-app.firebasestorage.app",
+  messagingSenderId: "266762331631",
+  appId: "1:266762331631:web:66ddfbde53d33086ac421a",
+  measurementId: "G-WK2RH31TC2"
 };
 
 firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
 const db = firebase.database();
 
-// Login Function
+//////////////// LOGIN FUNCTION //////////////////
+
 function login(){
 
-const user = document.getElementById("username").value;
-const pass = document.getElementById("password").value;
-const error = document.getElementById("error");
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const error = document.getElementById("error");
 
-error.innerText="";
+  error.innerText="";
 
-db.ref("users").once("value").then(snapshot=>{
+  if(!email || !password){
+    error.innerText="Fill all fields";
+    return;
+  }
 
-let found = false;
+  auth.signInWithEmailAndPassword(email,password)
+  .then(user=>{
+    const uid = user.user.uid;
 
-snapshot.forEach(child=>{
-
-let data = child.val();
-
-if(
-data.username === user &&
-data.password === pass &&
-data.role === "admin"
-){
-
-// Save Session
-localStorage.setItem("rectorID", child.key);
-localStorage.setItem("rectorName", data.name);
-
-found = true;
-window.location = "rector.html";
-}
-
-});
-
-if(!found){
-error.innerText="Wrong username or password!";
-}
-
-});
-
+    // Check role
+    db.ref("users/"+uid).once("value").then(snap=>{
+      if(snap.exists() && snap.val().role==="rector"){
+        // Go to dashboard
+        window.location="rector.html";
+      }else{
+        error.innerText="You are not authorized!";
+        auth.signOut();
+      }
+    });
+  })
+  .catch(err=>{
+    error.innerText = err.message;
+  });
 }
 </script>
 
