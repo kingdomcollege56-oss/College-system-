@@ -4,66 +4,39 @@
 <meta charset="UTF-8">
 <title>Kingdom College Management System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
 <style>
-/* GENERAL */
 body{margin:0;font-family:Arial;background:#eef3f9;}
-
-/* HEADER */
 header{background:#0a3d62;color:white;padding:25px;text-align:center;}
-
-/* NAV */
 nav{background:#1e3799;display:flex;justify-content:center;flex-wrap:wrap;}
 nav a{color:white;padding:12px 18px;text-decoration:none;font-weight:bold;}
 nav a:hover{background:#4a69bd;}
-
-/* HERO */
 .hero{background:#cce5ff;padding:40px;text-align:center;}
-
-/* LOGIN BOX */
 .login-box{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-top:25px;}
 .login-box a{background:#1e3799;color:white;padding:15px;border-radius:6px;text-decoration:none;font-weight:bold;text-align:center;}
-
-/* LOGIN FORM */
 #login-section{margin-top:25px;background:#f0f4f8;padding:20px;border-radius:10px;max-width:400px;margin-left:auto;margin-right:auto;text-align:center;}
 #login-section input,#login-section select,#login-section button{width:80%;padding:10px;margin:8px 0;border-radius:5px;border:1px solid #ccc;}
-
-/* SECTIONS */
 section{margin:20px;padding:25px;border-radius:10px;box-shadow:0 0 5px #ccc;}
-
-/* COLORS */
 .about{background:#e3f2fd;}
 .courses{background:#e8f5e9;}
 .gallery-sec{background:#fffde7;}
 .news{background:#fce4ec;}
 .map-sec{background:#ede7f6;}
 .contact{background:#e0f7fa;}
-
-/* GALLERY */
 .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
 .gallery img{width:100%;height:150px;object-fit:cover;border-radius:5px;cursor:pointer;transition:transform 0.2s;}
 .gallery img:hover{transform:scale(1.05);}
-
-/* ANNOUNCE */
 .announce{background:white;padding:10px;margin:8px 0;border-left:5px solid #1e3799;}
-
-/* LIGHTBOX */
 #lightboxOverlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);justify-content:center;align-items:center;z-index:1000;}
 #lightboxOverlay img{max-width:90%;max-height:90%;border-radius:10px;}
-
-/* FOOTER */
 footer{background:#0a3d62;color:white;text-align:center;padding:15px;}
+#error{color:red;font-size:14px;}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
 <h1>Kingdom College Management System</h1>
 <p>Kingdom College of Health & Allied Sciences</p>
@@ -71,7 +44,6 @@ footer{background:#0a3d62;color:white;text-align:center;padding:15px;}
 <p>📞 +255(0)85705151 | +255(0)35705151</p>
 </header>
 
-<!-- NAV -->
 <nav>
 <a href="#home">Home</a>
 <a href="#about">About</a>
@@ -82,7 +54,6 @@ footer{background:#0a3d62;color:white;text-align:center;padding:15px;}
 <a href="#contact">Contact</a>
 </nav>
 
-<!-- HERO -->
 <div class="hero" id="home">
 <h2>Welcome to Kingdom College</h2>
 <p>Building Future Health Professionals</p>
@@ -98,20 +69,19 @@ footer{background:#0a3d62;color:white;text-align:center;padding:15px;}
 </div>
 
 <div id="login-section">
-<h3>Smart Login</h3>
-<input type="email" id="email" placeholder="Email">
+<h3>Login (Role-based)</h3>
+<input type="text" id="username" placeholder="Username (for Rector)">
 <input type="password" id="password" placeholder="Password">
 <select id="role">
 <option value="student">Student</option>
 <option value="lecturer">Lecturer</option>
-<option value="admin">Admin</option>
+<option value="admin">Admin / Rector</option>
 </select>
 <button id="loginBtn">Login</button>
-<p id="loginStatus"></p>
+<p id="error"></p>
 </div>
 </div>
 
-<!-- ABOUT -->
 <section id="about" class="about">
 <h2>About Our College</h2>
 <p>Kingdom College of Health and Allied Sciences offers professional training in medical sciences.</p>
@@ -119,7 +89,6 @@ footer{background:#0a3d62;color:white;text-align:center;padding:15px;}
 <p id="history">(Updated by Rector)</p>
 </section>
 
-<!-- COURSES -->
 <section id="courses" class="courses">
 <h2>Courses Offered</h2>
 <ul>
@@ -130,131 +99,126 @@ footer{background:#0a3d62;color:white;text-align:center;padding:15px;}
 <p>Form Six or Form Four with D in Biology, Chemistry and Physics</p>
 </section>
 
-<!-- GALLERY -->
 <section id="gallery" class="gallery-sec">
 <h2>College Gallery</h2>
-<div class="gallery" id="galleryContainer">
-<!-- Images loaded from Firebase -->
-</div>
-
-<!-- Lightbox overlay -->
+<div class="gallery" id="galleryContainer"></div>
 <div id="lightboxOverlay">
 <img id="lightboxImage" src="">
 </div>
 </section>
 
-<!-- NEWS -->
 <section id="news" class="news">
 <h2>Announcements & News</h2>
 <div id="newsBox">Loading...</div>
 </section>
 
-<!-- MAP -->
 <section id="map" class="map-sec">
 <h2>Our Location</h2>
 <iframe src="https://www.google.com/maps?q=Mbeya%20Kyela%20njia%20panda%20ipinda%20nyuma%20ya%20Lake%20Oil&output=embed" width="100%" height="250" style="border:0;" loading="lazy"></iframe>
 </section>
 
-<!-- CONTACT -->
 <section id="contact" class="contact">
 <h2>Contact Us</h2>
 <p>📍 Mbeya - Kyela, Njia Panda Ipinda<br>📞 +255(0)85705151<br>📧 kingdomcollege@gmail.com</p>
 </section>
 
-<!-- FOOTER -->
 <footer>
 <p>© 2026 Kingdom College of Health & Allied Sciences</p>
 <p>Developed by: <b>Carina 💙</b></p>
 </footer>
 
 <script>
-//////////////////////////////////////
-// FIREBASE CONFIG
-//////////////////////////////////////
+// Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
-  authDomain: "collegeportal-app.firebaseapp.com",
-  databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
-  projectId: "collegeportal-app",
-  storageBucket: "collegeportal-app.firebasestorage.app",
-  messagingSenderId: "266762331631",
-  appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+apiKey:"AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+authDomain:"collegeportal-app.firebaseapp.com",
+databaseURL:"https://collegeportal-app-default-rtdb.firebaseio.com",
+projectId:"collegeportal-app",
+storageBucket:"collegeportal-app.firebasestorage.app",
+messagingSenderId:"266762331631",
+appId:"1:266762331631:web:66ddfbde53d33086ac421a"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const auth = firebase.auth();
-const storage = firebase.storage();
+const db=firebase.database();
 
-//////////////////////////////////////
-// LOAD ANNOUNCEMENTS
-//////////////////////////////////////
-db.ref("announcements").on("value", snap => {
-  let box = document.getElementById("newsBox");
-  box.innerHTML = "";
-  if (!snap.exists()) { box.innerHTML = "No announcements yet."; return; }
-  snap.forEach(item => {
-    let d = item.val();
-    box.innerHTML += `<div class="announce"><b>${d.title}</b> - <small>${d.date || ''}</small><br>${d.message}</div>`;
-  });
+// Load announcements
+db.ref("announcements").on("value",snap=>{
+let box=document.getElementById("newsBox");
+box.innerHTML="";
+if(!snap.exists()){box.innerHTML="No announcements yet.";return;}
+snap.forEach(item=>{
+let d=item.val();
+box.innerHTML+=`<div class="announce"><b>${d.title}</b><br>${d.message}</div>`;
+});
 });
 
-//////////////////////////////////////
-// LOAD HISTORY
-//////////////////////////////////////
-db.ref("college/history").on("value", snap => {
-  if (snap.exists()) { document.getElementById("history").innerText = snap.val(); }
+// Load history
+db.ref("college/history").on("value",snap=>{
+if(snap.exists()){document.getElementById("history").innerText=snap.val();}
 });
 
-//////////////////////////////////////
-// LOAD GALLERY IMAGES WITH LIGHTBOX
-//////////////////////////////////////
+// Load gallery
 const galleryContainer = document.getElementById('galleryContainer');
 const lightboxOverlay = document.getElementById('lightboxOverlay');
 const lightboxImage = document.getElementById('lightboxImage');
-
 function openLightbox(src){ lightboxImage.src=src; lightboxOverlay.style.display='flex'; }
 function closeLightbox(){ lightboxOverlay.style.display='none'; lightboxImage.src=''; }
 lightboxOverlay.addEventListener('click', closeLightbox);
 document.addEventListener('keydown', (e)=>{ if(e.key==="Escape") closeLightbox(); });
 
-db.ref("gallery").on("value", snap => {
-  galleryContainer.innerHTML = "";
-  if (!snap.exists()) { galleryContainer.innerHTML = "<p>No images uploaded.</p>"; return; }
-  snap.forEach(item => {
-    const d = item.val();
-    const img = document.createElement('img');
-    img.src = d.url;
-    img.alt = d.caption || 'Gallery Image';
-    img.addEventListener('click', ()=>openLightbox(d.url));
-    galleryContainer.appendChild(img);
-  });
+db.ref("gallery").on("value", snap=>{
+galleryContainer.innerHTML="";
+if(!snap.exists()){galleryContainer.innerHTML="<p>No images uploaded.</p>";return;}
+snap.forEach(item=>{
+const d=item.val();
+const img=document.createElement('img');
+img.src=d.url;
+img.alt=d.caption||'Gallery Image';
+img.addEventListener('click',()=>openLightbox(d.url));
+galleryContainer.appendChild(img);
+});
 });
 
-//////////////////////////////////////
-// ROLE-BASED LOGIN
-//////////////////////////////////////
-const loginBtn = document.getElementById('loginBtn');
-const loginStatus = document.getElementById('loginStatus');
+// LOGIN FUNCTION (Students/Rectors)
+const loginBtn=document.getElementById('loginBtn');
+const errorBox=document.getElementById('error');
 
-loginBtn.addEventListener('click', () => {
-  const email=document.getElementById('email').value;
-  const password=document.getElementById('password').value;
-  const role=document.getElementById('role').value;
+loginBtn.addEventListener('click',()=>{
+const username=document.getElementById('username').value.trim();
+const password=document.getElementById('password').value.trim();
+const role=document.getElementById('role').value;
 
-  auth.signInWithEmailAndPassword(email,password)
-  .then(userCredential=>{
-    const uid=userCredential.user.uid;
-    db.ref('users/'+uid).once('value').then(snap=>{
-      const userRole = snap.val()?.role;
-      if(userRole===role){
-        loginStatus.innerText=`Logged in as ${role}`;
-        if(role==='student') window.location='student.html';
-        else if(role==='lecturer') window.location='lecturer.html';
-        else if(role==='admin') window.location='admin.html';
-      } else { loginStatus.innerText='Role mismatch!'; }
-    });
-  })
-  .catch(error=>{ loginStatus.innerText=error.message; });
+if(role==='admin'){
+// Rector login by username/password in database
+db.ref('users').once('value').then(snap=>{
+let found=false;
+snap.forEach(u=>{
+const user=u.val();
+if(user.username===username && user.password===password && user.role==='admin'){
+found=true;
+localStorage.setItem('rectorUID', u.key);
+localStorage.setItem('rectorName', user.name);
+window.location='rector.html';
+}
+});
+if(!found) errorBox.innerText='Invalid Rector credentials!';
+});
+}else{
+// Students / Lecturers login (email/password Firebase Auth)
+const email=username;
+firebase.auth().signInWithEmailAndPassword(email,password)
+.then(userCredential=>{
+db.ref('users/'+userCredential.user.uid).once('value').then(snap=>{
+const userRole=snap.val()?.role;
+if(userRole===role){
+alert(`Logged in as ${role}`);
+if(role==='student') window.location='student.html';
+else if(role==='lecturer') window.location='lecturer.html';
+}else{errorBox.innerText='Role mismatch!';}
+});
+})
+.catch(err=>{errorBox.innerText=err.message;});
+}
 });
 </script>
 
