@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>First Admin Setup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+body{
+  background:#eef3f9;
+  font-family:Arial;
+}
+
+.box{
+  max-width:400px;
+  background:white;
+  padding:25px;
+  margin:60px auto;
+  border-radius:10px;
+  box-shadow:0 0 10px #aaa;
+}
+
+h2{
+  text-align:center;
+  color:#0a3d62;
+}
+
+input,button{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+}
+
+button{
+  background:#1e3799;
+  color:white;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{
+  background:#4a69bd;
+}
+
+.msg{
+  text-align:center;
+  margin-top:10px;
+  color:red;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>First Rector Setup</h2>
+
+<input type="text" id="name" placeholder="Full Name">
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="createAdmin()">Create Rector</button>
+
+<p class="msg" id="msg"></p>
+
+</div>
+
+<script>
+
+//////////////// FIREBASE //////////////////
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+  authDomain: "collegeportal-app.firebaseapp.com",
+  databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+  projectId: "collegeportal-app",
+  storageBucket: "collegeportal-app.firebasestorage.app",
+  messagingSenderId: "266762331631",
+  appId: "1:266762331631:web:66ddfbde53d33086ac421a",
+  measurementId: "G-WK2RH31TC2"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db   = firebase.database();
+
+//////////////// SETUP //////////////////
+
+function createAdmin(){
+
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+
+  if(!name || !email || !pass){
+    msg.innerText="Fill all fields";
+    return;
+  }
+
+  // Check if setup already done
+  db.ref("system/setupDone").once("value", snap=>{
+
+    if(snap.exists()){
+      msg.innerText="Admin already created!";
+      return;
+    }
+
+    // Create user
+    auth.createUserWithEmailAndPassword(email,pass)
+
+    .then(res=>{
+
+      const uid = res.user.uid;
+
+      // Save admin info
+      db.ref("users/"+uid).set({
+        name:name,
+        email:email,
+        role:"rector"
+      });
+
+      // Lock setup
+      db.ref("system/setupDone").set(true);
+
+      msg.style.color="green";
+      msg.innerText="Rector created successfully!";
+
+      setTimeout(()=>{
+        window.location="rector-login.html";
+      },2000);
+
+    })
+
+    .catch(err=>{
+      msg.innerText=err.message;
+    });
+
+  });
+
+}
+
+</script>
+
+</body>
+</html>
