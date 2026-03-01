@@ -4,70 +4,29 @@
 <meta charset="UTF-8">
 <title>Rector Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
 <style>
-body{
-  font-family: Arial;
-  background:#eef3f9;
-}
-
-.box{
-  max-width:350px;
-  background:white;
-  padding:25px;
-  margin:100px auto;
-  border-radius:10px;
-  box-shadow:0 0 10px #aaa;
-}
-
-input,button{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-}
-
-button{
-  background:#1e3799;
-  color:white;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-button:hover{
-  background:#4a69bd;
-}
-
-#error{
-  color:red;
-  text-align:center;
-}
+body{font-family:Arial;background:#eef3f9;}
+.box{max-width:350px;background:white;padding:25px;margin:100px auto;border-radius:10px;box-shadow:0 0 10px #aaa;}
+input,button{width:100%;padding:12px;margin:8px 0;}
+button{background:#1e3799;color:white;border:none;cursor:pointer;font-weight:bold;}
+button:hover{background:#4a69bd;}
+#error{color:red;text-align:center;}
 </style>
 </head>
-
 <body>
-
 <div class="box">
-
 <h2>Rector Login</h2>
-
 <input type="email" id="email" placeholder="Email">
 <input type="password" id="password" placeholder="Password">
-
 <button onclick="login()">Login</button>
-
 <p id="error"></p>
-
 </div>
 
 <script>
-//////////////// FIREBASE //////////////////
-
 const firebaseConfig = {
   apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
   authDomain: "collegeportal-app.firebaseapp.com",
@@ -78,37 +37,28 @@ const firebaseConfig = {
   appId: "1:266762331631:web:66ddfbde53d33086ac421a",
   measurementId: "G-WK2RH31TC2"
 };
-
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.database();
 
-//////////////// LOGIN FUNCTION //////////////////
-
 function login(){
-
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const error = document.getElementById("error");
-
   error.innerText="";
 
-  if(!email || !password){
-    error.innerText="Fill all fields";
-    return;
-  }
+  if(!email || !password){error.innerText="Fill all fields"; return;}
 
   auth.signInWithEmailAndPassword(email,password)
   .then(user=>{
     const uid = user.user.uid;
-
-    // Check role
+    // Check if role = rector
     db.ref("users/"+uid).once("value").then(snap=>{
       if(snap.exists() && snap.val().role==="rector"){
-        // Go to dashboard
+        // Redirect to dashboard
         window.location="rector.html";
-      }else{
+      } else {
         error.innerText="You are not authorized!";
         auth.signOut();
       }
@@ -119,6 +69,5 @@ function login(){
   });
 }
 </script>
-
 </body>
 </html>
