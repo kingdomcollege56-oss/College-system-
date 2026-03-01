@@ -2,57 +2,56 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Rector Panel</title>
+<title>Rector Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
 body{
-font-family:Arial;
-background:#eef3f9;
-margin:0;
+  font-family: Arial;
+  background:#eef3f9;
+  margin:0;
 }
 
-/* HEADER */
 header{
-background:#0a3d62;
-color:white;
-padding:20px;
-text-align:center;
+  background:#0a3d62;
+  color:white;
+  padding:20px;
+  text-align:center;
 }
 
-/* NAV */
 nav{
-background:#1e3799;
-padding:10px;
-text-align:center;
+  background:#1e3799;
+  padding:10px;
+  text-align:right;
 }
 
 nav button{
-background:#ff4757;
-color:white;
-border:none;
-padding:8px 15px;
-border-radius:5px;
-cursor:pointer;
+  background:red;
+  color:white;
+  border:none;
+  padding:7px 15px;
+  border-radius:5px;
+  cursor:pointer;
 }
 
-/* CONTENT */
 section{
-margin:20px;
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 0 5px #ccc;
+  margin:20px;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 0 5px #ccc;
 }
 
 .card{
-background:#f1f5ff;
-padding:15px;
-margin:10px 0;
-border-left:5px solid #1e3799;
+  background:#f1f5ff;
+  padding:15px;
+  margin:10px 0;
+  border-left:5px solid #1e3799;
 }
 </style>
 </head>
@@ -60,7 +59,7 @@ border-left:5px solid #1e3799;
 <body>
 
 <header>
-<h1>Rector Panel</h1>
+<h1>Rector Dashboard</h1>
 <p id="welcome"></p>
 </header>
 
@@ -69,51 +68,56 @@ border-left:5px solid #1e3799;
 </nav>
 
 <section>
-
 <h2>Dashboard</h2>
 
-<div class="card">
-📌 Manage Users
-</div>
-
-<div class="card">
-📢 Manage Announcements
-</div>
-
-<div class="card">
-🖼 Upload Gallery Photos
-</div>
-
-<div class="card">
-📩 Read Secret Messages
-</div>
-
-<div class="card">
-📚 Update College History
-</div>
+<div class="card">👥 Manage Users</div>
+<div class="card">📢 Announcements</div>
+<div class="card">🖼 Gallery Upload</div>
+<div class="card">📩 Secret Messages</div>
+<div class="card">📚 College Info</div>
 
 </section>
 
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+  authDomain: "collegeportal-app.firebaseapp.com",
+  databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+  projectId: "collegeportal-app",
+  storageBucket: "collegeportal-app.firebasestorage.app",
+  messagingSenderId: "266762331631",
+  appId: "1:266762331631:web:66ddfbde53d33086ac421a",
+  measurementId: "G-WK2RH31TC2"
+};
 
-// Check Login
-const rectorID = localStorage.getItem("rectorID");
-const rectorName = localStorage.getItem("rectorName");
+firebase.initializeApp(firebaseConfig);
 
-if(!rectorID){
-window.location="rector-login.html";
-}
+const auth = firebase.auth();
+const db = firebase.database();
 
-// Welcome
-document.getElementById("welcome").innerText =
-"Welcome, " + rectorName;
+//////////////// PAGE PROTECTION //////////////////
 
-// Logout
+auth.onAuthStateChanged(user=>{
+  if(!user){
+    window.location="rector-login.html";
+    return;
+  }
+
+  db.ref("users/"+user.uid).once("value").then(snap=>{
+    if(!snap.exists() || snap.val().role!=="rector"){
+      alert("Unauthorized!");
+      auth.signOut();
+      window.location="rector-login.html";
+    }else{
+      document.getElementById("welcome").innerText="Welcome, "+(snap.val().name || "Rector");
+    }
+  });
+});
+
+//////////////// LOGOUT //////////////////
 function logout(){
-localStorage.clear();
-window.location="rector-login.html";
+  auth.signOut().then(()=>{ window.location="rector-login.html"; });
 }
-
 </script>
 
 </body>
