@@ -16,9 +16,9 @@ nav{background:#1e3799;display:flex;justify-content:center;flex-wrap:wrap;}
 nav a{color:white;padding:12px 18px;text-decoration:none;font-weight:bold;}
 nav a:hover{background:#4a69bd;}
 .hero{background:#cce5ff;padding:40px;text-align:center;}
-.login-box{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-top:25px;}
-.login-box a{background:#1e3799;color:white;padding:15px;border-radius:6px;text-decoration:none;font-weight:bold;}
-.login-box a:hover{background:#4a69bd;}
+.portal-box{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-top:25px;}
+.portal-box a{background:#1e3799;color:white;padding:15px;border-radius:6px;text-decoration:none;font-weight:bold;text-align:center;}
+.portal-box a:hover{background:#4a69bd;}
 section{margin:20px;padding:25px;border-radius:10px;box-shadow:0 0 5px #ccc;}
 .about{background:#e3f2fd;}
 .courses{background:#e8f5e9;}
@@ -54,7 +54,8 @@ footer{background:#0a3d62;color:white;text-align:center;padding:15px;}
 <div class="hero" id="home">
 <h2>Welcome to Kingdom College</h2>
 <p>Building Future Health Professionals</p>
-<div class="login-box">
+
+<div class="portal-box">
 <a href="student-login.html">Student Portal</a>
 <a href="lecturer-login.html">Lecturer Portal</a>
 <a href="academics-login.html">Academic Affairs</a>
@@ -127,6 +128,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
 db.ref("announcements").on("value",snap=>{
 let box=document.getElementById("newsBox");
 box.innerHTML="";
@@ -136,6 +138,7 @@ let d=item.val();
 box.innerHTML+=`<div class="announce"><b>${d.title}</b><br>${d.message}</div>`;
 });
 });
+
 db.ref("college/history").on("value",snap=>{
 if(snap.exists()){document.getElementById("history").innerText=snap.val();}
 });
