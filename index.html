@@ -12,7 +12,6 @@
 
 <style>
 
-/* GENERAL */
 body{
 margin:0;
 font-family:Arial;
@@ -27,25 +26,6 @@ padding:25px;
 text-align:center;
 }
 
-/* NAV */
-nav{
-background:#1e3799;
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-}
-
-nav a{
-color:white;
-padding:12px 18px;
-text-decoration:none;
-font-weight:bold;
-}
-
-nav a:hover{
-background:#4a69bd;
-}
-
 /* HERO */
 .hero{
 background:#cce5ff;
@@ -58,7 +38,7 @@ text-align:center;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
 gap:15px;
-margin-top:25px;
+margin-top:30px;
 }
 
 .portal-box button{
@@ -76,7 +56,7 @@ font-size:16px;
 background:#4a69bd;
 }
 
-/* LOGIN MODAL */
+/* MODAL */
 .modal{
 display:none;
 position:fixed;
@@ -112,14 +92,10 @@ cursor:pointer;
 font-weight:bold;
 }
 
-.modal-box button:hover{
-background:#4a69bd;
-}
-
 .close{
 float:right;
-cursor:pointer;
 color:red;
+cursor:pointer;
 font-weight:bold;
 }
 
@@ -134,7 +110,7 @@ background:#0a3d62;
 color:white;
 text-align:center;
 padding:15px;
-margin-top:30px;
+margin-top:40px;
 }
 
 </style>
@@ -144,32 +120,24 @@ margin-top:30px;
 
 <!-- HEADER -->
 <header>
-<h1>Kingdom College Management System</h1>
-<p>Mbeya - Kyela | Health & Allied Sciences</p>
+<h1>Kingdom College Portal</h1>
+<p>Login System</p>
 </header>
 
-<!-- NAV -->
-<nav>
-<a href="#">Home</a>
-<a href="#">About</a>
-<a href="#">Courses</a>
-<a href="#">Contact</a>
-</nav>
 
 <!-- HOME -->
 <div class="hero">
 
-<h2>Welcome to Portal</h2>
-<p>Select Your Login Panel</p>
+<h2>Select Your Panel</h2>
 
 <div class="portal-box">
 
-<button onclick="openLogin('student')">🎓 Student</button>
-<button onclick="openLogin('lecturer')">📘 Lecturer</button>
-<button onclick="openLogin('bursar')">💰 Bursar</button>
-<button onclick="openLogin('counsellor')">🧠 Counsellor</button>
-<button onclick="openLogin('registrar')">📂 Registrar</button>
-<button onclick="openLogin('rector')">👑 Rector</button>
+<button type="button" onclick="openLogin('student')">🎓 Student</button>
+<button type="button" onclick="openLogin('lecturer')">📘 Lecturer</button>
+<button type="button" onclick="openLogin('bursar')">💰 Bursar</button>
+<button type="button" onclick="openLogin('counsellor')">🧠 Counsellor</button>
+<button type="button" onclick="openLogin('registrar')">📂 Registrar</button>
+<button type="button" onclick="openLogin('rector')">👑 Rector</button>
 
 </div>
 
@@ -199,11 +167,12 @@ margin-top:30px;
 <!-- FOOTER -->
 <footer>
 <p>© 2026 Kingdom College</p>
-<p>Developed by Carina 💙</p>
+<p>By Carina 💙</p>
 </footer>
 
 
 <script>
+
 /* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
@@ -222,6 +191,7 @@ const db = firebase.database();
 
 let selectedRole="";
 
+
 /* OPEN LOGIN */
 function openLogin(role){
 
@@ -236,12 +206,16 @@ document.getElementById("error").innerText="";
 
 }
 
+
 /* CLOSE LOGIN */
 function closeLogin(){
+
 document.getElementById("loginModal").style.display="none";
+
 }
 
-/* LOGIN FUNCTION */
+
+/* LOGIN */
 function login(){
 
 const email = document.getElementById("email").value;
@@ -250,44 +224,48 @@ const error = document.getElementById("error");
 
 error.innerText="";
 
-if(!email || !pass){
+if(email=="" || pass==""){
 error.innerText="Fill all fields";
 return;
 }
 
 auth.signInWithEmailAndPassword(email,pass)
+
 .then(user=>{
 
 const uid = user.user.uid;
 
 /* CHECK ROLE */
 db.ref("users/"+uid+"/role").once("value")
+
 .then(snap=>{
 
 if(!snap.exists()){
-error.innerText="No role assigned!";
+error.innerText="Account has no role!";
 auth.signOut();
 return;
 }
 
 const role = snap.val();
 
-/* VERIFY ROLE */
+/* VERIFY */
 if(role !== selectedRole){
-error.innerText="Wrong panel for your account!";
+
+error.innerText="Wrong panel!";
 auth.signOut();
 return;
 }
 
 /* SUCCESS */
-alert("Login successful as "+role);
+alert("Login Successful: "+role);
 
-/* LATER: redirect to dashboard */
- // window.location="student-dashboard.html";
+/* LATER: DASHBOARD */
+ // window.location = role+"-dashboard.html";
 
 });
 
 })
+
 .catch(err=>{
 error.innerText=err.message;
 });
