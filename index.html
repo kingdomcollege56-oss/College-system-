@@ -352,9 +352,33 @@ return;
 closeLogin();
 
 if(selectedRole=="rector"){
+
 rectorPanel.style.display="block";
-}else{
-alert("Login Success: "+selectedRole);
+
+}
+
+else if(selectedRole=="student"){
+window.location="student.html";
+}
+
+else if(selectedRole=="lecturer"){
+window.location="lecturer.html";
+}
+
+else if(selectedRole=="academic"){
+window.location="academic.html";
+}
+
+else if(selectedRole=="bursar"){
+window.location="bursar.html";
+}
+
+else if(selectedRole=="registrar"){
+window.location="registrar.html";
+}
+
+else if(selectedRole=="counsellor"){
+window.location="counsellor.html";
 }
 
 });
@@ -447,3 +471,4 @@ gallery.appendChild(img);
 
 </body>
 </html>
+
