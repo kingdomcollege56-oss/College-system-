@@ -46,7 +46,7 @@ background:#cce5ff;
 padding:40px;
 text-align:center;
 }
-/* LOGIN */
+/* LOGIN BOX */
 .login-box{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -101,6 +101,41 @@ background:#0a3d62;
 color:white;
 text-align:center;
 padding:15px;
+}
+/* LOGIN MODAL */
+.modal{
+display:none;
+position:fixed;
+top:0; left:0;
+width:100%; height:100%;
+background:rgba(0,0,0,0.6);
+justify-content:center;
+align-items:center;
+}
+.modal-content{
+background:white;
+padding:25px;
+border-radius:10px;
+width:300px;
+text-align:center;
+}
+.modal-content input{
+width:90%;
+padding:10px;
+margin:10px 0;
+}
+.modal-content button{
+padding:10px 15px;
+background:#1e3799;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+.close-btn{
+float:right;
+cursor:pointer;
+color:#333;
 }
 </style>
 </head>
@@ -203,6 +238,17 @@ width="100%" height="250" style="border:0;" loading="lazy"></iframe>
 <p>Developed by: <b>Irene 💙</b></p>
 </footer>
 
+<!-- LOGIN MODAL -->
+<div class="modal" id="loginModal">
+<div class="modal-content">
+<span class="close-btn" id="closeModal">&times;</span>
+<h3>Login</h3>
+<input type="email" id="modalEmail" placeholder="Email">
+<input type="password" id="modalPass" placeholder="Password">
+<button id="modalLoginBtn">Log In</button>
+</div>
+</div>
+
 <script>
 // Firebase Config
 const firebaseConfig = {
@@ -220,6 +266,7 @@ const db = firebase.database();
 
 // Load announcements
 db.ref("announcements").on("value",snap=>{
+  const newsBox=document.getElementById("newsBox");
   newsBox.innerHTML="";
   if(!snap.exists()){newsBox.innerHTML="No announcements yet."; return;}
   snap.forEach(item=>{
@@ -230,56 +277,44 @@ db.ref("announcements").on("value",snap=>{
 
 // Load history
 db.ref("college/history").on("value",snap=>{
-  if(snap.exists()){history.innerText=snap.val();}
+  if(snap.exists()){document.getElementById("history").innerText=snap.val();}
 });
 
 // --- LOGIN HOOKS ---
-function loginRedirect(email, password, dashboardPage){
-  firebase.auth().signInWithEmailAndPassword(email,password)
-    .then((userCredential)=>{
-      alert("Login successful! Redirecting...");
-      window.location.href = dashboardPage;
-    })
-    .catch(error=>{
-      alert("Login failed: "+error.message);
-    });
-}
+let currentDashboard = "";
+const modal = document.getElementById("loginModal");
+const closeModal = document.getElementById("closeModal");
+const modalLoginBtn = document.getElementById("modalLoginBtn");
 
-document.getElementById("studentLoginBtn").addEventListener("click",()=>{
-  const email=prompt("Enter Student Email");
-  const password=prompt("Enter Password");
-  loginRedirect(email,password,"student.html");
-});
-document.getElementById("lecturerLoginBtn").addEventListener("click",()=>{
-  const email=prompt("Enter Lecturer Email");
-  const password=prompt("Enter Password");
-  loginRedirect(email,password,"lecturer.html");
-});
-document.getElementById("academicsLoginBtn").addEventListener("click",()=>{
-  const email=prompt("Enter Academic Affairs Email");
-  const password=prompt("Enter Password");
-  loginRedirect(email,password,"academics.html");
-});
-document.getElementById("bursarLoginBtn").addEventListener("click",()=>{
-  const email=prompt("Enter Bursar Email");
-  const password=prompt("Enter Password");
-  loginRedirect(email,password,"bursar.html");
-});
-document.getElementById("counsellorLoginBtn").addEventListener("click",()=>{
-  const email=prompt("Enter Counsellor Email");
-  const password=prompt("Enter Password");
-  loginRedirect(email,password,"counsellor.html");
-});
-document.getElementById("registrarLoginBtn").addEventListener("click",()=>{
-  const email=prompt("Enter Registrar Email");
-  const password=prompt("Enter Password");
-  loginRedirect(email,password,"registrar.html");
-});
-document.getElementById("rectorLoginBtn").addEventListener("click",()=>{
-  const email=prompt("Enter Rector Email");
-  const password=prompt("Enter Password");
-  loginRedirect(email,password,"rector.html");
-});
+function openLogin(dashboard){
+  currentDashboard = dashboard;
+  modal.style.display="flex";
+}
+closeModal.onclick = ()=>{modal.style.display="none";};
+window.onclick = (e)=>{if(e.target==modal){modal.style.display="none";}};
+
+modalLoginBtn.onclick = ()=>{
+  const email = document.getElementById("modalEmail").value;
+  const pass = document.getElementById("modalPass").value;
+  if(!email || !pass){alert("Enter email & password"); return;}
+  firebase.auth().signInWithEmailAndPassword(email,pass)
+    .then((user)=>{
+      alert("Login successful!");
+      window.location.href=currentDashboard;
+    })
+    .catch(err=>{
+      alert("Login failed: "+err.message);
+    });
+};
+
+// Hook buttons to open modal with dashboard
+document.getElementById("studentLoginBtn").onclick = ()=>openLogin("student.html");
+document.getElementById("lecturerLoginBtn").onclick = ()=>openLogin("lecturer.html");
+document.getElementById("academicsLoginBtn").onclick = ()=>openLogin("academics.html");
+document.getElementById("bursarLoginBtn").onclick = ()=>openLogin("bursar.html");
+document.getElementById("counsellorLoginBtn").onclick = ()=>openLogin("counsellor.html");
+document.getElementById("registrarLoginBtn").onclick = ()=>openLogin("registrar.html");
+document.getElementById("rectorLoginBtn").onclick = ()=>openLogin("rector.html");
 </script>
 
 </body>
