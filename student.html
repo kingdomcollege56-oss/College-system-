@@ -1,284 +1,401 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>College Portal – Student</title>
+<title>Student Dashboard - Kingdom College</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
 <style>
-    body { font-family: Arial, sans-serif; margin:0; background:#f0f2f5;}
-    header {background:#1a73e8; color:white; padding:15px; text-align:center; font-size:24px;}
-    nav {width:220px; background:#2c3e50; min-height:100vh; float:left; color:white; display:none;}
-    nav ul {list-style:none; padding:0;}
-    nav ul li {padding:15px; border-bottom:1px solid #34495e;}
-    nav ul li a {color:white; text-decoration:none; display:block;}
-    nav ul li a:hover {background:#34495e;}
-    main {margin-left:220px; padding:20px;}
-    .panel {background:white; padding:20px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.1); display:none;}
-    .active {display:block;}
-    input, select, textarea {width:100%; padding:8px; margin:5px 0 10px 0; border:1px solid #ccc; border-radius:4px;}
-    .btn {background:#1a73e8; color:white; padding:8px 12px; border:none; border-radius:4px; cursor:pointer; margin-top:5px;}
-    .btn:hover {background:#155bb5;}
-    .section-title {font-size:20px; color:#1a73e8; margin-bottom:10px;}
-    table {width:100%; border-collapse:collapse;}
-    th, td {border:1px solid #ccc; padding:8px; text-align:left;}
-    .switch-btns {padding:10px; text-align:center;}
-    footer {clear:both; background:#1a73e8; color:white; text-align:center; padding:10px; margin-top:20px;}
+body {
+  margin:0;
+  font-family:Arial;
+  background:#e8f1fb;
+}
+header{
+  background:#0a3d62;
+  color:white;
+  padding:20px;
+  text-align:center;
+}
+.container{
+  display:flex;
+  min-height:calc(100vh - 120px);
+}
+.sidebar{
+  width:220px;
+  background:#1e3799;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  padding-top:20px;
+}
+.sidebar button{
+  background:none;
+  border:none;
+  color:white;
+  padding:12px 20px;
+  text-align:left;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:15px;
+}
+.sidebar button:hover{
+  background:#4a69bd;
+}
+.main{
+  flex:1;
+  padding:20px;
+}
+section{
+  display:none;
+  padding:15px;
+  background:white;
+  border-radius:8px;
+  box-shadow:0 0 5px #ccc;
+  margin-bottom:20px;
+}
+section.active{
+  display:block;
+}
+input,textarea,select{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:5px;
+  border:1px solid #ccc;
+}
+button.action{
+  padding:12px;
+  background:#1e3799;
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  margin-top:10px;
+}
+button.action:hover{
+  background:#4a69bd;
+}
+.gallery{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:10px;
+}
+.gallery img{
+  width:100%;
+  height:100px;
+  object-fit:cover;
+  border-radius:5px;
+}
+footer{
+  background:#0a3d62;
+  color:white;
+  text-align:center;
+  padding:15px;
+}
 </style>
 </head>
 <body>
 
-<header>College Portal – Student</header>
+<header>
+<h1>Kingdom College of Health & Allied Sciences</h1>
+<p>Welcome Student Dashboard</p>
+</header>
 
-<!-- LOGIN / REGISTER -->
-<div id="authPanel" class="panel active">
-    <div class="section-title">Student Login / Register</div>
-    <div>
-        <label>Email:</label>
-        <input type="email" id="authEmail" placeholder="Enter email">
-        <label>Password:</label>
-        <input type="password" id="authPass" placeholder="Enter password">
-        <button class="btn" onclick="login()">Login</button>
-        <button class="btn" onclick="showRegister()">Register</button>
-    </div>
-</div>
+<div class="container">
+  <div class="sidebar">
+    <button onclick="showSection('dashboard')">🏠 Dashboard</button>
+    <button onclick="showSection('profile')">👤 Profile</button>
+    <button onclick="showSection('courses')">📚 Courses</button>
+    <button onclick="showSection('results')">📝 Results</button>
+    <button onclick="showSection('fees')">💰 Fees</button>
+    <button onclick="showSection('timetable')">📅 Timetable</button>
+    <button onclick="showSection('notices')">📢 Notices</button>
+    <button onclick="showSection('downloads')">📂 Downloads</button>
+    <button onclick="showSection('assignments')">📤 Assignments</button>
+    <button onclick="showSection('transfer')">🔁 Transfer Form</button>
+    <button onclick="showSection('secret')">🔒 Secret SMS</button>
+    <button onclick="showSection('sports')">🏆 Sports & Games</button>
+    <button onclick="showSection('settings')">⚙️ Settings</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+  
+  <div class="main">
+    <!-- Dashboard -->
+    <section id="dashboard" class="active">
+      <h2>Welcome Student</h2>
+      <p id="studentName">Loading...</p>
+      <p id="regNo"></p>
+      <p id="courseLevel"></p>
+      <p id="status"></p>
+      <p id="gpa"></p>
+    </section>
 
-<div id="registerPanel" class="panel">
-    <div class="section-title">Student Registration</div>
-    <label>Name:</label>
-    <input type="text" id="regName" placeholder="Full Name">
-    <label>Email:</label>
-    <input type="email" id="regEmail" placeholder="Email">
-    <label>Password:</label>
-    <input type="password" id="regPass" placeholder="Password">
-    <button class="btn" onclick="register()">Submit Registration</button>
-    <button class="btn" onclick="showLogin()">Back to Login</button>
-</div>
-
-<!-- Student Dashboard Nav -->
-<nav id="studentNav">
-    <ul>
-        <li><a href="#" onclick="showPanelSection('profile')">Profile</a></li>
-        <li><a href="#" onclick="showPanelSection('announcement')">Announcements & News</a></li>
-        <li><a href="#" onclick="showPanelSection('modules')">Modules / Course Enrollment</a></li>
-        <li><a href="#" onclick="showPanelSection('assignments')">Assignments</a></li>
-        <li><a href="#" onclick="showPanelSection('results')">Results</a></li>
-        <li><a href="#" onclick="showPanelSection('sports')">Sports & Games</a></li>
-        <li><a href="#" onclick="showPanelSection('transfer')">Transfer Form</a></li>
-        <li><a href="#" onclick="showPanelSection('counsellor')">Counsellor SMS</a></li>
-        <li><a href="#" onclick="showPanelSection('materials')">Materials</a></li>
-        <li><a href="#" onclick="logout()">Logout</a></li>
-    </ul>
-</nav>
-
-<main>
     <!-- Profile -->
-    <div id="profile" class="panel">
-        <div class="section-title">Profile</div>
-        <label>Name:</label><input type="text" id="profileName">
-        <label>Student ID:</label><input type="text" id="profileID">
-        <label>Email:</label><input type="email" id="profileEmail">
-        <button class="btn" onclick="saveProfile()">Save Profile</button>
-    </div>
+    <section id="profile">
+      <h2>Profile</h2>
+      <p id="profileInfo">Loading...</p>
+    </section>
 
-    <!-- Announcements -->
-    <div id="announcement" class="panel">
-        <div class="section-title">Announcements & News</div>
-        <ul id="announcementList">
-            <li>Welcome to the semester 2026!</li>
-            <li>Library new books available.</li>
-        </ul>
-    </div>
-
-    <!-- Modules / Enrollment -->
-    <div id="modules" class="panel">
-        <div class="section-title">Modules / Course Enrollment</div>
-        <label>Select Modules:</label>
-        <select id="moduleSelect" multiple>
-            <option>Biochemistry 101</option>
-            <option>Anatomy 102</option>
-            <option>Physiology 103</option>
-        </select>
-        <button class="btn" onclick="enrollModules()">Submit Enrollment</button>
-        <ul id="enrolledModules"></ul>
-    </div>
-
-    <!-- Assignments -->
-    <div id="assignments" class="panel">
-        <div class="section-title">Assignments</div>
-        <label>Module:</label>
-        <select id="assignmentModule">
-            <option>Biochemistry 101</option>
-            <option>Anatomy 102</option>
-            <option>Physiology 103</option>
-        </select>
-        <label>Upload Assignment:</label>
-        <input type="file" id="assignmentFile">
-        <button class="btn" onclick="submitAssignment()">Submit</button>
-        <ul id="submittedAssignments"></ul>
-    </div>
+    <!-- Courses -->
+    <section id="courses">
+      <h2>Courses</h2>
+      <ul id="courseList"></ul>
+    </section>
 
     <!-- Results -->
-    <div id="results" class="panel">
-        <div class="section-title">Results</div>
-        <table id="resultsTable">
-            <tr><th>Module</th><th>Grade</th></tr>
-        </table>
-    </div>
+    <section id="results">
+      <h2>Results / Transcript</h2>
+      <table border="1" width="100%" id="resultsTable">
+        <tr><th>Subject</th><th>Test</th><th>Mid</th><th>Final</th><th>GPA</th></tr>
+      </table>
+    </section>
 
-    <!-- Sports -->
-    <div id="sports" class="panel">
-        <div class="section-title">Sports & Games</div>
-        <ul>
-            <li>Football team tryouts next week.</li>
-            <li>Basketball practice every Friday.</li>
-        </ul>
-    </div>
+    <!-- Fees -->
+    <section id="fees">
+      <h2>Fees & Payments</h2>
+      <p id="feesInfo">Loading...</p>
+    </section>
 
-    <!-- Transfer -->
-    <div id="transfer" class="panel">
-        <div class="section-title">Transfer Form</div>
-        <label>From College:</label><input type="text" id="transferFrom">
-        <label>To College:</label><input type="text" id="transferTo">
-        <label>Reason:</label><textarea id="transferReason"></textarea>
-        <button class="btn" onclick="submitTransfer()">Submit Transfer</button>
-        <ul id="transferStatus"></ul>
-    </div>
+    <!-- Timetable -->
+    <section id="timetable">
+      <h2>Timetable</h2>
+      <p id="timetableInfo">Loading...</p>
+    </section>
 
-    <!-- Counsellor -->
-    <div id="counsellor" class="panel">
-        <div class="section-title">Send Anonymous SMS to Counsellor</div>
-        <textarea id="counsellorMessage" placeholder="Type your message"></textarea>
-        <button class="btn" onclick="sendCounsellorSMS()">Send Message</button>
-        <ul id="sentMessages"></ul>
-    </div>
+    <!-- Notices -->
+    <section id="notices">
+      <h2>Notices & Announcements</h2>
+      <div id="noticesBox">Loading...</div>
+    </section>
 
-    <!-- Materials -->
-    <div id="materials" class="panel">
-        <div class="section-title">Materials from Lecturers</div>
-        <ul>
-            <li><a href="#">Biochemistry Lecture 1 PDF</a></li>
-            <li><a href="#">Anatomy Slides Week 2</a></li>
-        </ul>
-    </div>
+    <!-- Downloads -->
+    <section id="downloads">
+      <h2>Downloads</h2>
+      <div id="downloadsBox">Loading...</div>
+    </section>
 
-</main>
+    <!-- Assignments -->
+    <section id="assignments">
+      <h2>Submit Assignment</h2>
+      <input id="assignTitle" placeholder="Assignment Title">
+      <select id="assignSubject"></select>
+      <input type="file" id="assignFile">
+      <button class="action" onclick="submitAssignment()">Upload Assignment</button>
+      <p id="assignMsg"></p>
+    </section>
 
-<footer>College Portal &copy; 2026</footer>
+    <!-- Transfer Form -->
+    <section id="transfer">
+      <h2>Transfer Form</h2>
+      <input id="transferReason" placeholder="Reason for Transfer">
+      <input id="transferDest" placeholder="Destination College">
+      <button class="action" onclick="submitTransfer()">Submit Transfer Request</button>
+      <p id="transferMsg"></p>
+    </section>
+
+    <!-- Secret SMS -->
+    <section id="secret">
+      <h2>Secret SMS</h2>
+      <textarea id="secretMsg" placeholder="Write your message"></textarea>
+      <button class="action" onclick="sendSecret()">Send Secret Message</button>
+      <p id="secretInfo"></p>
+    </section>
+
+    <!-- Sports & Games -->
+    <section id="sports">
+      <h2>Sports & Games</h2>
+
+      <h3>Available Teams</h3>
+      <ul id="teamList"></ul>
+
+      <h3>Fixtures</h3>
+      <ul id="fixturesList"></ul>
+
+      <h3>Results</h3>
+      <ul id="resultsSportsList"></ul>
+
+      <h3>Register for Sport</h3>
+      <select id="sportSelect"></select>
+      <button class="action" onclick="registerSport()">Register</button>
+      <p id="sportMsg"></p>
+    </section>
+
+    <!-- Settings -->
+    <section id="settings">
+      <h2>Settings</h2>
+      <input type="password" id="newPass" placeholder="New Password">
+      <button class="action" onclick="changePassword()">Change Password</button>
+    </section>
+
+  </div>
+</div>
+
+<footer>
+<p>© 2026 Kingdom College</p>
+<p>Developed by Irene 💙</p>
+</footer>
 
 <script>
-// Dummy storage
-let students = [];
-let currentStudent = null;
-let enrollments = {};
-let assignments = {};
-let results = {};
-let transfers = [];
-let messages = [];
+// Firebase config
+const firebaseConfig = {
+apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+authDomain: "collegeportal-app.firebaseapp.com",
+databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+projectId: "collegeportal-app",
+storageBucket: "collegeportal-app.appspot.com",
+messagingSenderId: "266762331631",
+appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const storage = firebase.storage();
 
-// Show/Hide Panels
-function showPanelSection(panelId){
-    document.querySelectorAll('main .panel').forEach(p=>p.classList.remove('active'));
-    document.getElementById(panelId).classList.add('active');
+// Sidebar switching
+function showSection(id){
+  document.querySelectorAll('section').forEach(sec=>{
+    sec.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
 }
 
-// LOGIN / REGISTER
-function showRegister(){
-    document.getElementById('authPanel').classList.remove('active');
-    document.getElementById('registerPanel').classList.add('active');
-}
-function showLogin(){
-    document.getElementById('registerPanel').classList.remove('active');
-    document.getElementById('authPanel').classList.add('active');
-}
-
-function register(){
-    const name = document.getElementById('regName').value;
-    const email = document.getElementById('regEmail').value;
-    const pass = document.getElementById('regPass').value;
-    if(name && email && pass){
-        students.push({name,email,pass,id:Math.floor(Math.random()*10000)});
-        alert('Registration successful! Please login.');
-        showLogin();
-    } else alert('Fill all fields!');
-}
-
-function login(){
-    const email = document.getElementById('authEmail').value;
-    const pass = document.getElementById('authPass').value;
-    const student = students.find(s=>s.email===email && s.pass===pass);
-    if(student){
-        currentStudent = student;
-        alert('Login successful!');
-        document.getElementById('authPanel').classList.remove('active');
-        document.getElementById('studentNav').style.display='block';
-        showPanelSection('profile');
-        // autofill profile
-        document.getElementById('profileName').value = currentStudent.name;
-        document.getElementById('profileEmail').value = currentStudent.email;
-        document.getElementById('profileID').value = currentStudent.id;
-    } else alert('Invalid credentials!');
-}
-
+// Logout
 function logout(){
-    currentStudent=null;
-    document.getElementById('studentNav').style.display='none';
-    showPanelSection('authPanel');
+  auth.signOut().then(()=>{window.location="index.html";});
 }
 
-// Profile
-function saveProfile(){
-    if(currentStudent){
-        currentStudent.name = document.getElementById('profileName').value;
-        currentStudent.email = document.getElementById('profileEmail').value;
-        currentStudent.id = document.getElementById('profileID').value;
-        alert('Profile saved!');
+// Load student info
+auth.onAuthStateChanged(user=>{
+  if(!user) window.location="index.html";
+  const uid=user.uid;
+  db.ref("students/"+uid+"/profile").once("value").then(s=>{
+    const data=s.val();
+    if(data){
+      studentName.innerText="Name: "+data.name;
+      regNo.innerText="Reg#: "+data.regNo;
+      courseLevel.innerText="Course: "+data.course+" | Level "+data.level;
+      status.innerText="Status: "+data.status;
     }
-}
+  });
+  db.ref("students/"+uid+"/results").once("value").then(s=>{
+    resultsTable.innerHTML='<tr><th>Subject</th><th>Test</th><th>Mid</th><th>Final</th><th>GPA</th></tr>';
+    s.forEach(sub=>{
+      const d=sub.val();
+      const row=document.createElement('tr');
+      row.innerHTML=`<td>${d.subject}</td><td>${d.test}</td><td>${d.mid}</td><td>${d.final}</td><td>${d.gpa}</td>`;
+      resultsTable.appendChild(row);
+    });
+  });
+  db.ref("students/"+uid+"/fees").once("value").then(s=>{
+    feesInfo.innerText="Total Fee: "+s.val().total+" | Paid: "+s.val().paid+" | Balance: "+s.val().balance;
+  });
+  db.ref("students/"+uid+"/courses").once("value").then(s=>{
+    courseList.innerHTML="";
+    assignSubject.innerHTML="";
+    s.forEach(c=>{
+      courseList.innerHTML+='<li>'+c.val()+'</li>';
+      assignSubject.innerHTML+='<option value="'+c.val()+'">'+c.val()+'</option>';
+    });
+  });
+});
 
-// Modules / Enrollment
-function enrollModules(){
-    const selected = Array.from(document.getElementById('moduleSelect').selectedOptions).map(o=>o.value);
-    enrollments[currentStudent.email] = selected;
-    document.getElementById('enrolledModules').innerHTML = selected.map(m=>`<li>${m} (Pending Approval)</li>`).join('');
-    alert('Modules submitted for approval!');
-}
+// Notices
+db.ref("announcements").on("value",s=>{
+  noticesBox.innerHTML="";
+  s.forEach(n=>{
+    noticesBox.innerHTML+='<div>'+n.val()+'</div>';
+  });
+});
 
-// Assignments
+// Downloads
+db.ref("downloads").on("value",s=>{
+  downloadsBox.innerHTML="";
+  s.forEach(f=>{
+    downloadsBox.innerHTML+='<div><a href="'+f.val()+'" target="_blank">'+f.key+'</a></div>';
+  });
+});
+
+// Assignment submission
 function submitAssignment(){
-    const module = document.getElementById('assignmentModule').value;
-    const file = document.getElementById('assignmentFile').value;
-    if(!assignments[currentStudent.email]) assignments[currentStudent.email] = [];
-    assignments[currentStudent.email].push({module,file,status:'Submitted'});
-    document.getElementById('submittedAssignments').innerHTML = assignments[currentStudent.email].map(a=>`<li>${a.module}: ${a.file} - ${a.status}</li>`).join('');
-    alert('Assignment submitted!');
+  const uid=auth.currentUser.uid;
+  const file=assignFile.files[0];
+  const subject=assignSubject.value;
+  const title=assignTitle.value;
+  if(!file||!subject||!title){assignMsg.innerText="Fill all fields";return;}
+  const ref=storage.ref("assignments/"+uid+"/"+file.name);
+  ref.put(file).then(()=>{
+    ref.getDownloadURL().then(url=>{
+      db.ref("assignments/"+subject+"/"+uid).push({title:url,uploadedAt:Date.now()});
+      assignMsg.innerText="Assignment Uploaded ✔";
+    });
+  });
 }
 
-// Results
-function updateResults(module, grade){
-    if(!results[currentStudent.email]) results[currentStudent.email] = [];
-    results[currentStudent.email].push({module,grade});
-    const table = document.getElementById('resultsTable');
-    table.innerHTML = '<tr><th>Module</th><th>Grade</th></tr>';
-    results[currentStudent.email].forEach(r=>{table.innerHTML+=`<tr><td>${r.module}</td><td>${r.grade}</td></tr>`});
-}
-
-// Transfer
+// Transfer form
 function submitTransfer(){
-    const t = {from:document.getElementById('transferFrom').value,to:document.getElementById('transferTo').value,reason:document.getElementById('transferReason').value,status:'Pending'};
-    transfers.push(t);
-    document.getElementById('transferStatus').innerHTML = transfers.map(tr=>`<li>${tr.from} → ${tr.to}: ${tr.status}</li>`).join('');
-    alert('Transfer request submitted!');
+  const uid=auth.currentUser.uid;
+  const reason=transferReason.value;
+  const dest=transferDest.value;
+  if(!reason||!dest){transferMsg.innerText="Fill all fields";return;}
+  db.ref("transferRequests/"+uid).push({reason:reason,destination:dest,date:Date.now(),status:"Pending"});
+  transferMsg.innerText="Transfer Request Sent ✔";
 }
 
-// Counsellor SMS
-function sendCounsellorSMS(){
-    const msg = document.getElementById('counsellorMessage').value;
-    messages.push({msg,status:'Sent'});
-    document.getElementById('sentMessages').innerHTML = messages.map(m=>`<li>${m.msg} - ${m.status}</li>`).join('');
-    alert('Message sent anonymously!');
+// Secret SMS
+function sendSecret(){
+  const uid=auth.currentUser.uid;
+  const msg=secretMsg.value;
+  if(!msg){secretInfo.innerText="Message empty";return;}
+  db.ref("secretMessages").push({message:msg,from:uid,date:Date.now()});
+  secretInfo.innerText="Secret Message Sent ✔";
+  secretMsg.value="";
 }
 
+// Sports & Games
+db.ref("sports/teams").on("value",snap=>{
+  teamList.innerHTML="";
+  sportSelect.innerHTML="";
+  snap.forEach(team=>{
+    const t=team.val();
+    teamList.innerHTML+='<li>'+t.name+' ('+t.category+')</li>';
+    sportSelect.innerHTML+='<option value="'+t.name+'">'+t.name+'</option>';
+  });
+});
+db.ref("sports/fixtures").on("value",snap=>{
+  fixturesList.innerHTML="";
+  snap.forEach(f=>{
+    const d=f.val();
+    fixturesList.innerHTML+='<li>'+d.teamA+' vs '+d.teamB+' | '+d.date+'</li>';
+  });
+});
+db.ref("sports/results").on("value",snap=>{
+  resultsSportsList.innerHTML="";
+  snap.forEach(r=>{
+    const d=r.val();
+    resultsSportsList.innerHTML+='<li>'+d.teamA+' '+d.scoreA+' - '+d.scoreB+' '+d.teamB+'</li>';
+  });
+});
+function registerSport(){
+  const uid=auth.currentUser.uid;
+  const sport=sportSelect.value;
+  if(!sport){sportMsg.innerText="Select a sport"; return;}
+  db.ref("sports/registrations/"+sport+"/"+uid).set({registeredAt:Date.now()});
+  sportMsg.innerText="Registered for "+sport+" ✔";
+}
+
+// Change password
+function changePassword(){
+  const user=auth.currentUser;
+  const pass=newPass.value;
+  if(pass.length<6){alert("Password must be at least 6 chars");return;}
+  user.updatePassword(pass).then(()=>{alert("Password Changed ✔");newPass.value="";});
+}
 </script>
 
 </body>
-              </html>
+</html>
