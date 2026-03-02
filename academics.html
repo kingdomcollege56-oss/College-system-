@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Academic Affairs Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+body {font-family: Arial; margin:0; background:#ede7f6; }
+header{background:#6a1b9a; color:white; padding:20px; text-align:center;}
+h2{margin:10px 0;}
+section{margin:20px; padding:20px; background:white; border-radius:10px; box-shadow:0 0 5px #ccc;}
+button{padding:10px 15px; margin:5px; border:none; border-radius:5px; cursor:pointer; background:#6a1b9a; color:white;}
+table{width:100%; border-collapse: collapse; margin-top:10px;}
+th,td{border:1px solid #ccc; padding:8px; text-align:center;}
+th{background:#6a1b9a; color:white;}
+.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Academic Affairs Dashboard</h1>
+<p>Welcome, <span id="academicName">Academic</span></p>
+<button id="logoutBtn">Log Out</button>
+</header>
+
+<!-- Pending Results -->
+<section id="pendingResultsSec">
+<h2>Pending Results from Lecturers</h2>
+<table>
+<thead>
+<tr><th>Student ID</th><th>Subject</th><th>Score</th><th>Approve</th></tr>
+</thead>
+<tbody id="pendingResultsBody">
+<tr><td colspan="4">Loading...</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- Students Paid -->
+<section id="studentsPaidSec">
+<h2>Students Who Paid Fees</h2>
+<table>
+<thead>
+<tr><th>Student ID</th><th>Name</th><th>Send Results</th></tr>
+</thead>
+<tbody id="studentsPaidBody">
+<tr><td colspan="3">Loading...</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- Approved Results -->
+<section id="approvedResultsSec">
+<h2>Approved Results Sent</h2>
+<table>
+<thead>
+<tr><th>Student ID</th><th>Subject</th><th>Score</th><th>Approved By</th><th>Timestamp</th></tr>
+</thead>
+<tbody id="approvedResultsBody">
+<tr><td colspan="5">Loading...</td></tr>
+</tbody>
+</table>
+</section>
+
+<script>
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+  authDomain: "collegeportal-app.firebaseapp.com",
+  databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+  projectId: "collegeportal-app",
+  storageBucket: "collegeportal-app.appspot.com",
+  messagingSenderId: "266762331631",
+  appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+// --- LOGIN CHECK & ROLE ---
+auth.onAuthStateChanged(user=>{
+  if(!user){ window.location.href="index.html"; return; }
+  // Check role
+  db.ref("users").orderByChild("email").equalTo(user.email).once("value",snap=>{
+    if(!snap.exists()){ alert("Unauthorized"); auth.signOut(); window.location.href="index.html"; return; }
+    const userData = Object.values(snap.val())[0];
+    if(userData.role!=="academic"){ alert("Access denied"); auth.signOut(); window.location.href="index.html"; return; }
+    document.getElementById("academicName").innerText = userData.name;
+    loadPendingResults();
+    loadStudentsPaid();
+    loadApprovedResults();
+  });
+});
+
+// --- LOGOUT ---
+document.getElementById("logoutBtn").onclick = ()=>{ auth.signOut(); window.location.href="index.html"; };
+
+// --- Load Pending Results ---
+function loadPendingResults(){
+  const tbody = document.getElementById("pendingResultsBody");
+  db.ref("results/pending").once("value",snap=>{
+    tbody.innerHTML="";
+    if(!snap.exists()){ tbody.innerHTML="<tr><td colspan='4'>No pending results</td></tr>"; return; }
+    snap.forEach(r=>{
+      const key = r.key;
+      const val = r.val();
+      const tr = document.createElement("tr");
+      tr.innerHTML=`<td>${val.studentId}</td><td>${val.subject}</td><td>${val.score}</td>
+        <td><button onclick="approveResult('${key}')">Approve</button></td>`;
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+// --- Approve Result ---
+function approveResult(resultKey){
+  const user = auth.currentUser;
+  db.ref("results/pending/"+resultKey).once("value",snap=>{
+    if(!snap.exists()){ alert("Result not found"); return; }
+    const val = snap.val();
+    const approvedData = {
+      studentId: val.studentId,
+      subject: val.subject,
+      score: val.score,
+      approvedBy: user.email,
+      timestamp: Date.now()
+    };
+    // Move to approved
+    db.ref("results/approved/"+resultKey).set(approvedData).then(()=>{
+      db.ref("results/pending/"+resultKey).remove();
+      loadPendingResults();
+      loadApprovedResults();
+      alert("Result approved and sent to Bursar");
+    });
+  });
+}
+
+// --- Load Students Who Paid ---
+function loadStudentsPaid(){
+  const tbody = document.getElementById("studentsPaidBody");
+  db.ref("students").orderByChild("paid").equalTo(true).once("value",snap=>{
+    tbody.innerHTML="";
+    if(!snap.exists()){ tbody.innerHTML="<tr><td colspan='3'>No paid students</td></tr>"; return; }
+    snap.forEach(s=>{
+      const key = s.key;
+      const val = s.val();
+      const tr = document.createElement("tr");
+      tr.innerHTML=`<td>${key}</td><td>${val.name}</td>
+        <td><button onclick="sendResults('${key}')">Send Results</button></td>`;
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+// --- Send Results to Paid Student ---
+function sendResults(studentId){
+  db.ref("results/approved").once("value",snap=>{
+    snap.forEach(r=>{
+      const val = r.val();
+      if(val.studentId===studentId){
+        db.ref("students/"+studentId+"/results/"+r.key).set({
+          subject: val.subject,
+          score: val.score,
+          approvedBy: val.approvedBy,
+          timestamp: val.timestamp
+        });
+      }
+    });
+    alert("Results sent to student "+studentId);
+  });
+}
+
+// --- Load Approved Results ---
+function loadApprovedResults(){
+  const tbody = document.getElementById("approvedResultsBody");
+  db.ref("results/approved").once("value",snap=>{
+    tbody.innerHTML="";
+    if(!snap.exists()){ tbody.innerHTML="<tr><td colspan='5'>No approved results</td></tr>"; return; }
+    snap.forEach(r=>{
+      const val = r.val();
+      const tr = document.createElement("tr");
+      tr.innerHTML=`<td>${val.studentId}</td><td>${val.subject}</td><td>${val.score}</td><td>${val.approvedBy}</td><td>${new Date(val.timestamp).toLocaleString()}</td>`;
+      tbody.appendChild(tr);
+    });
+  });
+}
+</script>
+
+</body>
+  </html>
