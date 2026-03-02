@@ -2,24 +2,21 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Kingdom College Portal</title>
+<title>Kingdom College Management System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <style>
-
 /* GENERAL */
 body{
 margin:0;
 font-family:Arial;
 background:#eef3f9;
 }
-
 /* HEADER */
 header{
 background:#0a3d62;
@@ -27,448 +24,263 @@ color:white;
 padding:25px;
 text-align:center;
 }
-
+/* NAV */
+nav{
+background:#1e3799;
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+}
+nav a{
+color:white;
+padding:12px 18px;
+text-decoration:none;
+font-weight:bold;
+}
+nav a:hover{
+background:#4a69bd;
+}
 /* HERO */
 .hero{
 background:#cce5ff;
 padding:40px;
 text-align:center;
 }
-
-/* PANELS */
-.portal-box{
+/* LOGIN */
+.login-box{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
 gap:15px;
 margin-top:25px;
 }
-
-.portal-box button{
-padding:15px;
-border:none;
-border-radius:8px;
-color:white;
-font-weight:bold;
-cursor:pointer;
-font-size:15px;
-}
-
-/* COLORS */
-.student{background:#27ae60;}
-.lecturer{background:#2980b9;}
-.bursar{background:#f39c12;}
-.counsellor{background:#8e44ad;}
-.registrar{background:#16a085;}
-.academic{background:#d35400;}
-.rector{background:#c0392b;}
-
-/* MODAL */
-.modal{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.7);
-}
-
-.modal-box{
-background:white;
-max-width:350px;
-margin:100px auto;
-padding:25px;
-border-radius:10px;
-}
-
-.modal-box input,textarea{
-width:100%;
-padding:10px;
-margin:6px 0;
-}
-
-.modal-box button{
-width:100%;
-padding:12px;
+.login-box a{
 background:#1e3799;
 color:white;
-border:none;
-cursor:pointer;
+padding:15px;
+border-radius:6px;
+text-decoration:none;
 font-weight:bold;
-}
-
-.close{
-float:right;
-color:red;
 cursor:pointer;
-font-weight:bold;
 }
-
-#error{
-color:red;
-font-size:14px;
-}
-
 /* SECTIONS */
 section{
-margin:25px;
-padding:20px;
-background:white;
+margin:20px;
+padding:25px;
 border-radius:10px;
 box-shadow:0 0 5px #ccc;
 }
-
+/* COLORS */
+.about{background:#e3f2fd;}
+.courses{background:#e8f5e9;}
+.gallery-sec{background:#fffde7;}
+.news{background:#fce4ec;}
+.map-sec{background:#ede7f6;}
+.contact{background:#e0f7fa;}
+/* GALLERY */
 .gallery{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
 gap:10px;
 }
-
 .gallery img{
 width:100%;
-height:130px;
+height:150px;
 object-fit:cover;
 border-radius:5px;
 }
-
+/* ANNOUNCE */
+.announce{
+background:white;
+padding:10px;
+margin:8px 0;
+border-left:5px solid #1e3799;
+}
 /* FOOTER */
 footer{
 background:#0a3d62;
 color:white;
 text-align:center;
 padding:15px;
-margin-top:30px;
 }
-
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
 <header>
-<h1>Kingdom College of Health & Allied Sciences</h1>
-<p>Mbeya - Kyela | Lake Oil</p>
+<h1>Kingdom College Management System</h1>
+<p>Kingdom College of Health & Allied Sciences</p>
+<p>Mbeya - Kyela | Njia Panda Ipinda, Nyuma ya Lake Oil</p>
+<p>📞 +255(0)785705151 | +255(0)735705151</p>
 </header>
 
+<!-- NAV -->
+<nav>
+<a href="#home">Home</a>
+<a href="#about">About</a>
+<a href="#courses">Courses</a>
+<a href="#gallery">Gallery</a>
+<a href="#news">News</a>
+<a href="#map">Map</a>
+<a href="#contact">Contact</a>
+</nav>
 
-<!-- HOME -->
-<div class="hero">
+<!-- HERO -->
+<div class="hero" id="home">
+<h2>Welcome to Kingdom College</h2>
+<p>Building Future Health Professionals</p>
 
-<h2>Login Panel</h2>
-
-<div class="portal-box">
-
-<button class="student" onclick="openLogin('student')">Student</button>
-<button class="lecturer" onclick="openLogin('lecturer')">Lecturer</button>
-<button class="bursar" onclick="openLogin('bursar')">Bursar</button>
-<button class="counsellor" onclick="openLogin('counsellor')">Counsellor</button>
-<button class="registrar" onclick="openLogin('registrar')">Registrar</button>
-<button class="academic" onclick="openLogin('academic')">Academic Affairs</button>
-<button class="rector" onclick="openLogin('rector')">Rector</button>
-
+<div class="login-box">
+<a id="studentLoginBtn">Student Portal</a>
+<a id="lecturerLoginBtn">Lecturer Portal</a>
+<a id="academicsLoginBtn">Academic Affairs</a>
+<a id="bursarLoginBtn">Bursar Office</a>
+<a id="counsellorLoginBtn">Counselling Unit</a>
+<a id="registrarLoginBtn">Registrar Office</a>
+<a id="rectorLoginBtn">Rector Panel</a>
+</div>
 </div>
 
-</div>
-
-
-<!-- ANNOUNCEMENT -->
-<section>
-<h3>📢 Announcements</h3>
-<p id="announce">Loading...</p>
+<!-- ABOUT -->
+<section id="about" class="about">
+<h2>About Our College</h2>
+<p>Kingdom College of Health and Allied Sciences offers professional training in medical sciences.</p>
+<h3>History</h3>
+<p id="history">(Updated by Rector)</p>
 </section>
-
 
 <!-- COURSES -->
-<section>
-<h3>📘 Courses</h3>
-<ul id="courses"></ul>
+<section id="courses" class="courses">
+<h2>Courses Offered</h2>
+<ul>
+<li>Clinical Medicine (Level 4 - Level 6)</li>
+<li>Nursing Assistant</li>
+</ul>
+<h3>Entry Requirements (Clinical Medicine)</h3>
+<p>Form Six or Form Four with D in Biology, Chemistry and Physics</p>
 </section>
-
 
 <!-- GALLERY -->
-<section>
-<h3>🖼 Gallery</h3>
-<div class="gallery" id="gallery"></div>
+<section id="gallery" class="gallery-sec">
+<h2>College Gallery</h2>
+<div class="gallery">
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
+<img src="https://via.placeholder.com/300x200">
+</div>
 </section>
 
+<!-- NEWS -->
+<section id="news" class="news">
+<h2>Announcements & News</h2>
+<div id="newsBox">Loading...</div>
+</section>
 
 <!-- MAP -->
-<section>
-<h3>📍 Location</h3>
-<p id="location"></p>
-
-<iframe id="map" width="100%" height="250"></iframe>
-
+<section id="map" class="map-sec">
+<h2>Our Location</h2>
+<iframe src="https://www.google.com/maps?q=Mbeya%20Kyela%20njia%20panda%20ipinda%20nyuma%20ya%20Lake%20Oil&output=embed"
+width="100%" height="250" style="border:0;" loading="lazy"></iframe>
 </section>
-
 
 <!-- CONTACT -->
-<section>
-<h3>☎ Contact</h3>
-<p id="contact"></p>
+<section id="contact" class="contact">
+<h2>Contact Us</h2>
+<p>
+📍 Mbeya - Kyela, Njia Panda Ipinda  
+<br>📞 +255(0)785705151  
+<br>📧 kingdomcollege@gmail.com
+</p>
 </section>
 
-
-<!-- LOGIN MODAL -->
-<div class="modal" id="loginModal">
-
-<div class="modal-box">
-
-<span class="close" onclick="closeLogin()">X</span>
-
-<h3 id="loginTitle"></h3>
-
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Password">
-
-<button onclick="login()">Login</button>
-
-<p id="error"></p>
-
-</div>
-</div>
-
-
-<!-- RECTOR PANEL -->
-<div class="modal" id="rectorPanel">
-
-<div class="modal-box">
-
-<span class="close" onclick="closeRector()">X</span>
-
-<h3>👑 Rector Control Panel</h3>
-
-<textarea id="annText" placeholder="Announcement"></textarea>
-
-<input id="locText" placeholder="Location">
-
-<input id="contactText" placeholder="Contact">
-
-<input id="mapText" placeholder="Google Map Embed Link">
-
-<input id="courseText" placeholder="Add Course">
-
-<input type="file" id="imgFile">
-
-<button onclick="saveData()">Save</button>
-
-<p id="msg"></p>
-
-</div>
-</div>
-
-
+<!-- FOOTER -->
 <footer>
-<p>© 2026 Kingdom College</p>
-<p>Developed by Carina 💙</p>
+<p>© 2026 Kingdom College of Health & Allied Sciences</p>
+<p>Developed by: <b>Irene 💙</b></p>
 </footer>
 
-
 <script>
-
-/* FIREBASE CONFIG */
+// Firebase Config
 const firebaseConfig = {
-apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
-authDomain: "collegeportal-app.firebaseapp.com",
-databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
-projectId: "collegeportal-app",
-storageBucket: "collegeportal-app.appspot.com",
-messagingSenderId: "266762331631",
-appId: "1:266762331631:web:66ddfbde53d33086ac421a"
+  apiKey: "AIzaSyAcL_PjNww-ea6d33irNgWbn1EsBq4acTA",
+  authDomain: "collegeportal-app.firebaseapp.com",
+  databaseURL: "https://collegeportal-app-default-rtdb.firebaseio.com",
+  projectId: "collegeportal-app",
+  storageBucket: "collegeportal-app.appspot.com",
+  messagingSenderId: "266762331631",
+  appId: "1:266762331631:web:66ddfbde53d33086ac421a"
 };
-
 firebase.initializeApp(firebaseConfig);
-
 const auth = firebase.auth();
 const db = firebase.database();
-const storage = firebase.storage();
 
-let selectedRole="";
-
-
-/* DEFAULT DATA */
-const defaultLocation="Mbeya - Kyela njia panda ipinda nyuma ya Lake Oil";
-const defaultContact="+255(0)785705151 , +255(0)735705151";
-
-
-/* OPEN LOGIN */
-function openLogin(role){
-
-selectedRole=role;
-
-loginModal.style.display="block";
-
-loginTitle.innerText=role.toUpperCase()+" LOGIN";
-
-error.innerText="";
-
-}
-
-
-/* CLOSE */
-function closeLogin(){
-loginModal.style.display="none";
-}
-
-function closeRector(){
-rectorPanel.style.display="none";
-}
-
-
-/* LOGIN */
-function login(){
-
-let email=email.value;
-let pass=password.value;
-
-if(!email || !pass){
-error.innerText="Fill all fields";
-return;
-}
-
-auth.signInWithEmailAndPassword(email,pass)
-
-.then(res=>{
-
-const uid=res.user.uid;
-
-db.ref("users/"+uid+"/role").once("value")
-
-.then(s=>{
-
-if(!s.exists()){
-error.innerText="No role!";
-auth.signOut();
-return;
-}
-
-if(s.val()!=selectedRole){
-error.innerText="Wrong panel!";
-auth.signOut();
-return;
-}
-
-/* SUCCESS */
-closeLogin();
-
-if(selectedRole=="rector"){
-
-rectorPanel.style.display="block";
-
-}
-
-else if(selectedRole=="student"){
-window.location="student.html";
-}
-
-else if(selectedRole=="lecturer"){
-window.location="lecturer.html";
-}
-
-else if(selectedRole=="academic"){
-window.location="academic.html";
-}
-
-else if(selectedRole=="bursar"){
-window.location="bursar.html";
-}
-
-else if(selectedRole=="registrar"){
-window.location="registrar.html";
-}
-
-else if(selectedRole=="counsellor"){
-window.location="counsellor.html";
-}
-
+// Load announcements
+db.ref("announcements").on("value",snap=>{
+  newsBox.innerHTML="";
+  if(!snap.exists()){newsBox.innerHTML="No announcements yet."; return;}
+  snap.forEach(item=>{
+    const d=item.val();
+    newsBox.innerHTML+=`<div class="announce"><b>${d.title}</b><br>${d.message}</div>`;
+  });
 });
 
-})
-
-.catch(e=>{
-error.innerText=e.message;
+// Load history
+db.ref("college/history").on("value",snap=>{
+  if(snap.exists()){history.innerText=snap.val();}
 });
 
+// --- LOGIN HOOKS ---
+function loginRedirect(email, password, dashboardPage){
+  firebase.auth().signInWithEmailAndPassword(email,password)
+    .then((userCredential)=>{
+      alert("Login successful! Redirecting...");
+      window.location.href = dashboardPage;
+    })
+    .catch(error=>{
+      alert("Login failed: "+error.message);
+    });
 }
 
-
-/* SAVE BY RECTOR */
-function saveData(){
-
-db.ref("announcement").set(annText.value);
-
-db.ref("location").set(locText.value||defaultLocation);
-
-db.ref("contact").set(contactText.value||defaultContact);
-
-db.ref("map").set(mapText.value);
-
-if(courseText.value!=""){
-db.ref("courses").push(courseText.value);
-}
-
-let file=imgFile.files[0];
-
-if(file){
-
-let ref=storage.ref("gallery/"+file.name);
-
-ref.put(file).then(()=>{
-
-ref.getDownloadURL().then(url=>{
-db.ref("gallery").push(url);
+document.getElementById("studentLoginBtn").addEventListener("click",()=>{
+  const email=prompt("Enter Student Email");
+  const password=prompt("Enter Password");
+  loginRedirect(email,password,"student.html");
 });
-
+document.getElementById("lecturerLoginBtn").addEventListener("click",()=>{
+  const email=prompt("Enter Lecturer Email");
+  const password=prompt("Enter Password");
+  loginRedirect(email,password,"lecturer.html");
 });
-
-}
-
-msg.innerText="Saved Successfully ✔";
-
-}
-
-
-/* LOAD DATA */
-
-db.ref("announcement").on("value",s=>{
-announce.innerText=s.val()||"Karibu Kingdom College";
+document.getElementById("academicsLoginBtn").addEventListener("click",()=>{
+  const email=prompt("Enter Academic Affairs Email");
+  const password=prompt("Enter Password");
+  loginRedirect(email,password,"academics.html");
 });
-
-db.ref("location").on("value",s=>{
-location.innerText=s.val()||defaultLocation;
+document.getElementById("bursarLoginBtn").addEventListener("click",()=>{
+  const email=prompt("Enter Bursar Email");
+  const password=prompt("Enter Password");
+  loginRedirect(email,password,"bursar.html");
 });
-
-db.ref("contact").on("value",s=>{
-contact.innerText=s.val()||defaultContact;
+document.getElementById("counsellorLoginBtn").addEventListener("click",()=>{
+  const email=prompt("Enter Counsellor Email");
+  const password=prompt("Enter Password");
+  loginRedirect(email,password,"counsellor.html");
 });
-
-db.ref("map").on("value",s=>{
-
-map.src=s.val()||
-"https://www.google.com/maps?q=Kyela+Lake+Oil&output=embed";
-
+document.getElementById("registrarLoginBtn").addEventListener("click",()=>{
+  const email=prompt("Enter Registrar Email");
+  const password=prompt("Enter Password");
+  loginRedirect(email,password,"registrar.html");
 });
-
-
-db.ref("courses").on("child_added",s=>{
-
-let li=document.createElement("li");
-li.innerText=s.val();
-courses.appendChild(li);
-
+document.getElementById("rectorLoginBtn").addEventListener("click",()=>{
+  const email=prompt("Enter Rector Email");
+  const password=prompt("Enter Password");
+  loginRedirect(email,password,"rector.html");
 });
-
-
-db.ref("gallery").on("child_added",s=>{
-
-let img=document.createElement("img");
-img.src=s.val();
-gallery.appendChild(img);
-
-});
-
 </script>
 
 </body>
 </html>
-
